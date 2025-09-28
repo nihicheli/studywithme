@@ -16,6 +16,7 @@
     --top-gap: 12px;
     --content-top: 20vh;
 
+    /* 데스크톱 기본값(그대로 유지) */
     --maxh-board: 80vh;
     --maxh-timer: 35vh;
     --maxh-window: 40vh;
@@ -118,14 +119,14 @@
   #bottombar .card{ flex:1 1 0; min-width:260px; }
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
-  /* === (추가) 소품 레이어/소품 스타일 고정 === */
+  /* === 소품 레이어 === */
   #propsLayer{
-    position:absolute; inset:0; z-index:7; /* 음악(12)보다 낮고 창문/캐릭터(5/6)보다 높음 */
-    pointer-events:none; /* 내부 .prop만 이벤트 */
+    position:absolute; inset:0; z-index:7;
+    pointer-events:none;
   }
   .prop{
     position:absolute; left:40px; top:40px; width:120px; z-index:80;
-    pointer-events:auto; /* 드래그 가능 */
+    pointer-events:auto;
   }
   .prop img{ width:100%; height:auto; display:block; }
   .draggable { cursor: move; }
@@ -204,23 +205,23 @@
   /* 강제 가로 보기(세로에서) */
   html.portrait-force, body.portrait-force{
     height:100%;
-    overflow-x:auto;           /* 가로 스크롤 허용 → 1100px 기준 확대해도 볼 수 있게 */
+    overflow-x:auto;
     overflow-y:auto;
   }
   .portrait-force #app{
-    width: 100vh;              /* 회전 전 치수 → 회전 후 가로폭=100vh */
+    width: 100vh;
     height: 100vw;
-    transform: rotate(90deg) translateY(-100%); /* scale은 JS로 주입 */
+    transform: rotate(90deg) translateY(-100%);
     transform-origin: top left;
   }
 
-  /* 오른쪽 아래: 실시간 패널 */
+  /* 오른쪽 아래: 실시간 패널 (데스크톱 기본) */
   #presencePanel{
     position: fixed;
-    right: 0;                                /* 화면 우측에 딱 붙임 */
+    right: 0;
     bottom: calc(8px + 112px);
-    width: 25vw;                              /* 화면 가로의 25% */
-    max-width: 25vw;                          /* 정확히 25%만 쓰도록 */
+    width: 25vw;
+    max-width: 25vw;
     z-index: 8000;
   }
   #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
@@ -235,16 +236,36 @@
     width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
   }
   #adBanner img{ width:100%; height:100%; opacity:0; display:block; }
-  
+
+  /* ========== 모바일 전용 오버라이드 ========== */
   @media (max-width: 720px){
-    :root{ --content-top: 14vh; --maxw-char: 90vw; }
+    /* 요청하신 모바일 전용 최대 높이/폭 */
+    :root{
+      --content-top: 14vh;      /* 기존 유지 */
+      --maxh-board: 80vh;
+      --maxh-timer: 35vh;
+      --maxh-window: 45vh;
+      --maxh-char: 60vh;
+
+      --maxw-board: 35vw;
+      --maxw-window: 20vw;
+      --maxw-timer: 45vw;
+      --maxw-char: 80vw;
+    }
+
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
+
+    /* “지금 공부중” 패널 → Todo list 규격을 따름 */
     #presencePanel{
-      width: 25vw;               /* 모바일도 25% 유지 */
-      right: 0;
-      bottom: calc(8px + 160px); /* 기존 하단 여백 유지 */
+      right: 12px;
+      bottom: calc(8px + 160px);
+      width: min(var(--maxw-board), 92vw);
+      max-width: min(var(--maxw-board), 92vw);
+      max-height: var(--maxh-board);
+      overflow:auto;
     }
+  }
 </style>
 </head>
 <body>
@@ -341,7 +362,7 @@
       <h4>배경 선택</h4>
       <div id="bgChips" class="chips"></div>
 
-      <!-- 파일로 배경 선택(선택 즉시 적용, 적용 버튼 없음) -->
+      <!-- 파일로 배경 선택 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="customBgFile" type="file" accept="image/*" class="input-file-hidden">
         <label for="customBgFile" class="pill file-pill" title="배경 이미지 선택">
@@ -432,7 +453,6 @@
 
   <!-- (추가) 하단 중앙 투명 배너 자리 -->
   <div id="adBanner" aria-hidden="true">
-    <!-- 완전 투명 1x1 PNG (늘려서 사용) -->
     <img alt="ad-placeholder"
       src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="/>
   </div>
@@ -471,18 +491,17 @@
     isWork: true, running: false,
     workSec: 25*60, restSec: 5*60, remainSec: 25*60,
     interval: null, shuffle: false, playing: false,
-    mood: "전체", trackIdx: 0, repeatMode: "off",   // 기본 '전체'로
+    mood: "전체", trackIdx: 0, repeatMode: "off",
     totalCycles: 4, completedCycles: 0,
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]"),
     theme: localStorage.getItem("theme") || "dark",
     windowVisible: (localStorage.getItem("ui-window-visible") ?? "1") === "1",
     characterVisible: (localStorage.getItem("ui-character-visible") ?? "1") === "1",
     props: JSON.parse(localStorage.getItem("props-v1")||"[]"),
-    rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1") // 기본 켜짐
+    rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1")
   };
   window.state = state;
 
-  /* 레이아웃 초기화 후에도 타이머 유지(세션 복구) */
   let __resumeAfterReload = false;
   (function restoreTimerFromSession(){
     const saved = sessionStorage.getItem('timer-keep');
@@ -502,7 +521,6 @@
     sessionStorage.removeItem('timer-keep');
   })();
 
-  /* ===== 엘리먼트 ===== */
   const boardList = document.getElementById("todo-list");
   const todoInput = document.getElementById("todo-input");
   const todoAdd   = document.getElementById("todo-add");
@@ -565,7 +583,6 @@
   const presenceList  = document.getElementById("presenceList");
   const presenceToggle= document.getElementById("presenceToggle");
   const nicknameInput = document.getElementById("nickname");
-  const shareStudyBtn = document.getElementById("shareStudyBtn");
 
   function applyTheme(t){
     document.documentElement.setAttribute("data-theme", t);
@@ -576,39 +593,31 @@
   function init(){
     applyTheme(state.theme);
 
-    // 드로어
     hamburgerBtn.addEventListener("click", ()=>{ drawer.classList.add("open"); overlay.classList.add("show"); });
     closeDrawer  .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
     overlay      .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
     themeToggle  .addEventListener("click", ()=>{ state.theme = (state.theme==="dark")?"light":"dark"; applyTheme(state.theme); });
 
-    // 모드 라디오
     modeRadios.forEach(r=>{
       r.checked = (r.value === state.mode);
       r.addEventListener('change', ()=>{
         state.mode = r.value;
         localStorage.setItem("mode", state.mode);
-        if(state.mode==='timer'){ // 카운트업 초기화
-          state.isWork = true;
-          state.remainSec = 0;
-          state.completedCycles = 0;
-        }else{ // 뽀모도로
-          state.isWork = true;
-          state.remainSec = state.workSec;
-          state.completedCycles = 0;
+        if(state.mode==='timer'){
+          state.isWork = true; state.remainSec = 0; state.completedCycles = 0;
+        }else{
+          state.isWork = true; state.remainSec = state.workSec; state.completedCycles = 0;
         }
         stopTimer(); updateCyclesBtn(); updateTimerUI(); refreshModeFields();
       });
     });
     refreshModeFields();
 
-    // 입력값 초기화
     workMin.value = Math.round(state.workSec/60);
     restMin.value = Math.round(state.restSec/60);
     totalCyclesInput.value = state.totalCycles;
     updateCyclesBtn();
 
-    // 배경 프리셋
     const BG_PRESETS = [
       "https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true",
       "https://github.com/nihicheli/studywithme/blob/main/image/background%206.png?raw=true",
@@ -626,7 +635,6 @@
     applyBg.addEventListener("click", ()=>{ const url=(customBgUrl.value||"").trim(); if(url) setBackground(url); });
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
-    // 배경: 파일 선택 즉시 적용
     customBgFile?.addEventListener("change", ()=>{
       const file = customBgFile.files && customBgFile.files[0];
       if(!file) return;
@@ -640,24 +648,20 @@
       reader.readAsDataURL(file);
     });
 
-    // 교차 이미지
     charImg.src = charA; winImg.src = winA;
     blinkTimer = setInterval(()=>{
       showA = !showA; charImg.src = showA ? charA : charB;
       showWinA = !showWinA; winImg.src = showWinA ? winA : winB;
     }, 500);
 
-    // To-Do
     renderTodos();
     todoAdd.addEventListener("click", addTodo);
     todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
 
-    // 음악 — 스타일/트랙 필터링
     initMoodsAndTracks();
 
     player.addEventListener("ended", onEnded);
     player.addEventListener("error", ()=>{
-      // 오류 시: 현재 필터 목록에서 다음 곡
       const list = filteredTrackIdxs();
       if(list.length){
         const curPos = list.indexOf(state.trackIdx);
@@ -667,7 +671,6 @@
     });
     repeatBtn.addEventListener("click", toggleRepeat);
 
-    // 설정 적용
     applyPom.addEventListener("click", ()=>{
       if(state.mode === 'pomodoro'){
         const wm=Math.max(1,parseInt(workMin.value||"25",10));
@@ -682,7 +685,6 @@
     });
     cyclesBtn.addEventListener("click", ()=>{ state.completedCycles=0; updateCyclesBtn(); });
 
-    // 화면 표시
     updateWindowToggleUI();
     updateCharacterToggleUI();
     toggleWindowBtn.addEventListener("click", ()=>{
@@ -698,10 +700,8 @@
       updateCharacterToggleUI();
     });
 
-    // 레이아웃 편집/원복(타이머 유지)
     setupLayoutDrag();
 
-    // 회전 토글 — 기본 켜짐
     function setRotate(on){
       state.rotateOn = !!on;
       localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
@@ -711,37 +711,25 @@
     function applyRotateState(){
       const portrait = window.innerHeight > window.innerWidth;
       document.documentElement.classList.toggle('portrait-force', state.rotateOn && portrait);
-      if (state.rotateOn && portrait) applyScaleToTarget();  // ← 여기!
+      if (state.rotateOn && portrait) applyScaleToTarget();
       else clearScale();
     }
-
-    function applyScaleTo1100(){ // <- 이름 유지
-      // 회전 후 치수: width = 100vh, height = 100vw
+    function applyScaleTo1100(){
       const vh = Math.max(1, window.innerHeight);
       const vw = Math.max(1, window.innerWidth);
-      const targetW = ROTATE_BASE_WIDTH;   // 1000
-      const targetH = ROTATE_BASE_HEIGHT;  // 2200
-      // 가로/세로 모두 target 안에 들어가도록 스케일
+      const targetW = ROTATE_BASE_WIDTH;
+      const targetH = ROTATE_BASE_HEIGHT;  /* (원본 로직 유지) */
       const s = Math.min(targetW / vh, targetH / vw);
-
-      const MOBILE_ZOOM = 1.05; // 필요시 1.1~1.5 사이로 조절
-      function isSmallPhone(){
-        return Math.min(window.innerWidth, window.innerHeight) < 820;
-      }
-      
       const app = document.getElementById('app');
       app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
     }
-
     function clearScale(){ document.getElementById('app').style.transform = ''; }
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
     if(localStorage.getItem('rotateOn') === null){ setRotate(false); } else { setRotate(state.rotateOn); }
 
-    // 소품 프리셋
     document.querySelectorAll('.propPreset').forEach(btn=> btn.addEventListener('click', ()=> addProp(btn.dataset.url, true, {autoEdit:true})));
-    // 파일 선택(라벨 파일명 표시) + 추가 시 중앙 최소배치 + 즉시 편집
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
       propFileName.textContent = f ? f.name : '선택 안 됨';
@@ -750,11 +738,10 @@
       const f = propFile.files && propFile.files[0];
       if(!f) return;
       const url = URL.createObjectURL(f);
-      addProp(url, true, {autoEdit:true});  // 중앙+최소크기+즉시편집
+      addProp(url, true, {autoEdit:true});
       propFile.value = ""; propFileName.textContent = "선택 안 됨";
       closeDrawer.click();
     });
-    // URL 추가도 중앙 최소 배치 + 즉시 편집
     propAdd.addEventListener('click', ()=>{
       const u=(propUrl.value||"").trim(); if(!u) return;
       addProp(u, true, {autoEdit:true});
@@ -762,7 +749,6 @@
     });
     renderProps();
 
-    // 내 공부시간 공개 토글 (기본 ON)
     function refreshShareStudyUI(){
       shareStudyBtn.textContent = `내 공부시간 공개: ${state.shareStudy ? "켜짐" : "꺼짐"}`;
     }
@@ -774,7 +760,6 @@
     });
     refreshShareStudyUI();
 
-    // 탭 제목 + 세션 복원 후 자동 재개
     updateTimerUI();
     if(__resumeAfterReload){ startTimer(); }
   }
@@ -786,7 +771,6 @@
     stateEl.textContent = isPom ? (state.isWork?"집중중":"휴식중") : "타이머";
   }
 
-  /* To-Do */
   function renderTodos(){
     boardList.innerHTML = "";
     if(state.todos.length === 0) return;
@@ -804,7 +788,6 @@
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
   function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
 
-  /* 음악: 스타일/트랙 필터링 */
   function MOODS(){ return ["전체","Lo-Fi","Jazz","Loud","Piano","Noise"]; }
   function filteredTrackIdxs(){
     if(state.mood==="전체") return TRACKS.map((_,i)=>i);
@@ -831,7 +814,6 @@
       b.addEventListener("click", ()=> selectTrack(idx, state.playing));
       tracksWrap.appendChild(b);
     });
-    // 현재 선택곡이 필터에서 빠졌다면 첫 곡으로
     if(!idxs.includes(state.trackIdx) && idxs.length){
       selectTrack(idxs[0], false);
     }
@@ -868,7 +850,6 @@
     state.playing=false; playPause.textContent="재생";
   }
 
-  /* 타이머 / 뽀모도로 */
   function fmt(sec){
     const s=Math.max(0,sec|0);
     const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
@@ -887,7 +868,7 @@
   function startTimer(){
     if(state.running) return;
     state.running=true; updateTimerUI();
-    state.interval=setInterval(()=>{ 
+    state.interval=setInterval(()=>{
       if(state.mode==='pomodoro'){
         if(state.remainSec<=0){
           beep();
@@ -922,7 +903,6 @@
   function updateWindowToggleUI(){ toggleWindowBtn.textContent = `창문: ${state.windowVisible ? "보임" : "숨김"}`; windowBox.style.display = state.windowVisible ? "" : "none"; }
   function updateCharacterToggleUI(){ toggleCharacterBtn.textContent = `캐릭터: ${state.characterVisible ? "보임" : "숨김"}`; characterBox.style.display = state.characterVisible ? "" : "none"; }
 
-  /* ===== 레이아웃 편집/원복(타이머 유지) ===== */
   function setupLayoutDrag(){
     const APP = document.getElementById('app');
     const DRAG_IDS = ['timer','board','window','character','music-controls'];
@@ -1080,7 +1060,7 @@
         const move = (ev)=>{
           const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
           const dx = cx - startX;
-          const newW = Math.max(120, startWidth + dx);  // 최소크기 유지
+          const newW = Math.max(120, startWidth + dx);
           el.style.width = newW + 'px';
         };
         const up = ()=>{
@@ -1123,7 +1103,6 @@
       }
     }
 
-    // 화면설정 원상복구(타이머 유지)
     layoutResetBtn.addEventListener('click', ()=>{
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
@@ -1143,7 +1122,6 @@
     restorePositionsOnLoad();
   }
 
-  /* 소품(중앙 "최소크기" 배치 + 즉시 편집) */
   function renderProps(){
     propsLayer.innerHTML = '';
     state.props.forEach(p=>{
@@ -1163,13 +1141,6 @@
       propsLayer.appendChild(el);
     });
     renderPropList();
-    // 편집 모드에서 추가된 소품도 즉시 드래그/리사이즈 가능하게
-    if(document.getElementById('app').classList.contains('edit-on')){
-      document.querySelectorAll('.prop').forEach(el=>{
-        // 아래 두 함수는 setupLayoutDrag 내에서 정의/바인딩됨
-        // 재바인딩 유도: 편집모드 토글 한번 껐다 켬
-      });
-    }
   }
   function renderPropList(){
     propList.innerHTML = '';
@@ -1191,7 +1162,7 @@
   function addProp(url, center=true, opts={}){
     const id = 'prop-' + Date.now().toString(36);
     const MINW = 120;
-    let left=40, top=40, width=MINW;  // 최소크기
+    let left=40, top=40, width=MINW;
     if(center){
       const appRect = document.getElementById('app').getBoundingClientRect();
       left = Math.max(0, Math.floor((appRect.width - width)/2));
@@ -1202,13 +1173,11 @@
     renderProps();
 
     if(opts.autoEdit){
-      window.__layoutSetEditable?.(true);  // 편집 모드 켜기
-      // 조금 뒤에 포커스(렌더 후)
+      window.__layoutSetEditable?.(true);
       setTimeout(()=> window.__layoutFocus?.(id), 0);
     }
   }
 
-  /* 시작 */
   init();
 </script>
 
@@ -1241,9 +1210,9 @@ function getSnapshot(){
   let study = null;
   if(st.shareStudy){
     if(st.mode==='timer'){
-      study = st.remainSec||0;                       // 카운트업 전체 경과
+      study = st.remainSec||0;
     }else if(st.mode==='pomodoro' && st.isWork){
-      study = Math.max(0,(st.workSec|0) - (st.remainSec|0)); // 현재 집중 경과
+      study = Math.max(0,(st.workSec|0) - (st.remainSec|0));
     }
   }
   const status = (st.mode==='pomodoro') ? (st.isWork ? "work" : "break") : "timer";
@@ -1251,25 +1220,6 @@ function getSnapshot(){
 }
 function fmtMin(sec){ return `${Math.floor((sec|0)/60)}분`; }
 
-function applyScaleToTarget(){
-  // 회전 후 치수: width = 100vh, height = 100vw → 1000×2200 안에 맞춤
-  const vh = Math.max(1, window.innerHeight);
-  const vw = Math.max(1, window.innerWidth);
-  let s = Math.min(ROTATE_BASE_WIDTH / vh, ROTATE_BASE_HEIGHT / vw);
-
-  // 작은 화면이면 살짝 더 키워서 가독성 확보
-  if (isSmallPhone()) s *= MOBILE_ZOOM;
-
-  // 과도 확대 방지
-  s = Math.min(s, 2);
-
-  const app = document.getElementById('app');
-  app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
-}
-
-// ✅ 예전 코드 호환용 (파일에 applyScaleTo1100만 호출하고 있어도 동작하게)
-function applyScaleTo1100(){ applyScaleToTarget(); }
-  
 function renderOnline(presenceState){
   const items = [];
   for(const [nick, metas] of Object.entries(presenceState)){

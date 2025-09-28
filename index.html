@@ -3,79 +3,131 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>감각적인 뽀모도로</title>
+<title>Studywithme</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg-url: url("https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true");
-    --ink: #FBFFF4; --ink-sub: rgba(0,0,0,.7); --line: transparent;
-    --top-gap:12px; --content-top:20vh;
-    --maxh-board:80vh; --maxh-timer:35vh; --maxh-window:40vh; --maxh-char:50vh;
-    --maxw-board:25vw; --maxw-window:15vw; --maxw-timer:35vw; --maxw-char:70vw;
+    --ink: #FBFFF4;
+    --ink-sub: rgba(0,0,0,.7);
+    --line: transparent;
+    --top-gap: 12px;
+    --content-top: 20vh;
+
+    --maxh-board: 80vh;
+    --maxh-timer: 35vh;
+    --maxh-window: 40vh;
+    --maxh-char: 50vh;
+
+    --maxw-board: 25vw;
+    --maxw-window: 15vw;
+    --maxw-timer: 35vw;
+    --maxw-char: 70vw;
   }
-  :root[data-theme="light"]{ --ink:#202020; --ink-sub:rgba(0,0,0,.7); --line:transparent; }
+  :root[data-theme="light"]{
+    --ink:#202020;
+    --ink-sub:rgba(0,0,0,.7);
+    --line:transparent;
+  }
 
   *{box-sizing:border-box}
-  html,body{ height:100%; margin:0; color:var(--ink);
+  html,body{
+    height:100%; margin:0; color:var(--ink);
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
-    background:#000; font-size:clamp(12px,1.6vw,14px); letter-spacing:.02em; }
+    background:#000; font-size:clamp(12px,1.6vw,14px); letter-spacing:.02em;
+  }
 
-  /* 10% 검정 오버레이 유지 */
-  #app{ position:relative; height:100dvh; overflow:hidden;
-    background-image: linear-gradient(rgba(0,0,0,.10), rgba(0,0,0,.10)), var(--bg-url);
-    background-size:cover; background-position:center; }
+  /* 배경 + 10% 검정 오버레이 */
+  #app{
+    position:relative; height:100dvh; overflow:hidden;
+    background-image:
+      linear-gradient(rgba(0,0,0,.10), rgba(0,0,0,.10)),
+      var(--bg-url);
+    background-size:cover; background-position:center;
+  }
 
-  .card{ background:rgba(0,0,0,.02); border:2px solid var(--line); border-radius:16px; }
-  .panel{ padding:1rem; }
+  .card{ background: rgba(0,0,0,.02); border: 2px solid var(--line); border-radius: 16px; }
+  .panel{ padding: 1rem; }
 
-  button,.pill{ cursor:pointer; user-select:none; background:rgba(255,255,255,.08); color:var(--ink);
-    border:1px solid var(--line); border-radius:999px; padding:.6rem .9rem; font-weight:700; font-family:inherit; font-size:1rem; outline:none; }
-  button:focus,.pill:focus,button:focus-visible,.pill:focus-visible{ outline:none; box-shadow:inset 0 0 0 1px #7C9AFF; }
-  *{-webkit-tap-highlight-color:transparent}
-  input,textarea,select{ font-family:inherit; font-size:1rem; color:#fff }
+  button, .pill{
+    cursor:pointer; user-select:none; outline:0;
+    background: rgba(255,255,255,.08); color:var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: .6rem .9rem;
+    font-weight: 700;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  /* 안쪽 포커스 링 */
+  button:focus, .pill:focus, button:focus-visible, .pill:focus-visible{
+    outline: none; box-shadow: inset 0 0 0 1px #7C9AFF;
+  }
+  *{ -webkit-tap-highlight-color: transparent; }
+  input, textarea, select{ font-family: inherit; font-size: 1rem; color:#fff }
 
-  .row{display:flex; gap:.75rem; align-items:center}
+  .row{display:flex; gap:.75rem; align-items:center; flex-wrap:wrap}
   .hwrap{ display:flex; gap:.5rem; align-items:center; overflow-x:auto; }
-  .title{font-weight:900; font-size:1.125rem}
+  .title{font-weight:900; font-size: 1.125rem}
 
-  #topbar{ position:absolute; left:12px; right:12px; top:var(--top-gap);
-    display:grid; grid-template-columns:1fr auto 1fr; align-items:start; gap:12px; z-index:10; }
-  #hamburger{ justify-self:start; width:3.4rem; height:3.4rem; display:grid; place-items:center; font-size:1.2rem; }
+  /* 상단 레이아웃 — 최상단 유지 */
+  #topbar{
+    position:absolute; left:12px; right:12px; top: var(--top-gap);
+    display:grid; grid-template-columns: 1fr auto 1fr; align-items:start; gap:12px;
+    z-index: 9000; /* ↑ 드래그 대상보다 항상 큼 */
+  }
+  #hamburger{ justify-self:start; width:3.4rem; height:3.4rem; display:grid; place-items:center; font-size:1.2rem; position:relative; z-index:9001; }
 
-  #timer{ justify-self:center; width:min(var(--maxw-timer),90vw); max-height:var(--maxh-timer);
-    display:flex; flex-direction:column; align-items:center; gap:.6rem; text-align:center; overflow:hidden; }
-  #state{ font-size:1.25rem; font-weight:900; }
-  #time{ font-weight:900; font-size:clamp(2.2rem,6vw,4rem); line-height:1; }
+  /* 타이머(가운데) */
+  #timer{
+    justify-self:center; width: min(var(--maxw-timer), 90vw); max-height: var(--maxh-timer);
+    display:flex; flex-direction:column; align-items:center; gap:.6rem; text-align:center; overflow:hidden;
+  }
+  #state{ font-size: 1.25rem; font-weight:900; }
+  #time{ font-weight:900; font-size: clamp(2.2rem, 6vw, 4rem); line-height:1; }
 
-  #board{ justify-self:end; width:min(var(--maxw-board),92vw); max-height:var(--maxh-board);
-    display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
+  /* Todo list(오른쪽) */
+  #board{
+    justify-self:end; width: min(var(--maxw-board), 92vw); max-height: var(--maxh-board);
+    display:grid; grid-template-rows: auto 1fr auto; overflow:hidden;
+  }
   #board .title{margin:0 0 .5rem 0}
-  #todo-list{ overflow:auto; padding-right:2px; scrollbar-width:thin; }
+  #todo-list{ overflow:auto; padding-right:2px; scrollbar-width: thin; }
   .todo{display:flex; align-items:center; gap:.5rem; padding:.45rem 0; border-bottom:1px solid rgba(255,255,255,.15)}
   .todo:last-child{border-bottom:0}
   .todo .txt{flex:1}
   .todo .del{background:transparent; border:0; color:var(--ink-sub); padding:.3rem .5rem; border-radius:.6rem}
   .todo .del:hover{background:rgba(255,255,255,.12); color:#fff}
   #inputRow{ display:flex; gap:.5rem; align-items:center; padding-top:.6rem; }
-  #board input[type="text"]{ width:100%; background:transparent; border:2px solid var(--line); border-radius:12px; color:#fff; padding:.5rem .6rem }
+  #board input[type="text"]{ width:100%; background:transparent; border: 2px solid var(--line); border-radius: 12px; color:#fff; padding:.5rem .6rem; }
 
-  #window{ position:absolute; left:2vw; top:var(--content-top); z-index:5; width:min(var(--maxw-window),90vw) }
-  #win-img{ display:block; width:100%; height:auto; max-height:var(--maxh-window); border-radius:16px; border:2px solid var(--line) }
+  /* 좌: 창문, 가운데: 캐릭터 */
+  #window{ position:absolute; left:2vw; top: var(--content-top); z-index:5; width: min(var(--maxw-window), 90vw); }
+  #win-img{ display:block; width:100%; height:auto; max-height: var(--maxh-window); border-radius:16px; border:2px solid var(--line); }
 
-  #character{ position:absolute; left:50%; transform:translateX(-50%);
-    top:calc(var(--content-top) + 20vh); z-index:6; width:min(var(--maxw-char),96vw) }
-  #char-img{ display:block; width:100%; height:auto; max-height:var(--maxh-char); border-radius:18px; border:2px solid var(--line);
-    background:transparent center/contain no-repeat; }
+  #character{ position:absolute; left:50%; transform:translateX(-50%); top: calc(var(--content-top) + 20vh); z-index:6; width: min(var(--maxw-char), 96vw); }
+  #char-img{ display:block; width:100%; height:auto; max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); background:transparent center/contain no-repeat; }
 
-  #bottombar{ position:fixed; left:12px; right:12px; bottom:8px; display:flex; gap:12px; justify-content:center; align-items:flex-end; z-index:12; }
+  /* 하단: 음악패널 */
+  #bottombar{
+    position:fixed; left:12px; right:12px; bottom: 8px;
+    display:flex; gap:12px; justify-content:center; align-items:flex-end; z-index:12;
+  }
   #bottombar .card{ flex:1 1 0; min-width:260px; }
-  #bottombar h4{ margin:0 0 .5rem 0; font-size:1.125rem; font-weight:900 }
+  #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
-  #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:50; }
+  /* 드로어/오버레이 — 절대 최상단 */
+  #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index: 10000; }
   #overlay.show{ opacity:1; pointer-events:auto; }
 
-  #drawer{ position:fixed; top:0; left:0; bottom:0; width:min(380px,86vw); background:#111; color:#eee; border-right:2px solid var(--line);
-    transform:translateX(-100%); transition:transform .24s ease; z-index:60; display:flex; flex-direction:column; gap:0; overflow-y:auto; }
+  #drawer{
+    position:fixed; top:0; left:0; bottom:0; width:min(380px, 86vw);
+    background:#111; color:#eee; border-right:2px solid var(--line);
+    transform:translateX(-100%); transition:transform .24s ease; z-index: 10001; /* 최상단 */
+    display:flex; flex-direction:column; gap:0; overflow-y:auto;
+  }
   :root[data-theme="light"] #drawer{ background:#fafafa; color:#222; }
   #drawer.open{ transform:translateX(0) }
   .drawer-head{ display:flex; align-items:center; justify-content:space-between; padding:1rem; border-bottom:2px solid var(--line); }
@@ -83,42 +135,103 @@
   :root[data-theme="light"] .drawer-sec{ border-bottom-color: rgba(0,0,0,.12); }
   .drawer-sec h4{ margin:.2rem 0 .8rem; font-weight:900; }
 
-  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; }
   .drawer-sec input[type="number"], .drawer-sec input[type="text"]{
     width:100%; padding:.55rem .7rem; border:2px solid var(--line); border-radius:12px; background:transparent; color:#fff;
   }
   :root[data-theme="light"] .drawer-sec input[type="number"], :root[data-theme="light"] .drawer-sec input[type="text"]{ color:#222; }
   .fill{ flex:1 }
 
-  .chips{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
-  .chips .pill{ border:1px solid var(--line); border-radius:14px; padding:.5rem .75rem; background:rgba(255,255,255,.06); transition:background .15s ease; }
+  .chips{ display:flex; gap:.5rem; align-items:center; flex-wrap: wrap; }
+  .chips .pill{ border:1px solid var(--line); border-radius:14px; padding:.5rem .75rem; background:rgba(255,255,255,.06); transition: background .15s ease; }
   .chips .pill:hover{ background:rgba(255,255,255,.12); }
-  .list-scroll{ max-height:40vh; overflow:auto; padding-bottom:.25rem; }
+  .list-scroll{ max-height: 40vh; overflow: auto; padding-bottom: .25rem; }
   .list-scroll::-webkit-scrollbar{ width:10px; height:10px; }
-  .list-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.22); border-radius:999px; }
+  .list-scroll::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.22); border-radius:999px; }
 
   a#creditLink{ color:#9db7ff; text-decoration:none; border-bottom:1px dashed #9db7ff; }
   a#creditLink:hover{ opacity:.85; }
 
-  .pill-input{ width:100%; padding:.6rem .9rem; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.08);
-    color:#fff; line-height:1; outline:none; transition:background .15s ease, box-shadow .15s ease; -webkit-appearance:none; }
-  .pill-input::placeholder{ color:rgba(255,255,255,.6) }
-  :root[data-theme="light"] .pill-input{ background:rgba(0,0,0,.06); color:#222 }
-  :root[data-theme="light"] .pill-input::placeholder{ color:rgba(0,0,0,.5) }
-  .pill-input:focus{ box-shadow: inset 0 0 0 3px #7C9AFF; background:rgba(124,154,255,.15) }
-  .drawer-sec .row .pill-input{ flex:1; min-width:0 }
+  .pill-input{
+    width:100%; padding:.6rem .9rem; border:1px solid var(--line); border-radius:999px;
+    background: rgba(255,255,255,.08); color:#fff; line-height:1; outline:none;
+    transition: background .15s ease, box-shadow .15s ease; -webkit-appearance:none;
+  }
+  .pill-input::placeholder{ color: rgba(255,255,255,.6); }
+  :root[data-theme="light"] .pill-input{ background: rgba(0,0,0,.06); color:#222; }
+  :root[data-theme="light"] .pill-input::placeholder{ color: rgba(0,0,0,.5); }
+  .pill-input:focus{ box-shadow: inset 0 0 0 3px #7C9AFF; background: rgba(124,154,255,.15); }
+  .drawer-sec .row .pill-input{ flex:1; min-width:0; }
 
-  @media (max-width:720px){
-    :root{ --content-top:14vh; --maxw-char:90vw; }
+  /* 파일 선택을 pill처럼 */
+  .input-file-hidden{
+    position:absolute; width:0.1px; height:0.1px;
+    opacity:0; overflow:hidden; z-index:-1;
+  }
+  .file-row{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+  .file-pill{ display:inline-flex; align-items:center; gap:.5rem; }
+  .file-pill .icon{ font-size:1.1rem; line-height:1; }
+  #bgFileName{
+    max-width: 10rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    opacity:.8;
+  }
+  .bg-thumb{
+    width:42px; height:28px; border-radius:8px;
+    border:1px solid var(--line); background:#000 center/cover no-repeat;
+  }
+
+  /* 드래그/리사이즈 */
+  .draggable { cursor: move; }
+  .dragging  { opacity:.92; }
+  .resizer{
+    position:absolute; right:-8px; bottom:-8px; width:16px; height:16px;
+    border-radius:4px; background:rgba(255,255,255,.75);
+    border:1px solid rgba(0,0,0,.3);
+    display:none; z-index:3;
+  }
+  .edit-on .resizable .resizer{ display:block; }
+
+  /* 소품 레이어 */
+  #propsLayer{ position:absolute; inset:0; pointer-events:none; z-index:7; }
+  .prop{ position:absolute; pointer-events:auto; }
+  .prop img{ display:block; width:100%; height:auto; }
+  .prop.selected{ outline: 2px dashed #7C9AFF; outline-offset: 2px; }
+
+  /* 오른쪽 아래: 실시간 패널 */
+  #presencePanel{
+    position:fixed; right:12px; bottom: calc(8px + 112px);
+    width: 260px; z-index: 8000;
+  }
+  #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
+  #presencePanel .dot.work{ background:#7CFF7C; }
+  #presencePanel .dot.break{ background:#FFC66D; }
+  #presenceList .person{ display:flex; justify-content:space-between; gap:.5rem; padding:.25rem 0; }
+  #presenceList .nick{ font-weight:700; }
+
+  @media (max-width: 720px){
+    :root{ --content-top: 14vh; --maxw-char: 90vw; }
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
+    #presencePanel{ width: 90vw; right:5vw; bottom: calc(8px + 160px); }
   }
 </style>
 </head>
 <body>
-<div id="app">
+<div id="app" class="">
+  <!-- 오른쪽 아래: 실시간 패널 -->
+  <aside id="presencePanel" class="card panel" style="display:none">
+    <div class="row" style="justify-content:space-between">
+      <div class="title">지금 공부중</div>
+      <div id="meNick" style="opacity:.8"></div>
+    </div>
+    <div id="presenceList"></div>
+  </aside>
 
-  <!-- 오버레이 + 드로어(설정) -->
+  <!-- 소품 레이어 -->
+  <div id="propsLayer"></div>
+
+  <!-- 오버레이 + 드로어 -->
   <div id="overlay"></div>
   <aside id="drawer" aria-label="설정">
     <header class="drawer-head">
@@ -129,13 +242,22 @@
       </div>
     </header>
 
+    <!-- 1) 뽀모도로 / 타이머 -->
     <section class="drawer-sec">
-      <h4>뽀모도로</h4>
-      <div class="grid2">
-        <label>집중(분)<input id="workMin" type="number" min="1" value="25"></label>
-        <label>휴식(분)<input id="restMin" type="number" min="1" value="5"></label>
+      <h4>뽀모도로 / 타이머</h4>
+      <div class="row" id="modeRow">
+        <label><input type="radio" name="mode" value="pomodoro" checked> 뽀모도로</label>
+        <label><input type="radio" name="mode" value="timer"> 타이머(카운트업)</label>
       </div>
-      <label style="display:block; margin-top:.5rem">사이클 수(N회)
+      <div class="grid2" id="pomodoroFields" style="margin-top:.5rem">
+        <label>집중(분)
+          <input id="workMin" type="number" min="1" value="25">
+        </label>
+        <label>휴식(분)
+          <input id="restMin" type="number" min="1" value="5">
+        </label>
+      </div>
+      <label style="display:block; margin-top:.5rem" id="cyclesWrap">사이클 수(N회)
         <input id="totalCycles" type="number" min="1" value="4">
       </label>
       <div class="row" style="margin-top:.6rem">
@@ -143,6 +265,20 @@
       </div>
     </section>
 
+    <!-- 2) 실시간 보기 (뽀모도로 다음으로 이동됨) -->
+    <section class="drawer-sec">
+      <h4>실시간 보기</h4>
+      <div class="row">
+        <input id="nickname" class="fill pill-input" placeholder="닉네임(예: do)">
+        <button id="presenceToggle" class="pill">공개: 꺼짐</button>
+      </div>
+      <div class="row" style="margin-top:.5rem">
+        <button id="shareStudyBtn" class="pill">내 공부시간 공개: 꺼짐</button>
+      </div>
+      <div style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시. 공부시간 비공개 시 내 시간은 숨겨집니다.</div>
+    </section>
+
+    <!-- 3) 음악 -->
     <section class="drawer-sec">
       <h4>음악 스타일</h4>
       <div id="moods" class="chips list-scroll"></div>
@@ -153,19 +289,63 @@
       <div id="tracks" class="chips list-scroll"></div>
     </section>
 
-    <!-- ✅ 추가: 화면 표시 섹션 (창문 토글) -->
+    <!-- 화면 표시 / 레이아웃 / 배경 / 소품 / 크레딧 (기존 순서 유지) -->
     <section class="drawer-sec">
       <h4>화면 표시</h4>
-      <button id="toggleWindow" class="pill">창문: 보임</button>
+      <div class="row">
+        <button id="toggleWindow" class="pill">창문: 보임</button>
+        <button id="toggleCharacter" class="pill">캐릭터: 보임</button>
+      </div>
     </section>
 
     <section class="drawer-sec">
-      <h4>배경 선택 (어두운 계열)</h4>
+      <h4>레이아웃(화면설정)</h4>
+      <div class="row">
+        <button id="layoutEdit" class="pill">배치 편집: 꺼짐</button>
+        <button id="layoutReset" class="pill" title="원상복구">원상복구</button>
+      </div>
+      <div style="opacity:.8; margin-top:.4rem">※ 편집 모드에서 요소를 드래그로 이동, 모서리로 크기 조절(비율 유지)</div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>배경 선택</h4>
       <div id="bgChips" class="chips"></div>
+
+      <!-- NEW: 파일로 배경 선택 -->
+      <div class="file-row" style="margin-top:.5rem">
+        <input id="customBgFile" type="file" accept="image/*" class="input-file-hidden">
+        <label for="customBgFile" class="pill file-pill" title="배경 이미지 선택">
+          <span class="icon">📁</span> 배경 파일 선택
+        </label>
+        <span id="bgFileName">선택 안 됨</span>
+        <span id="bgPreview" class="bg-thumb" aria-hidden="true"></span>
+        <button id="applyBgFile" class="pill">적용</button>
+      </div>
+
       <div class="row" style="margin-top:.5rem">
         <input id="customBgUrl" placeholder="배경 이미지 URL 붙여넣기" class="fill pill-input">
         <button id="applyBg" class="pill">적용</button>
       </div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>소품</h4>
+      <div class="row">
+        <input id="propUrl" class="fill pill-input" placeholder="소품 이미지 URL">
+        <button id="propAdd" class="pill">추가</button>
+      </div>
+      <div class="row" style="margin-top:.5rem">
+        <input id="propFile" type="file" accept="image/*" class="fill pill-input" />
+        <button id="propFileAdd" class="pill">파일 추가</button>
+      </div>
+      <div class="chips" style="margin-top:.5rem">
+        <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f331.svg">🌱</button>
+        <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2615.svg">☕</button>
+        <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4a1.svg">💡</button>
+        <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg">📚</button>
+      </div>
+      <div id="propList" class="list-scroll" style="margin-top:.6rem"></div>
+      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능(자동 편집 모드)</div>
     </section>
 
     <section class="drawer-sec">
@@ -174,11 +354,11 @@
     </section>
   </aside>
 
-  <!-- 상단 -->
+  <!-- 상단: 햄버거 / 타이머 / Todo -->
   <div id="topbar">
     <button id="hamburger" class="card panel" aria-label="메뉴 열기">⋯</button>
 
-    <section id="timer" class="card panel" aria-label="타이머">
+    <section id="timer" class="card panel resizable" aria-label="타이머">
       <div id="state">집중중</div>
       <div id="time">25:00</div>
       <div class="row">
@@ -198,11 +378,11 @@
     </section>
   </div>
 
-  <!-- 메인: 창문(좌) + 캐릭터(중앙) -->
-  <div id="window"><img id="win-img" alt="창문" /></div>
-  <div id="character"><img id="char-img" alt="캐릭터" /></div>
+  <!-- 메인: 창문 + 캐릭터 -->
+  <div id="window" class="resizable"><img id="win-img" alt="창문" /></div>
+  <div id="character" class="resizable"><img id="char-img" alt="캐릭터" /></div>
 
-  <!-- 하단: 음악 재생 -->
+  <!-- 하단: 음악 -->
   <div id="bottombar">
     <section id="music-controls" class="card panel" aria-label="음악 재생">
       <h4>음악 재생</h4>
@@ -217,68 +397,130 @@
 </div>
 
 <script>
+  /* ===== 트랙 데이터 ===== */
   const TRACKS = [
-    { title:"Bass Meant Jazz", mood:"Jazz", url:"https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
-    { title:"Stompin at Midnight", mood:"Jazz", url:"https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
-    { title:"Abstract Anxiety", mood:"Loud", url:"https://freepd.com/music/Abstract%20Anxiety.mp3" },
-    { title:"Adding the Sun", mood:"Lo-Fi", url:"https://freepd.com/music/Adding%20the%20Sun.mp3" },
-    { title:"Bleu", mood:"Lo-Fi", url:"https://freepd.com/music/Bleu.mp3" },
-    { title:"Study and Relax", mood:"Lo-Fi", url:"https://freepd.com/music/Study%20and%20Relax.mp3" },
-    { title:"Deep Focus", mood:"Lo-Fi", url:"https://freepd.com/music/Deep%20Focus.mp3" },
-    { title:"White Noise", mood:"Noise", url:"https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
-    { title:"Pink Noise",  mood:"Noise", url:"https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
-    { title:"Brown Noise", mood:"Noise", url:"https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
+    { title: "Bass Meant Jazz",     mood: "Jazz",  url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
+    { title: "Stompin at Midnight", mood: "Jazz",  url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
+    { title: "Abstract Anxiety",    mood: "Loud",  url: "https://freepd.com/music/Abstract%20Anxiety.mp3" },
+    { title: "Adding the Sun",      mood: "Lo-Fi", url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
+    { title: "Bleu",                mood: "Lo-Fi", url: "https://freepd.com/music/Bleu.mp3" },
+    { title: "Study and Relax",     mood: "Lo-Fi", url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
+    { title: "Deep Focus",          mood: "Lo-Fi", url: "https://freepd.com/music/Deep%20Focus.mp3" },
+    /* White/Pink/Brown Noise (Public Domain) */
+    { title: "White Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
+    { title: "Pink Noise (10m, PD)",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
+    { title: "Brown Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
   ];
 
-  let charA="https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true";
-  let charB="https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true";
-  let winA ="https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
-  let winB ="https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
-  let showA=true, showWinA=true, blinkTimer=null;
+  /* 창문/캐릭터 0.5s 교차 */
+  let charA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true";
+  let charB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true";
+  let winA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
+  let winB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
+  let showA = true, showWinA = true, blinkTimer = null;
 
+  /* ===== 전역 상태 ===== */
   const state = {
-    isWork:true, running:false, workSec:25*60, restSec:5*60, remainSec:25*60,
-    interval:null, shuffle:false, playing:false, mood:"Lo-Fi", trackIdx:0,
-    repeatMode:"off", totalCycles:4, completedCycles:0,
+    mode: localStorage.getItem("mode") || "pomodoro", // 'pomodoro' | 'timer'(카운트업)
+    shareStudy: (localStorage.getItem("shareStudy") === "1") ? true : false,
+    isWork: true, running: false,
+    workSec: 25*60, restSec: 5*60, remainSec: 25*60, // timer 모드에선 remainSec=경과초
+    interval: null, shuffle: false, playing: false,
+    mood: "Lo-Fi", trackIdx: 0, repeatMode: "off",
+    totalCycles: 4, completedCycles: 0,
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]"),
     theme: localStorage.getItem("theme") || "dark",
-    windowVisible: true   // ✅ 창문 표시 상태 추가
+    windowVisible: (localStorage.getItem("ui-window-visible") ?? "1") === "1",
+    characterVisible: (localStorage.getItem("ui-character-visible") ?? "1") === "1",
+    props: JSON.parse(localStorage.getItem("props-v1")||"[]")
   };
+  window.state = state;
 
-  const boardList=document.getElementById("todo-list");
-  const todoInput=document.getElementById("todo-input");
-  const todoAdd=document.getElementById("todo-add");
-  const charImg=document.getElementById("char-img");
-  const winImg=document.getElementById("win-img");
-  const timeEl=document.getElementById("time");
-  const stateEl=document.getElementById("state");
-  const startPause=document.getElementById("startPause");
-  const resetBtn=document.getElementById("reset");
-  const cyclesBtn=document.getElementById("cyclesBtn");
-  const playPause=document.getElementById("playPause");
-  const shuffleBtn=document.getElementById("shuffle");
-  const repeatBtn=document.getElementById("repeat");
-  const player=document.getElementById("player");
+  /* 레이아웃 초기화 후에도 타이머 유지(세션 복구) */
+  let __resumeAfterReload = false;
+  (function restoreTimerFromSession(){
+    const saved = sessionStorage.getItem('timer-keep');
+    if(!saved) return;
+    try{
+      const s = JSON.parse(saved);
+      state.mode = s.mode || state.mode;
+      state.isWork = !!s.isWork;
+      state.workSec = +s.workSec || state.workSec;
+      state.restSec = +s.restSec || state.restSec;
+      state.remainSec = +s.remainSec || state.remainSec;
+      state.totalCycles = +s.totalCycles || state.totalCycles;
+      state.completedCycles = +s.completedCycles || 0;
+      __resumeAfterReload = !!s.running;
+      localStorage.setItem("mode", state.mode);
+    }catch(e){}
+    sessionStorage.removeItem('timer-keep');
+  })();
 
-  const overlay=document.getElementById("overlay");
-  const drawer=document.getElementById("drawer");
-  const hamburgerBtn=document.getElementById("hamburger");
-  const closeDrawer=document.getElementById("closeDrawer");
-  const themeToggle=document.getElementById("themeToggle");
-  const moodsWrap=document.getElementById("moods");
-  const tracksWrap=document.getElementById("tracks");
-  const workMin=document.getElementById("workMin");
-  const restMin=document.getElementById("restMin");
-  const totalCyclesInput=document.getElementById("totalCycles");
-  const applyPom=document.getElementById("applyPom");
-  const bgChips=document.getElementById("bgChips");
-  const customBgUrl=document.getElementById("customBgUrl");
-  const applyBg=document.getElementById("applyBg");
-  const creditLink=document.getElementById("creditLink");
+  /* ===== 엘리먼트 ===== */
+  const boardList = document.getElementById("todo-list");
+  const todoInput = document.getElementById("todo-input");
+  const todoAdd   = document.getElementById("todo-add");
+  const charImg   = document.getElementById("char-img");
+  const winImg    = document.getElementById("win-img");
+  const timeEl    = document.getElementById("time");
+  const stateEl   = document.getElementById("state");
+  const startPause= document.getElementById("startPause");
+  const resetBtn  = document.getElementById("reset");
+  const cyclesBtn = document.getElementById("cyclesBtn");
+  const playPause = document.getElementById("playPause");
+  const shuffleBtn= document.getElementById("shuffle");
+  const repeatBtn = document.getElementById("repeat");
+  const player    = document.getElementById("player");
 
-  // ✅ 새 요소: 창문 토글 버튼
-  const toggleWindowBtn = document.getElementById("toggleWindow");
-  const windowBox = document.getElementById("window");
+  const overlay   = document.getElementById("overlay");
+  const drawer    = document.getElementById("drawer");
+  const hamburgerBtn = document.getElementById("hamburger");
+  const closeDrawer  = document.getElementById("closeDrawer");
+  const themeToggle  = document.getElementById("themeToggle");
+  const moodsWrap    = document.getElementById("moods");
+  const tracksWrap   = document.getElementById("tracks");
+
+  const workMin      = document.getElementById("workMin");
+  const restMin      = document.getElementById("restMin");
+  const totalCyclesInput = document.getElementById("totalCycles");
+  const applyPom     = document.getElementById("applyPom");
+
+  const modeRadios   = document.querySelectorAll('input[name="mode"]');
+  const pomodoroFields = document.getElementById("pomodoroFields");
+  const cyclesWrap   = document.getElementById("cyclesWrap");
+
+  const bgChips      = document.getElementById("bgChips");
+  const customBgUrl  = document.getElementById("customBgUrl");
+  const applyBg      = document.getElementById("applyBg");
+  const customBgFile = document.getElementById("customBgFile");
+  const bgFileName   = document.getElementById("bgFileName");
+  const bgPreview    = document.getElementById("bgPreview");
+  const applyBgFile  = document.getElementById("applyBgFile");
+
+  const creditLink   = document.getElementById("creditLink");
+
+  const toggleWindowBtn    = document.getElementById("toggleWindow");
+  const toggleCharacterBtn = document.getElementById("toggleCharacter");
+  const windowBox          = document.getElementById("window");
+  const characterBox       = document.getElementById("character");
+
+  const layoutEditBtn  = document.getElementById("layoutEdit");
+  const layoutResetBtn = document.getElementById("layoutReset");
+
+  const propsLayer   = document.getElementById("propsLayer");
+  const propUrl      = document.getElementById("propUrl");
+  const propAdd      = document.getElementById("propAdd");
+  const propFile     = document.getElementById("propFile");
+  const propFileAdd  = document.getElementById("propFileAdd");
+  const propList     = document.getElementById("propList");
+  const propPresets  = document.querySelectorAll(".propPreset");
+
+  const presencePanel = document.getElementById("presencePanel");
+  const meNickEl      = document.getElementById("meNick");
+  const presenceList  = document.getElementById("presenceList");
+  const presenceToggle= document.getElementById("presenceToggle");
+  const nicknameInput = document.getElementById("nickname");
+  const shareStudyBtn = document.getElementById("shareStudyBtn");
 
   function applyTheme(t){
     document.documentElement.setAttribute("data-theme", t);
@@ -289,18 +531,40 @@
   function init(){
     applyTheme(state.theme);
 
+    // 드로어
     hamburgerBtn.addEventListener("click", ()=>{ drawer.classList.add("open"); overlay.classList.add("show"); });
-    closeDrawer.addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
-    overlay.addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
+    closeDrawer  .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
+    overlay      .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
+    themeToggle  .addEventListener("click", ()=>{ state.theme = (state.theme==="dark")?"light":"dark"; applyTheme(state.theme); });
 
-    themeToggle.addEventListener("click", ()=>{ state.theme = (state.theme==="dark")?"light":"dark"; applyTheme(state.theme); });
+    // 모드 라디오
+    modeRadios.forEach(r=>{
+      r.checked = (r.value === state.mode);
+      r.addEventListener('change', ()=>{
+        state.mode = r.value;
+        localStorage.setItem("mode", state.mode);
+        if(state.mode==='timer'){ // 카운트업 초기화
+          state.isWork = true;
+          state.remainSec = 0;
+          state.completedCycles = 0;
+        }else{ // 뽀모도로
+          state.isWork = true;
+          state.remainSec = state.workSec;
+          state.completedCycles = 0;
+        }
+        stopTimer(); updateCyclesBtn(); updateTimerUI(); refreshModeFields();
+      });
+    });
+    refreshModeFields();
 
-    workMin.value=Math.round(state.workSec/60);
-    restMin.value=Math.round(state.restSec/60);
-    totalCyclesInput.value=state.totalCycles;
+    // 입력값 초기화
+    workMin.value = Math.round(state.workSec/60);
+    restMin.value = Math.round(state.restSec/60);
+    totalCyclesInput.value = state.totalCycles;
     updateCyclesBtn();
 
-    const BG_PRESETS=[
+    // 배경 프리셋
+    const BG_PRESETS = [
       "https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true",
       "https://github.com/nihicheli/studywithme/blob/main/image/background%206.png?raw=true",
       "https://github.com/nihicheli/studywithme/blob/main/image/background%202.png?raw=true",
@@ -317,21 +581,51 @@
     applyBg.addEventListener("click", ()=>{ const url=(customBgUrl.value||"").trim(); if(url) setBackground(url); });
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
-    // 이미지 교차(0.5s)
+    // NEW: 파일로 배경 선택
+    customBgFile?.addEventListener("change", ()=>{
+      const file = customBgFile.files && customBgFile.files[0];
+      if(!file) return;
+      bgFileName.textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (e)=>{
+        const dataUrl = e.target.result;
+        bgPreview.style.backgroundImage = `url("${dataUrl}")`;
+        setBackground(dataUrl); // 즉시 적용
+      };
+      reader.readAsDataURL(file);
+    });
+    applyBgFile?.addEventListener("click", ()=>{
+      const file = customBgFile.files && customBgFile.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e)=>{
+        const dataUrl = e.target.result;
+        bgPreview.style.backgroundImage = `url("${dataUrl}")`;
+        setBackground(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 교차 이미지
     charImg.src = charA; winImg.src = winA;
-    blinkTimer = setInterval(()=>{ showA=!showA; charImg.src=showA?charA:charB; showWinA=!showWinA; winImg.src=showWinA?winA:winB; },500);
+    blinkTimer = setInterval(()=>{
+      showA = !showA; charImg.src = showA ? charA : charB;
+      showWinA = !showWinA; winImg.src = showWinA ? winA : winB;
+    }, 500);
 
     // To-Do
     renderTodos();
+    todoAdd.addEventListener("click", addTodo);
+    todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
 
-    // 음악 — 무드/트랙
+    // 음악
     ["Lo-Fi","Jazz","Loud","Piano","Noise"].forEach(m=>{
       const b=document.createElement("button");
       b.className="pill"; b.textContent=m; b.dataset.mood=m;
       b.addEventListener("click", ()=>{ state.mood=m; highlightMood(); });
       moodsWrap.appendChild(b);
     });
-    TRACKS.forEach((t,idx)=>{
+    TRACKS.forEach((t, idx)=>{
       const b=document.createElement("button");
       b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
       b.addEventListener("click", ()=> selectTrack(idx, state.playing));
@@ -341,34 +635,88 @@
 
     player.addEventListener("ended", onEnded);
     player.addEventListener("error", ()=>{ const n=(state.trackIdx+1)%TRACKS.length; selectTrack(n,true); });
-
     repeatBtn.addEventListener("click", toggleRepeat);
 
+    // 설정 적용
     applyPom.addEventListener("click", ()=>{
-      const wm=Math.max(1,parseInt(workMin.value||"25",10));
-      const rm=Math.max(1,parseInt(restMin.value||"5",10));
-      const tc=Math.max(1,parseInt(totalCyclesInput.value||"4",10));
-      state.workSec=wm*60; state.restSec=rm*60; state.totalCycles=tc;
-      resetTimer(); state.completedCycles=0; updateCyclesBtn();
+      if(state.mode === 'pomodoro'){
+        const wm=Math.max(1,parseInt(workMin.value||"25",10));
+        const rm=Math.max(1,parseInt(restMin.value||"5",10));
+        const tc=Math.max(1,parseInt(totalCyclesInput.value||"4",10));
+        state.workSec=wm*60; state.restSec=rm*60; state.totalCycles=tc;
+        state.isWork=true; state.remainSec=state.workSec; state.completedCycles=0;
+      }else{
+        // 타이머(카운트업): 0부터
+        state.isWork=true; state.remainSec=0; state.totalCycles=1; state.completedCycles=0;
+      }
+      stopTimer(); updateCyclesBtn(); updateTimerUI();
     });
-
     cyclesBtn.addEventListener("click", ()=>{ state.completedCycles=0; updateCyclesBtn(); });
 
-    // ✅ 창문 토글 초기화
+    // 화면 표시
     updateWindowToggleUI();
+    updateCharacterToggleUI();
     toggleWindowBtn.addEventListener("click", ()=>{
       state.windowVisible = !state.windowVisible;
       windowBox.style.display = state.windowVisible ? "" : "none";
+      localStorage.setItem("ui-window-visible", state.windowVisible ? "1" : "0");
       updateWindowToggleUI();
     });
+    toggleCharacterBtn.addEventListener("click", ()=>{
+      state.characterVisible = !state.characterVisible;
+      characterBox.style.display = state.characterVisible ? "" : "none";
+      localStorage.setItem("ui-character-visible", state.characterVisible ? "1" : "0");
+      updateCharacterToggleUI();
+    });
 
-    // ✅ 초기 탭 제목 동기화
+    // 레이아웃 편집/원복(타이머 유지)
+    setupLayoutDrag();
+
+    // 소품 + 파일 업로드(중앙 삽입 → 즉시 편집)
+    document.querySelectorAll('.propPreset').forEach(btn=> btn.addEventListener('click', ()=> addProp(btn.dataset.url, true, {autoEdit:true})));
+    propAdd.addEventListener('click', ()=>{
+      const u=(propUrl.value||"").trim(); if(!u) return;
+      addProp(u, true, {autoEdit:true});
+      propUrl.value=""; closeDrawer.click(); // 편집하기 쉽도록 닫기
+    });
+    propFileAdd.addEventListener('click', ()=>{
+      const f = propFile.files && propFile.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      addProp(url, true, {autoEdit:true});
+      propFile.value = "";
+      closeDrawer.click();
+    });
+    renderProps();
+
+    // 내 공부시간 공개 토글
+    function refreshShareStudyUI(){
+      shareStudyBtn.textContent = `내 공부시간 공개: ${state.shareStudy ? "켜짐" : "꺼짐"}`;
+    }
+    shareStudyBtn.addEventListener('click', ()=>{
+      state.shareStudy = !state.shareStudy;
+      localStorage.setItem('shareStudy', state.shareStudy ? "1" : "0");
+      refreshShareStudyUI();
+      window.__presence_broadcastNow?.();
+    });
+    refreshShareStudyUI();
+
+    // 탭 제목 + 세션 복원 후 자동 재개
     updateTimerUI();
+    if(__resumeAfterReload){ startTimer(); }
+  }
+
+  function refreshModeFields(){
+    const isPom = (state.mode === 'pomodoro');
+    pomodoroFields.style.display = isPom ? '' : 'none';
+    cyclesWrap.style.display     = isPom ? '' : 'none';
+    stateEl.textContent = isPom ? (state.isWork?"집중중":"휴식중") : "타이머";
   }
 
   /* To-Do */
   function renderTodos(){
-    boardList.innerHTML=""; if(state.todos.length===0) return;
+    boardList.innerHTML = "";
+    if(state.todos.length === 0) return;
     state.todos.forEach((t,idx)=>{
       const row=document.createElement("div"); row.className="todo";
       const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!t.done;
@@ -403,39 +751,450 @@
     state.playing=false; playPause.textContent="재생";
   }
 
-  /* 타이머 */
-  function fmt(sec){ const s=Math.max(0,sec|0), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
-    const mm=m.toString().padStart(2,'0'), s2=ss.toString().padStart(2,'0'); return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`; }
-
+  /* 타이머 / 뽀모도로 */
+  function fmt(sec){
+    const s=Math.max(0,sec|0);
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+    const mm=m.toString().padStart(2,'0'); const s2=ss.toString().padStart(2,'0');
+    return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`;
+  }
   function updateTimerUI(){
     timeEl.textContent=fmt(state.remainSec);
-    stateEl.textContent=state.isWork?"집중중":"휴식중";
+    stateEl.textContent=(state.mode==='pomodoro') ? (state.isWork?"집중중":"휴식중") : "타이머";
     startPause.textContent=state.running?"일시정지":"시작";
-    // ✅ 탭 제목에 타이머 + Studywithme
     document.title = `${fmt(state.remainSec)} • Studywithme`;
+    window.__presence_broadcastNow?.();
   }
-
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
-
-  function startTimer(){ if(state.running) return; state.running=true; updateTimerUI();
-    state.interval=setInterval(()=>{ if(state.remainSec<=0){ beep(); const wasWork=state.isWork; state.isWork=!state.isWork; state.remainSec=state.isWork?state.workSec:state.restSec;
-        if(state.isWork && !wasWork){ state.completedCycles=Math.min(state.totalCycles, state.completedCycles+1); updateCyclesBtn(); if(state.completedCycles>=state.totalCycles){ stopTimer(); } }
-      } else { state.remainSec-=1; } updateTimerUI(); },1000);
+  function startTimer(){
+    if(state.running) return;
+    state.running=true; updateTimerUI();
+    state.interval=setInterval(()=>{ 
+      if(state.mode==='pomodoro'){
+        if(state.remainSec<=0){
+          beep();
+          const wasWork=state.isWork;
+          state.isWork=!state.isWork;
+          state.remainSec=state.isWork?state.workSec:state.restSec;
+          if(state.isWork && !wasWork){
+            state.completedCycles=Math.min(state.totalCycles, state.completedCycles+1);
+            updateCyclesBtn();
+            if(state.completedCycles>=state.totalCycles){ stopTimer(); }
+          }
+        } else {
+          state.remainSec-=1;
+        }
+      }else{
+        // 타이머(카운트업): 0→1→2 …
+        state.remainSec+=1;
+      }
+      updateTimerUI();
+    },1000);
   }
   function stopTimer(){ state.running=false; if(state.interval){ clearInterval(state.interval); state.interval=null; } updateTimerUI(); }
-  function resetTimer(){ stopTimer(); state.isWork=true; state.remainSec=state.workSec; updateTimerUI(); }
+  function resetTimer(){
+    stopTimer();
+    state.isWork=true;
+    state.remainSec = (state.mode==='pomodoro') ? state.workSec : 0; // 타이머는 0으로
+    updateTimerUI();
+  }
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
-  function updateCyclesBtn(){ cyclesBtn.textContent=`${state.completedCycles}/${state.totalCycles}회`; }
+  function updateCyclesBtn(){ cyclesBtn.textContent = `${state.completedCycles}/${state.totalCycles}회`; }
 
-  // ✅ 창문 토글 버튼 라벨/상태 동기화
-  function updateWindowToggleUI(){
-    toggleWindowBtn.textContent = `창문: ${state.windowVisible ? "보임" : "숨김"}`;
+  function updateWindowToggleUI(){ toggleWindowBtn.textContent = `창문: ${state.windowVisible ? "보임" : "숨김"}`; windowBox.style.display = state.windowVisible ? "" : "none"; }
+  function updateCharacterToggleUI(){ toggleCharacterBtn.textContent = `캐릭터: ${state.characterVisible ? "보임" : "숨김"}`; characterBox.style.display = state.characterVisible ? "" : "none"; }
+
+  /* ===== 레이아웃 편집/원복(타이머 유지) ===== */
+  function setupLayoutDrag(){
+    const APP = document.getElementById('app');
+    const DRAG_IDS = ['timer','board','window','character','music-controls'];
+    const RESIZE_IDS = ['window','character'];
+    const Z_TOP_CAP = 8999; /* 드로어/오버레이보다 낮게 */
+
+    const registry = new Map();
+    let editOn = false;
+    let zTop = 100;
+
+    const posKey = id => `pos-${id}`;
+
+    function restorePositionsOnLoad(){
+      DRAG_IDS.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        const saved = localStorage.getItem(posKey(id));
+        if(saved){
+          const {left, top, width} = JSON.parse(saved);
+          absolutize(el);
+          place(el, left, top, width);
+        }
+      });
+    }
+
+    function absolutize(el){
+      if(registry.has(el.id)) return;
+      const rect = el.getBoundingClientRect();
+      const appRect = APP.getBoundingClientRect();
+
+      const ph = document.createElement('div');
+      ph.style.width  = rect.width + 'px';
+      ph.style.height = rect.height + 'px';
+      ph.style.visibility = 'hidden';
+      el.parentNode.insertBefore(ph, el);
+
+      el.style.position = 'absolute';
+      el.style.width    = rect.width + 'px';
+      el.style.left     = (rect.left - appRect.left + window.scrollX) + 'px';
+      el.style.top      = (rect.top  - appRect.top  + window.scrollY) + 'px';
+      el.style.zIndex   = (parseInt(el.style.zIndex||'10',10));
+      APP.appendChild(el);
+
+      if(el.classList.contains('resizable') && !el.querySelector('.resizer')){
+        const rz = document.createElement('div');
+        rz.className = 'resizer';
+        el.appendChild(rz);
+      }
+
+      registry.set(el.id, {el, placeholder: ph});
+    }
+
+    function place(el, left, top, width){
+      if(width) el.style.width = width + 'px';
+      el.style.left = left + 'px';
+      el.style.top  = top  + 'px';
+    }
+
+    function setEditable(on){
+      editOn = on;
+      document.getElementById('app').classList.toggle('edit-on', on);
+      layoutEditBtn.textContent = `배치 편집: ${on ? '켜짐' : '꺼짐'}`;
+
+      DRAG_IDS.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        if(on){
+          if(!registry.has(id)) absolutize(el);
+          el.classList.add('draggable');
+          enableDrag(el);
+          if(RESIZE_IDS.includes(id)) enableResize(el);
+        }else{
+          el.classList.remove('draggable');
+          disableDrag(el);
+          if(RESIZE_IDS.includes(id)) disableResize(el);
+        }
+      });
+
+      document.querySelectorAll('.prop').forEach(el=>{
+        if(on){ enableDrag(el); enableResize(el); }
+        else  { disableDrag(el); disableResize(el); }
+      });
+    }
+
+    /* 외부에서 호출할 수 있게 노출 */
+    window.__layoutSetEditable = setEditable;
+    window.__layoutFocus = (pid)=>{
+      const el = document.querySelector(`.prop[data-pid="${pid}"]`);
+      if(!el) return;
+      el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
+      el.classList.add('selected');
+      setTimeout(()=> el.classList.remove('selected'), 1500);
+      el.scrollIntoView?.({behavior:'smooth', block:'center', inline:'center'});
+    };
+
+    function enableDrag(el){
+      if(el._dragBound) return;
+      const onDown = (e)=>{
+        if(!editOn) return;
+        if(e.target.classList && e.target.classList.contains('resizer')) return;
+
+        e.preventDefault();
+        el.classList.add('dragging');
+        el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
+
+        const startX = (e.touches? e.touches[0].clientX : e.clientX);
+        const startY = (e.touches? e.touches[0].clientY : e.clientY);
+        const startLeft = parseFloat(el.style.left)||0;
+        const startTop  = parseFloat(el.style.top)||0;
+
+        const move = (ev)=>{
+          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
+          const cy = (ev.touches? ev.touches[0].clientY : ev.clientY);
+          const dx = cx - startX;
+          const dy = cy - startY;
+          place(el, startLeft + dx, startTop + dy);
+        };
+        const up = ()=>{
+          document.removeEventListener('pointermove', move);
+          document.removeEventListener('pointerup', up);
+          document.removeEventListener('touchmove', move);
+          document.removeEventListener('touchend', up);
+          el.classList.remove('dragging');
+          persistPos(el);
+        };
+
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+        document.addEventListener('touchmove', move, {passive:false});
+        document.addEventListener('touchend', up);
+      };
+      el.addEventListener('pointerdown', onDown);
+      el.addEventListener('touchstart', onDown, {passive:false});
+      el._dragBound = onDown;
+    }
+    function disableDrag(el){
+      if(!el._dragBound) return;
+      el.removeEventListener('pointerdown', el._dragBound);
+      el.removeEventListener('touchstart', el._dragBound);
+      delete el._dragBound;
+    }
+
+    function enableResize(el){
+      if(el._resizeBound) return;
+      const onDown = (e)=>{
+        if(!editOn) return;
+        if(!e.target.classList || !e.target.classList.contains('resizer')) return;
+        e.preventDefault();
+        el.classList.add('dragging');
+        el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
+
+        const startX = (e.touches? e.touches[0].clientX : e.clientX);
+        const startWidth = parseFloat(el.style.width) || el.getBoundingClientRect().width;
+
+        const move = (ev)=>{
+          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
+          const dx = cx - startX;
+          const newW = Math.max(120, startWidth + dx);
+          el.style.width = newW + 'px';
+        };
+        const up = ()=>{
+          document.removeEventListener('pointermove', move);
+          document.removeEventListener('pointerup', up);
+          document.removeEventListener('touchmove', move);
+          document.removeEventListener('touchend', up);
+          el.classList.remove('dragging');
+          persistPos(el);
+        };
+
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+        document.addEventListener('touchmove', move);
+        document.addEventListener('touchend', up);
+      };
+      el.addEventListener('pointerdown', onDown);
+      el.addEventListener('touchstart', onDown, {passive:false});
+      el._resizeBound = onDown;
+    }
+    function disableResize(el){
+      if(!el._resizeBound) return;
+      el.removeEventListener('pointerdown', el._resizeBound);
+      el.removeEventListener('touchstart', el._resizeBound);
+      delete el._resizeBound;
+    }
+
+    function persistPos(el){
+      const left = parseFloat(el.style.left)||0;
+      const top  = parseFloat(el.style.top)||0;
+      const width= parseFloat(el.style.width)||el.getBoundingClientRect().width;
+
+      if(el.classList.contains('prop')){
+        const id = el.dataset.pid;
+        const idx = state.props.findIndex(p=>p.id===id);
+        if(idx>=0){ state.props[idx].left=left; state.props[idx].top=top; state.props[idx].width=width; }
+        localStorage.setItem('props-v1', JSON.stringify(state.props));
+      }else{
+        localStorage.setItem(`pos-${el.id}`, JSON.stringify({left, top, width}));
+      }
+    }
+
+    // 화면설정 원상복구(타이머 유지)
+    layoutResetBtn.addEventListener('click', ()=>{
+      const snap = {
+        mode: state.mode, isWork: state.isWork, running: state.running,
+        workSec: state.workSec, restSec: state.restSec, remainSec: state.remainSec,
+        totalCycles: state.totalCycles, completedCycles: state.completedCycles
+      };
+      sessionStorage.setItem('timer-keep', JSON.stringify(snap));
+
+      DRAG_IDS.forEach(id=> localStorage.removeItem(`pos-${id}`));
+      localStorage.removeItem('props-v1');
+      localStorage.removeItem('ui-window-visible');
+      localStorage.removeItem('ui-character-visible');
+      location.reload();
+    });
+
+    layoutEditBtn.addEventListener('click', ()=> setEditable(!editOn));
+    restorePositionsOnLoad();
   }
 
-  // 시작
+  /* 소품(중앙 삽입 + 즉시 편집) */
+  function renderProps(){
+    propsLayer.innerHTML = '';
+    state.props.forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'prop resizable';
+      el.dataset.pid = p.id;
+      el.style.left = (p.left ?? 40) + 'px';
+      el.style.top  = (p.top  ?? 40) + 'px';
+      el.style.width= (p.width?? 120) + 'px';
+      el.style.zIndex = 80;
+
+      const img = document.createElement('img');
+      img.src = p.url; img.alt = 'prop';
+      el.appendChild(img);
+
+      const rz = document.createElement('div'); rz.className='resizer'; el.appendChild(rz);
+      propsLayer.appendChild(el);
+    });
+    renderPropList();
+  }
+  function renderPropList(){
+    propList.innerHTML = '';
+    state.props.forEach(p=>{
+      const row = document.createElement('div'); row.className='todo';
+      const tx  = document.createElement('div'); tx.className='txt';
+      tx.innerHTML = `<img src="${p.url}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:.5rem"> ${p.id}`;
+      const del = document.createElement('button'); del.className='del'; del.textContent='삭제';
+      del.addEventListener('click', ()=>{
+        const idx = state.props.findIndex(x=>x.id===p.id);
+        if(idx>=0) state.props.splice(idx,1);
+        localStorage.setItem('props-v1', JSON.stringify(state.props));
+        renderProps();
+      });
+      row.append(tx, del);
+      propList.appendChild(row);
+    });
+  }
+  function addProp(url, center=false, opts={}){
+    const id = 'prop-' + Date.now().toString(36);
+    let left=40, top=40, width=120;
+    if(center){
+      const appRect = document.getElementById('app').getBoundingClientRect();
+      width = Math.min(240, Math.floor(appRect.width * 0.25));
+      left = Math.max(0, Math.floor((appRect.width - width)/2));
+      top  = Math.max(0, Math.floor((appRect.height - width)/2));
+    }
+    state.props.push({id, url, left, top, width});
+    localStorage.setItem('props-v1', JSON.stringify(state.props));
+    renderProps();
+
+    if(opts.autoEdit){
+      window.__layoutSetEditable?.(true);
+      window.__layoutFocus?.(id);
+    }
+  }
+
+  /* 시작 */
   init();
+</script>
+
+<!-- ===== Supabase Presence (실시간) ===== -->
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";   // ← 본인 값
+const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";          // ← 본인 값
+
+const presencePanel = document.getElementById("presencePanel");
+const meNickEl      = document.getElementById("meNick");
+const presenceList  = document.getElementById("presenceList");
+const presenceToggle= document.getElementById("presenceToggle");
+const nicknameInput = document.getElementById("nickname");
+
+let supabase = null;
+let channel  = null;
+let heartbeat= null;
+
+/* 기본 ON: 모듈 로드 시 자동 시도 */
+window.addEventListener('load', ()=>{ if(cfgReady()) goOnline(); });
+
+function cfgReady(){
+  return SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== "YOUR_PUBLIC_ANON_KEY";
+}
+function getSnapshot(){
+  const st = window.state || {};
+  // "n분 공부중"을 위해 study(분모)만 전송. 남은시간은 전송/표시하지 않음.
+  let study = null;
+  if(st.shareStudy){
+    if(st.mode==='timer'){
+      study = st.remainSec||0; // 카운트업 전체 경과
+    }else if(st.mode==='pomodoro' && st.isWork){
+      study = Math.max(0,(st.workSec|0) - (st.remainSec|0)); // 현재 작업 세션 경과치(대충 OK)
+    }
+  }
+  const status = (st.mode==='pomodoro') ? (st.isWork ? "work" : "break") : "timer";
+  return { status, study };
+}
+function fmtMin(sec){ return `${Math.floor((sec|0)/60)}분`; }
+
+/* 표시: 오직 "공부중 n분" / 휴식중 */
+function renderOnline(presenceState){
+  const items = [];
+  for(const [nick, metas] of Object.entries(presenceState)){
+    const meta = metas[metas.length-1] || {};
+    const status = meta?.status || "idle";
+    const study  = typeof meta?.study  === "number" ? meta.study  : null;
+
+    let rightTxt = "";
+    if(status === "break"){
+      rightTxt = "휴식중";
+    }else{
+      rightTxt = "공부중";
+      if(study!=null) rightTxt += ` · ${fmtMin(study)}`;
+    }
+
+    items.push(
+      `<div class="person">
+         <div><span class="${status==="work"?"dot work":status==="break"?"dot break":"dot"}"></span><span class="nick">${nick}</span></div>
+         <div style="opacity:.8">${rightTxt}</div>
+       </div>`
+    );
+  }
+  presenceList.innerHTML = items.slice(0,5).join("") || `<div style="opacity:.8">아직 아무도 없어요</div>`;
+}
+
+/* 외부에서 수동 호출 가능 */
+window.__presence_broadcastNow = async function(){
+  if(!channel) return;
+  try{ await channel.track(getSnapshot()); }catch{}
+};
+window.__presence_goOnline = goOnline;
+window.__presence_goOffline = goOffline;
+
+async function goOnline(){
+  if(!cfgReady()){ alert("Supabase 설정이 필요합니다."); return; }
+  if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const myNick = (nicknameInput.value || "").trim() || "anonymous";
+  meNickEl.textContent = myNick;
+  presencePanel.style.display = "block";
+
+  channel = supabase.channel("studyroom", { config: { presence: { key: myNick } } });
+  channel.on("presence", { event: "sync" }, ()=>{ renderOnline(channel.presenceState()); });
+
+  channel.subscribe(async (status)=>{
+    if(status === "SUBSCRIBED"){
+      try{ await channel.track(getSnapshot()); }catch{}
+      heartbeat = setInterval(async ()=>{ try{ await channel.track(getSnapshot()); }catch{} }, 15000);
+    }
+  });
+
+  presenceToggle.textContent = "공개: 켜짐";
+}
+async function goOffline(){
+  if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
+  if(channel){ try{ await channel.unsubscribe(); }catch{} }
+  channel = null;
+  presenceToggle.textContent = "공개: 꺼짐";
+  presencePanel.style.display = "none";
+  presenceList.innerHTML = "";
+}
+
+/* 버튼 토글 */
+presenceToggle?.addEventListener("click", async ()=>{
+  if(!channel){ await goOnline(); } else { await goOffline(); }
+});
 </script>
 </body>
 </html>

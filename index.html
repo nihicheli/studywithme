@@ -711,9 +711,10 @@
     function applyRotateState(){
       const portrait = window.innerHeight > window.innerWidth;
       document.documentElement.classList.toggle('portrait-force', state.rotateOn && portrait);
-      if(state.rotateOn && portrait) applyScaleTo1100();
+      if (state.rotateOn && portrait) applyScaleToTarget();  // ← 여기!
       else clearScale();
     }
+
     function applyScaleTo1100(){ // <- 이름 유지
       // 회전 후 치수: width = 100vh, height = 100vw
       const vh = Math.max(1, window.innerHeight);
@@ -722,7 +723,12 @@
       const targetH = ROTATE_BASE_HEIGHT;  // 2200
       // 가로/세로 모두 target 안에 들어가도록 스케일
       const s = Math.min(targetW / vh, targetH / vw);
-    
+
+      const MOBILE_ZOOM = 1.25; // 필요시 1.1~1.5 사이로 조절
+      function isSmallPhone(){
+        return Math.min(window.innerWidth, window.innerHeight) < 820;
+      }
+      
       const app = document.getElementById('app');
       app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
     }
@@ -731,7 +737,7 @@
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
-    if(localStorage.getItem('rotateOn') === null){ setRotate(true); } else { setRotate(state.rotateOn); }
+    if(localStorage.getItem('rotateOn') === null){ setRotate(false); } else { setRotate(state.rotateOn); }
 
     // 소품 프리셋
     document.querySelectorAll('.propPreset').forEach(btn=> btn.addEventListener('click', ()=> addProp(btn.dataset.url, true, {autoEdit:true})));
@@ -1245,6 +1251,25 @@ function getSnapshot(){
 }
 function fmtMin(sec){ return `${Math.floor((sec|0)/60)}분`; }
 
+function applyScaleToTarget(){
+  // 회전 후 치수: width = 100vh, height = 100vw → 1000×2200 안에 맞춤
+  const vh = Math.max(1, window.innerHeight);
+  const vw = Math.max(1, window.innerWidth);
+  let s = Math.min(ROTATE_BASE_WIDTH / vh, ROTATE_BASE_HEIGHT / vw);
+
+  // 작은 화면이면 살짝 더 키워서 가독성 확보
+  if (isSmallPhone()) s *= MOBILE_ZOOM;
+
+  // 과도 확대 방지
+  s = Math.min(s, 2);
+
+  const app = document.getElementById('app');
+  app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
+}
+
+// ✅ 예전 코드 호환용 (파일에 applyScaleTo1100만 호출하고 있어도 동작하게)
+function applyScaleTo1100(){ applyScaleToTarget(); }
+  
 function renderOnline(presenceState){
   const items = [];
   for(const [nick, metas] of Object.entries(presenceState)){

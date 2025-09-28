@@ -16,8 +16,8 @@
     --top-gap: 12px;
     --content-top: 20vh;
 
-    /* 높이/너비 맥스 규칙 */
-    --maxh-board: 30vh;
+    /* 높이/너비 맥스 규칙 (기존 유지) */
+    --maxh-board: 80vh;
     --maxh-timer: 35vh;
     --maxh-window: 40vh;
     --maxh-char: 50vh;
@@ -33,21 +33,20 @@
     height:100%; margin:0; color:var(--ink);
     font-family: "Patrick Hand","Nanum Pen Script", system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif;
     background:#000;
-    /* 화면 축소 시 전체 폰트도 함께 축소 */
     font-size: clamp(12px, 1.6vw, 14px);
     letter-spacing:.02em;
   }
 
-  /* 배경: 유리(블러) 제거 */
+  /* 배경: 기존 유지 */
   #app{
     position:relative; height:100dvh; overflow:hidden;
     background-image:
-      linear-gradient(to bottom, rgba(38,27,31,.2), rgba(38,27,31,.2)),
+      linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,.2)),
       var(--bg-url);
     background-size: cover; background-position: center;
   }
 
-  /* 카드/버튼: 그림자 제거, 검정 실선 */
+  /* 카드/버튼: 기존 룰 유지 */
   .card{
     background: rgba(0,0,0,.02);
     border: 2px solid var(--line);
@@ -56,19 +55,25 @@
   .panel{ padding: 1rem; }
 
   button, .pill{
-    cursor:pointer; user-select:none; outline:0;
+    cursor:pointer; user-select:none;
     background: rgba(255,255,255,.08); color:var(--ink);
     border: 1px solid var(--line);
     border-radius: 999px;
     padding: .6rem .9rem;
     font-weight: 700;
-    font-family: inherit;        /* 버튼 폰트도 손글씨 */
-    font-size: 1rem;             /* 루트 폰트와 함께 축소 */
+    font-family: inherit;
+    font-size: 1rem;
     outline: none;
   }
-  
-  
-  input, textarea, select{ font-family: inherit; font-size: 1rem; }
+  /* 포커스 링: 안쪽(inset) */
+  button:focus, .pill:focus,
+  button:focus-visible, .pill:focus-visible{
+    outline: none;
+    box-shadow: inset 0 0 0 3px #7C9AFF;
+  }
+  *{ -webkit-tap-highlight-color: transparent; }
+
+  input, textarea, select{ font-family: inherit; font-size: 1rem; color:#fff }
 
   .row{display:flex; gap:.75rem; align-items:center}
   .hwrap{ display:flex; gap:.5rem; align-items:center; overflow-x:auto; }
@@ -83,7 +88,7 @@
     justify-self:start; width:3.4rem; height:3.4rem; display:grid; place-items:center; font-size:1.2rem;
   }
 
-  /* 타이머(가로 중앙, 상단선 동일, 높이 맥스) */
+  /* 타이머(중앙) */
   #timer{
     justify-self:center;
     width: min(var(--maxw-timer), 90vw);
@@ -94,7 +99,7 @@
   #state{ font-size: 1.25rem; font-weight:900; }
   #time{ font-weight:900; font-size: clamp(2.2rem, 6vw, 4rem); line-height:1; }
 
-  /* Todo list: 우정렬, 입력줄은 항상 하단(3행 그리드) */
+  /* Todo list (우), 입력은 항상 하단 */
   #board{
     justify-self:end;
     width: min(var(--maxw-board), 92vw);
@@ -109,15 +114,13 @@
   .todo .txt{flex:1}
   .todo .del{background:transparent; border:0; color:var(--ink-sub); padding:.3rem .5rem; border-radius:.6rem}
   .todo .del:hover{background:rgba(255,255,255,.12); color:#fff}
-
-  /* << 입력은 '항상 맨 아래' >> */
   #inputRow{ display:flex; gap:.5rem; align-items:center; padding-top:.6rem; }
   #board input[type="text"]{
     width:100%; background:transparent; border: 2px solid var(--line); border-radius: 12px;
     color:#fff; padding:.5rem .6rem;
   }
 
-  /* ===== 메인: 창문(좌) + 캐릭터(중앙) — 같은 top, 맥스 규칙, 비율 유지 ===== */
+  /* ===== 메인: 창문(좌) + 캐릭터(중앙) ===== */
   #window{
     position:absolute; left:2vw; top: var(--content-top); z-index:5;
     width: min(var(--maxw-window), 90vw);
@@ -138,7 +141,7 @@
     background:transparent center/contain no-repeat;
   }
 
-  /* ===== 하단 고정: 재생 / 음악스타일 / 곡 선택 — 가로 정렬 ===== */
+  /* ===== 하단: 음악 재생(그대로 유지) ===== */
   #bottombar{
     position:fixed; left:12px; right:12px; bottom: 8px;
     display:flex; gap:12px; justify-content:center; align-items:flex-end; z-index:12;
@@ -146,7 +149,48 @@
   #bottombar .card{ flex:1 1 0; min-width:260px; }
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
-  /* 반응형(폰트/요소는 이미 clamp·vw로 축소됨) */
+  /* ===== Drawer & Overlay (햄버거 메뉴) ===== */
+  #overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.35);
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index: 50;
+  }
+  #overlay.show{ opacity:1; pointer-events:auto; }
+
+  #drawer{
+    position:fixed; top:0; left:0; bottom:0; width:min(380px, 86vw);
+    background:#111; color:#eee; border-right:2px solid var(--line);
+    transform:translateX(-100%); transition:transform .24s ease; z-index: 60;
+    display:flex; flex-direction:column; gap:0; overflow-y:auto;
+  }
+  #drawer.open{ transform:translateX(0) }
+  .drawer-head{ display:flex; align-items:center; justify-content:space-between; padding:1rem; border-bottom:2px solid var(--line); }
+  .drawer-sec{ padding:1rem; border-bottom:2px dashed rgba(255,255,255,.12); }
+  .drawer-sec h4{ margin:.2rem 0 .8rem; font-weight:900; }
+
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; }
+  .drawer-sec input[type="number"], .drawer-sec input[type="text"]{
+    width:100%; padding:.55rem .7rem; border:2px solid var(--line); border-radius:12px; background:transparent; color:#fff;
+  }
+  .fill{ flex:1 }
+
+  /* 칩/스크롤 미관 개선 (드로어 전용) */
+  .chips{
+    display:flex; gap:.5rem; align-items:center; flex-wrap: wrap;
+  }
+  .chips .pill{
+    border:1px solid var(--line); border-radius:14px; padding:.5rem .75rem;
+    background:rgba(255,255,255,.06);
+    transition: background .15s ease;
+  }
+  .chips .pill:hover{ background:rgba(255,255,255,.12); }
+  .list-scroll{ max-height: 40vh; overflow: auto; padding-bottom: .25rem; }
+  .list-scroll::-webkit-scrollbar{ width:10px; height:10px; }
+  .list-scroll::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.22); border-radius:999px; }
+
+  a#creditLink{ color:#9db7ff; text-decoration:none; border-bottom:1px dashed #9db7ff; }
+  a#creditLink:hover{ opacity:.85; }
+
+  /* 반응형 */
   @media (max-width: 720px){
     :root{
       --content-top: 14vh;
@@ -160,7 +204,58 @@
 <body>
 <div id="app">
 
-  <!-- 상단: 햄버거 / 타이머 / Todo list (상단선 동일) -->
+  <!-- 오버레이 + 드로어(설정) -->
+  <div id="overlay"></div>
+  <aside id="drawer" aria-label="설정">
+    <header class="drawer-head">
+      <h3 style="margin:0">설정</h3>
+      <button id="closeDrawer" class="pill">닫기</button>
+    </header>
+
+    <section class="drawer-sec">
+      <h4>뽀모도로</h4>
+      <div class="grid2">
+        <label>집중(분)
+          <input id="workMin" type="number" min="1" value="25">
+        </label>
+        <label>휴식(분)
+          <input id="restMin" type="number" min="1" value="5">
+        </label>
+      </div>
+      <label style="display:block; margin-top:.5rem">사이클 수(N회)
+        <input id="totalCycles" type="number" min="1" value="4">
+      </label>
+      <div class="row" style="margin-top:.6rem">
+        <button id="applyPom" class="pill">적용</button>
+      </div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>음악 스타일</h4>
+      <div id="moods" class="chips list-scroll"></div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>곡 선택</h4>
+      <div id="tracks" class="chips list-scroll"></div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>배경 선택</h4>
+      <div id="bgChips" class="chips"></div>
+      <div class="row" style="margin-top:.5rem">
+        <input id="customBgUrl" placeholder="배경 이미지 URL 붙여넣기" class="fill">
+        <button id="applyBg" class="pill">적용</button>
+      </div>
+    </section>
+
+    <section class="drawer-sec">
+      <h4>Credits</h4>
+      <a id="creditLink" href="#" target="_blank" rel="noopener">Made by do</a>
+    </section>
+  </aside>
+
+  <!-- 상단: 햄버거 / 타이머 / Todo list -->
   <div id="topbar">
     <button id="hamburger" class="card panel" aria-label="메뉴 열기">⋯</button>
 
@@ -170,13 +265,14 @@
       <div class="row">
         <button class="pill" id="startPause">시작</button>
         <button class="pill" id="reset">리셋</button>
+        <!-- N회 버튼 추가 -->
+        <button class="pill" id="cyclesBtn" title="사이클 진행 상황">0/4회</button>
       </div>
     </section>
 
     <section id="board" class="card panel" aria-label="Todo list">
       <div class="title">Todo list</div>
       <div id="todo-list"></div>
-      <!-- 입력은 항상 카드 맨 아래 (grid 3행) -->
       <div id="inputRow">
         <input id="todo-input" type="text" placeholder="할 일을 적고 Enter" />
         <button id="todo-add" class="pill" title="추가">＋</button>
@@ -188,7 +284,7 @@
   <div id="window"><img id="win-img" alt="창문" /></div>
   <div id="character"><img id="char-img" alt="캐릭터" /></div>
 
-  <!-- 하단: 재생 / 스타일 / 곡선택 (가로 고정) -->
+  <!-- 하단: 음악 재생(유지) -->
   <div id="bottombar">
     <section id="music-controls" class="card panel" aria-label="음악 재생">
       <h4>음악 재생</h4>
@@ -199,21 +295,11 @@
       </div>
       <audio id="player" preload="metadata"></audio>
     </section>
-
-    <section id="music-styles" class="card panel" aria-label="음악 스타일">
-      <h4>음악 스타일</h4>
-      <div class="hwrap" id="moods"></div>
-    </section>
-
-    <section id="track-list" class="card panel" aria-label="곡 선택">
-      <h4>곡 선택</h4>
-      <div class="hwrap" id="tracks"></div>
-    </section>
   </div>
 </div>
 
 <script>
-  /* 무료 상업 사용 가능(FreePD) 트랙 */
+  /* 무료 상업 사용 가능 트랙 (FreePD + Public Domain 화이트/핑크/브라운 노이즈) */
   const TRACKS = [
     { title: "Bass Meant Jazz",     mood: "Jazz",  url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
     { title: "Stompin at Midnight", mood: "Jazz",  url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
@@ -221,10 +307,15 @@
     { title: "Adding the Sun",      mood: "Lo-Fi", url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
     { title: "Bleu",                mood: "Lo-Fi", url: "https://freepd.com/music/Bleu.mp3" },
     { title: "Study and Relax",     mood: "Lo-Fi", url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
-    { title: "Deep Focus",          mood: "Lo-Fi", url: "https://freepd.com/music/Deep%20Focus.mp3" }
+    { title: "Deep Focus",          mood: "Lo-Fi", url: "https://freepd.com/music/Deep%20Focus.mp3" },
+
+    /* === White / Pink / Brown Noise (Public Domain, Internet Archive) === */
+    { title: "White Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
+    { title: "Pink Noise (10m, PD)",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
+    { title: "Brown Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
   ];
 
-  /* 이미지 A/B (0.5초 교차) */
+  /* 이미지 A/B (0.5초 교차) — 기존 유지 */
   let charA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true";
   let charB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true";
   let winA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
@@ -236,7 +327,9 @@
     workSec: 25*60, restSec: 5*60, remainSec: 25*60,
     interval: null, shuffle: false, playing: false,
     mood: "Lo-Fi", trackIdx: 0,
-    repeatMode: "off", // off | one | all
+    repeatMode: "off",            // off | one | all
+    totalCycles: 4,               // 목표 사이클 수 (N회)
+    completedCycles: 0,           // 완료 사이클 수
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]")
   };
 
@@ -250,196 +343,185 @@
   const stateEl = document.getElementById("state");
   const startPause = document.getElementById("startPause");
   const resetBtn = document.getElementById("reset");
+  const cyclesBtn = document.getElementById("cyclesBtn");
   const playPause = document.getElementById("playPause");
   const shuffleBtn = document.getElementById("shuffle");
   const repeatBtn = document.getElementById("repeat");
-  const moodsWrap = document.getElementById("moods");
-  const tracksWrap = document.getElementById("tracks");
   const player = document.getElementById("player");
 
+  /* 드로어 요소 */
+  const overlay = document.getElementById("overlay");
+  const drawer = document.getElementById("drawer");
+  const hamburgerBtn = document.getElementById("hamburger");
+  const closeDrawer = document.getElementById("closeDrawer");
+  const moodsWrap = document.getElementById("moods");
+  const tracksWrap = document.getElementById("tracks");
+  const workMin = document.getElementById("workMin");
+  const restMin = document.getElementById("restMin");
+  const totalCyclesInput = document.getElementById("totalCycles");
+  const applyPom = document.getElementById("applyPom");
+  const bgChips = document.getElementById("bgChips");
+  const customBgUrl = document.getElementById("customBgUrl");
+  const applyBg = document.getElementById("applyBg");
+  const creditLink = document.getElementById("creditLink");
+
   function init(){
-    // 이미지 교차 (원본 비율은 <img>가 유지)
-    charImg.src = charA;
-    winImg.src  = winA;
+    // 드로어 열기/닫기
+    hamburgerBtn.addEventListener("click", ()=>{ drawer.classList.add("open"); overlay.classList.add("show"); });
+    closeDrawer.addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
+    overlay.addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
+
+    // 드로어 입력 초기값
+    workMin.value = Math.round(state.workSec/60);
+    restMin.value = Math.round(state.restSec/60);
+    totalCyclesInput.value = state.totalCycles;
+    updateCyclesBtn();
+
+    // 배경 프리셋
+    const BG_PRESETS = [
+      "https://images.unsplash.com/photo-1462332420958-a05d1e002413?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop"
+    ];
+    BG_PRESETS.forEach((url,i)=>{
+      const btn=document.createElement("button");
+      btn.className="pill";
+      btn.innerHTML=`<img src="${url}" alt="bg${i}" style="width:42px;height:28px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:.4rem"> 배경 ${i+1}`;
+      btn.addEventListener("click", ()=> setBackground(url));
+      bgChips.appendChild(btn);
+    });
+    applyBg.addEventListener("click", ()=>{
+      const url=(customBgUrl.value||"").trim(); if(url) setBackground(url);
+    });
+    function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
+
+    // 이미지 교차(0.5s)
+    charImg.src = charA; winImg.src = winA;
     blinkTimer = setInterval(()=>{
       showA = !showA; charImg.src = showA ? charA : charB;
       showWinA = !showWinA; winImg.src = showWinA ? winA : winB;
     }, 500);
 
+    // To-Do 렌더
     renderTodos();
 
-    // 음악 UI
-    ["Lo-Fi","Jazz","Loud","Piano"].forEach(m=>{
-      const b = document.createElement("button");
-      b.className = "pill"; b.textContent = m; b.dataset.mood = m;
-      b.addEventListener("click", ()=>{ state.mood = m; highlightMood(); });
+    // 음악 — 무드/트랙 버튼을 드로어에 렌더
+    ["Lo-Fi","Jazz","Loud","Piano","Noise"].forEach(m=>{
+      const b=document.createElement("button");
+      b.className="pill"; b.textContent=m; b.dataset.mood=m;
+      b.addEventListener("click", ()=>{ state.mood=m; highlightMood(); });
       moodsWrap.appendChild(b);
     });
     TRACKS.forEach((t, idx)=>{
-      const b = document.createElement("button");
-      b.className = "pill"; b.textContent = t.title; b.dataset.idx = idx;
+      const b=document.createElement("button");
+      b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
       b.addEventListener("click", ()=> selectTrack(idx, state.playing));
       tracksWrap.appendChild(b);
     });
-    selectTrack(0, false);
-    highlightMood(); highlightTrack();
+    selectTrack(0,false); highlightMood(); highlightTrack();
 
-    updateTimerUI();
-    updateRepeatUI();
-
-    // 종료/에러 핸들
+    // 플레이어 핸들러
     player.addEventListener("ended", onEnded);
-    player.addEventListener("error", ()=> {
-      const next = (state.trackIdx + 1) % TRACKS.length;
-      selectTrack(next, true);
+    player.addEventListener("error", ()=>{
+      const n=(state.trackIdx+1)%TRACKS.length; selectTrack(n,true);
     });
 
     // 반복 버튼
     repeatBtn.addEventListener("click", toggleRepeat);
+
+    // 뽀모도로 설정 적용
+    applyPom.addEventListener("click", ()=>{
+      const wm=Math.max(1,parseInt(workMin.value||"25",10));
+      const rm=Math.max(1,parseInt(restMin.value||"5",10));
+      const tc=Math.max(1,parseInt(totalCyclesInput.value||"4",10));
+      state.workSec=wm*60; state.restSec=rm*60; state.totalCycles=tc;
+      resetTimer(); state.completedCycles=0; updateCyclesBtn();
+    });
+
+    // N회 버튼(리셋 옆): 클릭 시 카운터 리셋
+    cyclesBtn.addEventListener("click", ()=>{ state.completedCycles=0; updateCyclesBtn(); });
   }
 
   /* To-Do */
   function renderTodos(){
     boardList.innerHTML = "";
-    if(state.todos.length === 0){ return; }
+    if(state.todos.length === 0) return;
     state.todos.forEach((t,idx)=>{
-      const row = document.createElement("div");
-      row.className = "todo";
-      const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!t.done;
-      cb.addEventListener("change", ()=>{ t.done = cb.checked; persistTodos(); renderTodos(); });
-      const tx = document.createElement("div"); tx.className="txt"; tx.textContent = t.text;
-      tx.style.textDecoration = t.done ? "line-through" : "none";
-      tx.style.opacity = t.done ? ".6" : "1";
-      const del = document.createElement("button"); del.className="del"; del.title="삭제"; del.textContent="삭제";
-      del.addEventListener("click", ()=>{ state.todos.splice(idx,1); persistTodos(); renderTodos(); });
-      row.append(cb, tx, del); boardList.appendChild(row);
+      const row=document.createElement("div"); row.className="todo";
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!t.done;
+      cb.addEventListener("change",()=>{ t.done=cb.checked; persistTodos(); renderTodos(); });
+      const tx=document.createElement("div"); tx.className="txt"; tx.textContent=t.text;
+      tx.style.textDecoration=t.done?"line-through":"none"; tx.style.opacity=t.done?".6":"1";
+      const del=document.createElement("button"); del.className="del"; del.textContent="삭제";
+      del.addEventListener("click",()=>{ state.todos.splice(idx,1); persistTodos(); renderTodos(); });
+      row.append(cb,tx,del); boardList.appendChild(row);
     });
   }
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
-  function addTodo(){
-    const v = todoInput.value.trim(); if(!v) return;
-    state.todos.push({text:v, done:false}); todoInput.value = "";
-    persistTodos(); renderTodos();
-  }
+  function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
   todoAdd.addEventListener("click", addTodo);
-  todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ addTodo() } });
+  todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
 
   /* 음악 */
   function selectTrack(idx, autoplay=false){
-    state.trackIdx = idx;
-    player.src = TRACKS[idx].url;
-    highlightTrack();
-    if(autoplay){ tryPlay(); }
+    state.trackIdx=idx; player.src=TRACKS[idx].url; highlightTrack(); if(autoplay) tryPlay();
   }
-  function tryPlay(){
-    player.play().then(()=>{
-      state.playing = true; playPause.textContent = "일시정지";
-    }).catch(err=>{ console.warn("재생 실패:", err); });
-  }
+  function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent="일시정지"; }).catch(()=>{}); }
   function highlightMood(){
     [...moodsWrap.children].forEach(b=>{
-      b.style.boxShadow = (b.dataset.mood === state.mood)
-        ? "inset 0 0 0 1px #7C9AFF"   // 선택된 버튼 → 안쪽 파란 테두리
-        : "none";                     // 선택되지 않은 버튼 → 효과 없음
+      b.style.boxShadow = (b.dataset.mood===state.mood) ? "inset 0 0 0 1px #7C9AFF" : "none";
     });
   }
   function highlightTrack(){
     [...tracksWrap.children].forEach(b=>{
-      b.style.boxShadow = (Number(b.dataset.idx) === state.trackIdx)
-        ? "inset 0 0 0 1px #7C9AFF"   // 선택된 곡 → 안쪽 파란 테두리
-        : "none";                     // 나머지 → 효과 없음
+      b.style.boxShadow = (+b.dataset.idx===state.trackIdx) ? "inset 0 0 0 1px #7C9AFF" : "none";
     });
   }
-
   playPause.addEventListener("click", ()=>{
-    if(!player.src) selectTrack(state.trackIdx, false);
-    if(!state.playing){ tryPlay(); }
-    else { player.pause(); state.playing=false; playPause.textContent="재생"; }
+    if(!player.src) selectTrack(state.trackIdx,false);
+    if(!state.playing){ tryPlay(); } else { player.pause(); state.playing=false; playPause.textContent="재생"; }
   });
   shuffleBtn.addEventListener("click", ()=>{
-    state.shuffle = !state.shuffle;
-    shuffleBtn.textContent = state.shuffle ? "랜덤 ON" : "랜덤 OFF";
+    state.shuffle=!state.shuffle; shuffleBtn.textContent=state.shuffle?"랜덤 ON":"랜덤 OFF";
   });
 
   // 반복 모드
-  function toggleRepeat(){
-    const order = ["off","one","all"];
-    const i = order.indexOf(state.repeatMode);
-    state.repeatMode = order[(i+1)%order.length];
-    updateRepeatUI();
-  }
-  function updateRepeatUI(){
-    repeatBtn.textContent =
-      "반복: " + (state.repeatMode === "off" ? "꺼짐" : state.repeatMode === "one" ? "한곡" : "전체");
-    player.loop = state.repeatMode === "one";
-  }
+  function toggleRepeat(){ const order=["off","one","all"]; const i=order.indexOf(state.repeatMode); state.repeatMode=order[(i+1)%order.length]; updateRepeatUI(); }
+  function updateRepeatUI(){ repeatBtn.textContent="반복: "+(state.repeatMode==="off"?"꺼짐":state.repeatMode==="one"?"한곡":"전체"); player.loop=(state.repeatMode==="one"); }
+  updateRepeatUI();
   function onEnded(){
-    if (state.repeatMode === "one") return; // loop=true 이므로 자동반복
-    if (state.shuffle) {
-      let next = state.trackIdx;
-      if (TRACKS.length > 1) {
-        while (next === state.trackIdx) next = Math.floor(Math.random() * TRACKS.length);
-      }
-      selectTrack(next, true);
-      return;
+    if(state.repeatMode==="one") return;
+    if(state.shuffle){
+      let n=state.trackIdx; if(TRACKS.length>1){ while(n===state.trackIdx) n=Math.floor(Math.random()*TRACKS.length); }
+      selectTrack(n,true); return;
     }
-    if (state.repeatMode === "all") {
-      const next = (state.trackIdx + 1) % TRACKS.length;
-      selectTrack(next, true);
-      return;
-    }
-    // off: 멈춤
-    state.playing = false; playPause.textContent = "재생";
+    if(state.repeatMode==="all"){ const n=(state.trackIdx+1)%TRACKS.length; selectTrack(n,true); return; }
+    state.playing=false; playPause.textContent="재생";
   }
 
   /* 타이머 */
   function fmt(sec){
-    const s = Math.max(0, sec|0);
-    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), ss= s%60;
-    const mm = m.toString().padStart(2,'0'); const s2 = ss.toString().padStart(2,'0');
-    return h>0 ? `${h}:${mm}:${s2}` : `${mm}:${s2}`;
+    const s=Math.max(0,sec|0); const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+    const mm=m.toString().padStart(2,'0'); const s2=ss.toString().padStart(2,'0');
+    return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`;
   }
-  function updateTimerUI(){
-    timeEl.textContent = fmt(state.remainSec);
-    stateEl.textContent = state.isWork ? "집중중" : "휴식중";
-    startPause.textContent = state.running ? "일시정지" : "시작";
+  function updateTimerUI(){ timeEl.textContent=fmt(state.remainSec); stateEl.textContent=state.isWork?"집중중":"휴식중"; startPause.textContent=state.running?"일시정지":"시작"; }
+  function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
+  function startTimer(){ if(state.running) return; state.running=true; updateTimerUI();
+    state.interval=setInterval(()=>{ if(state.remainSec<=0){ beep(); const wasWork=state.isWork; state.isWork=!state.isWork; state.remainSec=state.isWork?state.workSec:state.restSec;
+        // 휴식이 끝나고 다시 집중으로 진입할 때 +1 (사이클 완료)
+        if(state.isWork && !wasWork){ state.completedCycles=Math.min(state.totalCycles, state.completedCycles+1); updateCyclesBtn(); if(state.completedCycles>=state.totalCycles){ stopTimer(); } }
+      } else { state.remainSec-=1; } updateTimerUI(); },1000);
   }
-  function beep(){
-    try{
-      const ctx = new (window.AudioContext||window.webkitAudioContext)();
-      const o = ctx.createOscillator(); const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(0.0001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime+0.01);
-      o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.25);
-      o.stop(ctx.currentTime+0.3);
-    }catch(e){}
-  }
-  function startTimer(){
-    if(state.running) return;
-    state.running = true; updateTimerUI();
-    state.interval = setInterval(()=>{
-      if(state.remainSec<=0){
-        beep();
-        state.isWork = !state.isWork;
-        state.remainSec = state.isWork? state.workSec : state.restSec;
-      }else{
-        state.remainSec -= 1;
-      }
-      updateTimerUI();
-    }, 1000);
-  }
-  function stopTimer(){
-    state.running = false; if(state.interval){ clearInterval(state.interval); state.interval=null; }
-    updateTimerUI();
-  }
-  function resetTimer(){
-    stopTimer(); state.isWork = true; state.remainSec = state.workSec; updateTimerUI();
-  }
-  document.getElementById("startPause").addEventListener("click", ()=> state.running ? stopTimer() : startTimer());
+  function stopTimer(){ state.running=false; if(state.interval){ clearInterval(state.interval); state.interval=null; } updateTimerUI(); }
+  function resetTimer(){ stopTimer(); state.isWork=true; state.remainSec=state.workSec; updateTimerUI(); }
+  document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
+  function updateCyclesBtn(){ cyclesBtn.textContent = `${state.completedCycles}/${state.totalCycles}회`; }
 
-  /* 시작 */
+  // 시작
   init();
 </script>
 </body>

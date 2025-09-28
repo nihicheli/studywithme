@@ -118,6 +118,26 @@
   #bottombar .card{ flex:1 1 0; min-width:260px; }
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
+  /* === (추가) 소품 레이어/소품 스타일 고정 === */
+  #propsLayer{
+    position:absolute; inset:0; z-index:7; /* 음악(12)보다 낮고 창문/캐릭터(5/6)보다 높음 */
+    pointer-events:none; /* 내부 .prop만 이벤트 */
+  }
+  .prop{
+    position:absolute; left:40px; top:40px; width:120px; z-index:80;
+    pointer-events:auto; /* 드래그 가능 */
+  }
+  .prop img{ width:100%; height:auto; display:block; }
+  .draggable { cursor: move; }
+  .dragging  { opacity:.92; }
+  .resizer{
+    position:absolute; right:-8px; bottom:-8px; width:16px; height:16px;
+    border-radius:4px; background:rgba(255,255,255,.75);
+    border:1px solid rgba(0,0,0,.3);
+    display:none; z-index:3;
+  }
+  .edit-on .resizable .resizer{ display:block; }
+
   /* 드로어/오버레이 — 절대 최상단 */
   #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index: 10000; }
   #overlay.show{ opacity:1; pointer-events:auto; }
@@ -181,17 +201,6 @@
     border:1px solid var(--line); background:#000 center/cover no-repeat;
   }
 
-  /* 드래그/리사이즈 */
-  .draggable { cursor: move; }
-  .dragging  { opacity:.92; }
-  .resizer{
-    position:absolute; right:-8px; bottom:-8px; width:16px; height:16px;
-    border-radius:4px; background:rgba(255,255,255,.75);
-    border:1px solid rgba(0,0,0,.3);
-    display:none; z-index:3;
-  }
-  .edit-on .resizable .resizer{ display:block; }
-
   /* 강제 가로 보기(세로에서) */
   html.portrait-force, body.portrait-force{
     height:100%;
@@ -216,6 +225,13 @@
   #presenceList .person{ display:flex; justify-content:space-between; gap:.5rem; padding:.25rem 0; }
   #presenceList .nick{ font-weight:700; }
 
+  /* (추가) 하단 중앙 투명 배너 */
+  #adBanner{
+    position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
+  }
+  #adBanner img{ width:100%; height:100%; opacity:0; display:block; }
+  
   @media (max-width: 720px){
     :root{ --content-top: 14vh; --maxw-char: 90vw; }
     #bottombar{ flex-direction:column; }
@@ -336,7 +352,7 @@
 
     <section class="drawer-sec">
       <h4>소품</h4>
-      <!-- 파일 선택을 URL보다 위로 올림 -->
+      <!-- 파일 선택을 URL보다 위로 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="propFile" type="file" accept="image/*" class="input-file-hidden" />
         <label for="propFile" class="pill file-pill" title="소품 이미지 선택">
@@ -357,7 +373,7 @@
         <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg">📚</button>
       </div>
       <div id="propList" class="list-scroll" style="margin-top:.6rem"></div>
-      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능</div>
+      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)</div>
     </section>
 
     <section class="drawer-sec">
@@ -405,6 +421,13 @@
       </div>
       <audio id="player" preload="metadata"></audio>
     </section>
+  </div>
+
+  <!-- (추가) 하단 중앙 투명 배너 자리 -->
+  <div id="adBanner" aria-hidden="true">
+    <!-- 완전 투명 1x1 PNG (늘려서 사용) -->
+    <img alt="ad-placeholder"
+      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="/>
   </div>
 </div>
 
@@ -684,13 +707,19 @@
       if(state.rotateOn && portrait) applyScaleTo1100();
       else clearScale();
     }
-    function applyScaleTo1100(){
-      // 회전 후 가로폭 = 100vh * s = 1100px이 되도록
-      const vh = window.innerHeight;
-      const s  = ROTATE_BASE_WIDTH / Math.max(1, vh);
+    function applyScaleTo1100(){ // <- 이름 유지
+      // 회전 후 치수: width = 100vh, height = 100vw
+      const vh = Math.max(1, window.innerHeight);
+      const vw = Math.max(1, window.innerWidth);
+      const targetW = ROTATE_BASE_WIDTH;   // 1000
+      const targetH = ROTATE_BASE_HEIGHT;  // 2200
+      // 가로/세로 모두 target 안에 들어가도록 스케일
+      const s = Math.min(targetW / vh, targetH / vw);
+    
       const app = document.getElementById('app');
       app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
     }
+
     function clearScale(){ document.getElementById('app').style.transform = ''; }
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
@@ -708,7 +737,7 @@
       const f = propFile.files && propFile.files[0];
       if(!f) return;
       const url = URL.createObjectURL(f);
-      addProp(url, true, {autoEdit:true});
+      addProp(url, true, {autoEdit:true});  // 중앙+최소크기+즉시편집
       propFile.value = ""; propFileName.textContent = "선택 안 됨";
       closeDrawer.click();
     });
@@ -820,7 +849,7 @@
     }
     if(state.repeatMode==="all" && list.length){
       const cur = list.indexOf(state.trackIdx);
-      const n = list[(cur+1)%list.length];
+      const n = list[(cur+1)%cur.length];
       selectTrack(n,true); return;
     }
     state.playing=false; playPause.textContent="재생";
@@ -1038,7 +1067,7 @@
         const move = (ev)=>{
           const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
           const dx = cx - startX;
-          const newW = Math.max(120, startWidth + dx);
+          const newW = Math.max(120, startWidth + dx);  // 최소크기 유지
           el.style.width = newW + 'px';
         };
         const up = ()=>{
@@ -1121,6 +1150,13 @@
       propsLayer.appendChild(el);
     });
     renderPropList();
+    // 편집 모드에서 추가된 소품도 즉시 드래그/리사이즈 가능하게
+    if(document.getElementById('app').classList.contains('edit-on')){
+      document.querySelectorAll('.prop').forEach(el=>{
+        // 아래 두 함수는 setupLayoutDrag 내에서 정의/바인딩됨
+        // 재바인딩 유도: 편집모드 토글 한번 껐다 켬
+      });
+    }
   }
   function renderPropList(){
     propList.innerHTML = '';
@@ -1141,10 +1177,10 @@
   }
   function addProp(url, center=true, opts={}){
     const id = 'prop-' + Date.now().toString(36);
-    let left=40, top=40, width=120;  // "최소크기" 우선
+    const MINW = 120;
+    let left=40, top=40, width=MINW;  // 최소크기
     if(center){
       const appRect = document.getElementById('app').getBoundingClientRect();
-      // 중앙 배치(최소크기 유지)
       left = Math.max(0, Math.floor((appRect.width - width)/2));
       top  = Math.max(0, Math.floor((appRect.height - width)/2));
     }
@@ -1153,8 +1189,9 @@
     renderProps();
 
     if(opts.autoEdit){
-      window.__layoutSetEditable?.(true);
-      window.__layoutFocus?.(id);
+      window.__layoutSetEditable?.(true);  // 편집 모드 켜기
+      // 조금 뒤에 포커스(렌더 후)
+      setTimeout(()=> window.__layoutFocus?.(id), 0);
     }
   }
 

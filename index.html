@@ -193,9 +193,13 @@
   .edit-on .resizable .resizer{ display:block; }
 
   /* 강제 가로 보기(세로에서) */
-  html.portrait-force, body.portrait-force{ height:100%; overflow:hidden; }
+  html.portrait-force, body.portrait-force{
+    height:100%;
+    overflow-x:auto;           /* 가로 스크롤 허용 → 1100px 기준 확대해도 볼 수 있게 */
+    overflow-y:auto;
+  }
   .portrait-force #app{
-    width: 100vh;
+    width: 100vh;              /* 회전 전 치수 → 회전 후 가로폭=100vh */
     height: 100vw;
     transform: rotate(90deg) translateY(-100%); /* scale은 JS로 주입 */
     transform-origin: top left;
@@ -278,7 +282,7 @@
       <div class="row" style="margin-top:.5rem">
         <button id="shareStudyBtn" class="pill">내 공부시간 공개: 켜짐</button>
       </div>
-      <div style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시. 공부시간 비공개 시 내 시간은 숨겨집니다.</div>
+      <div style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시.</div>
     </section>
 
     <!-- 3) 음악 -->
@@ -294,7 +298,7 @@
 
     <!-- 화면 표시 / 레이아웃 / 배경 / 소품 / 크레딧 -->
     <section class="drawer-sec">
-      <h4>화면 표시</h4>
+      <h4>창문/캐릭터 표시</h4>
       <div class="row">
         <button id="toggleWindow" class="pill">창문: 보임</button>
         <button id="toggleCharacter" class="pill">캐릭터: 보임</button>
@@ -302,13 +306,12 @@
     </section>
 
     <section class="drawer-sec">
-      <h4>레이아웃(화면설정)</h4>
+      <h4>화면 설정</h4>
       <div class="row">
         <button id="layoutEdit" class="pill">배치 편집: 꺼짐</button>
         <button id="layoutReset" class="pill" title="원상복구">원상복구</button>
         <button id="rotateToggle" class="pill" title="세로에서 가로로 표시">회전: 켜짐</button>
       </div>
-      <div style="opacity:.8; margin-top:.4rem">※ 편집 모드에서 요소 드래그/리사이즈(비율 유지). ‘회전’은 세로 화면에서 가로로 보이게 해줍니다.</div>
     </section>
 
     <section class="drawer-sec">
@@ -333,11 +336,7 @@
 
     <section class="drawer-sec">
       <h4>소품</h4>
-      <div class="row">
-        <input id="propUrl" class="fill pill-input" placeholder="소품 이미지 URL">
-        <button id="propAdd" class="pill">추가</button>
-      </div>
-      <!-- 파일 선택을 배경 스타일과 동일하게 -->
+      <!-- 파일 선택을 URL보다 위로 올림 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="propFile" type="file" accept="image/*" class="input-file-hidden" />
         <label for="propFile" class="pill file-pill" title="소품 이미지 선택">
@@ -345,6 +344,10 @@
         </label>
         <span id="propFileName">선택 안 됨</span>
         <button id="propFileAdd" class="pill">파일 추가</button>
+      </div>
+      <div class="row" style="margin-top:.5rem">
+        <input id="propUrl" class="fill pill-input" placeholder="소품 이미지 URL">
+        <button id="propAdd" class="pill">추가</button>
       </div>
 
       <div class="chips" style="margin-top:.5rem">
@@ -354,7 +357,7 @@
         <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg">📚</button>
       </div>
       <div id="propList" class="list-scroll" style="margin-top:.6rem"></div>
-      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능(자동 편집 모드)</div>
+      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능</div>
     </section>
 
     <section class="drawer-sec">
@@ -416,9 +419,9 @@
     { title: "Study and Relax",     mood: "Lo-Fi", url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
     { title: "Deep Focus",          mood: "Lo-Fi", url: "https://freepd.com/music/Deep%20Focus.mp3" },
     /* White/Pink/Brown Noise (Public Domain) */
-    { title: "White Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
-    { title: "Pink Noise (10m, PD)",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
-    { title: "Brown Noise (10m, PD)",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
+    { title: "White Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
+    { title: "Pink Noise",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
+    { title: "Brown Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
   ];
 
   /* 창문/캐릭터 0.5s 교차 */
@@ -428,6 +431,8 @@
   let winB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
   let showA = true, showWinA = true, blinkTimer = null;
 
+  const ROTATE_BASE_WIDTH = 1100; /* 세로에서 가로처럼 보여줄 때 목표 가로폭(px) */
+
   /* ===== 전역 상태 ===== */
   const lsShare = localStorage.getItem("shareStudy");
   const state = {
@@ -436,7 +441,7 @@
     isWork: true, running: false,
     workSec: 25*60, restSec: 5*60, remainSec: 25*60,
     interval: null, shuffle: false, playing: false,
-    mood: "Lo-Fi", trackIdx: 0, repeatMode: "off",
+    mood: "전체", trackIdx: 0, repeatMode: "off",   // 기본 '전체'로
     totalCycles: 4, completedCycles: 0,
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]"),
     theme: localStorage.getItem("theme") || "dark",
@@ -506,8 +511,6 @@
   const customBgFile = document.getElementById("customBgFile");
   const bgFileName   = document.getElementById("bgFileName");
   const bgPreview    = document.getElementById("bgPreview");
-
-  const creditLink   = document.getElementById("creditLink");
 
   const toggleWindowBtn    = document.getElementById("toggleWindow");
   const toggleCharacterBtn = document.getElementById("toggleCharacter");
@@ -593,7 +596,7 @@
     applyBg.addEventListener("click", ()=>{ const url=(customBgUrl.value||"").trim(); if(url) setBackground(url); });
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
-    // 배경: 파일 선택 즉시 적용 (버튼 없음)
+    // 배경: 파일 선택 즉시 적용
     customBgFile?.addEventListener("change", ()=>{
       const file = customBgFile.files && customBgFile.files[0];
       if(!file) return;
@@ -602,7 +605,7 @@
       reader.onload = (e)=>{
         const dataUrl = e.target.result;
         bgPreview.style.backgroundImage = `url("${dataUrl}")`;
-        setBackground(dataUrl); // 즉시 적용
+        setBackground(dataUrl);
       };
       reader.readAsDataURL(file);
     });
@@ -619,23 +622,19 @@
     todoAdd.addEventListener("click", addTodo);
     todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
 
-    // 음악
-    ["Lo-Fi","Jazz","Loud","Piano","Noise"].forEach(m=>{
-      const b=document.createElement("button");
-      b.className="pill"; b.textContent=m; b.dataset.mood=m;
-      b.addEventListener("click", ()=>{ state.mood=m; highlightMood(); });
-      moodsWrap.appendChild(b);
-    });
-    TRACKS.forEach((t, idx)=>{
-      const b=document.createElement("button");
-      b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
-      b.addEventListener("click", ()=> selectTrack(idx, state.playing));
-      tracksWrap.appendChild(b);
-    });
-    selectTrack(0,false); highlightMood(); highlightTrack();
+    // 음악 — 스타일/트랙 필터링
+    initMoodsAndTracks();
 
     player.addEventListener("ended", onEnded);
-    player.addEventListener("error", ()=>{ const n=(state.trackIdx+1)%TRACKS.length; selectTrack(n,true); });
+    player.addEventListener("error", ()=>{
+      // 오류 시: 현재 필터 목록에서 다음 곡
+      const list = filteredTrackIdxs();
+      if(list.length){
+        const curPos = list.indexOf(state.trackIdx);
+        const n = list[(curPos+1) % list.length];
+        selectTrack(n,true);
+      }
+    });
     repeatBtn.addEventListener("click", toggleRepeat);
 
     // 설정 적용
@@ -672,8 +671,8 @@
     // 레이아웃 편집/원복(타이머 유지)
     setupLayoutDrag();
 
-    // 회전 토글(세로에서 가로로 표시) — 기본 켜짐(더 긴 변을 가로로 인식)
-    function setRotate(on, fromUser=false){
+    // 회전 토글 — 기본 켜짐
+    function setRotate(on){
       state.rotateOn = !!on;
       localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
       rotateToggle.textContent = `회전: ${state.rotateOn ? "켜짐" : "꺼짐"}`;
@@ -682,36 +681,25 @@
     function applyRotateState(){
       const portrait = window.innerHeight > window.innerWidth;
       document.documentElement.classList.toggle('portrait-force', state.rotateOn && portrait);
-      if(state.rotateOn && portrait) applyScale();
+      if(state.rotateOn && portrait) applyScaleTo1100();
       else clearScale();
     }
-    function applyScale(){
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const s = Math.min(vw / vh, vh / vw);
+    function applyScaleTo1100(){
+      // 회전 후 가로폭 = 100vh * s = 1100px이 되도록
+      const vh = window.innerHeight;
+      const s  = ROTATE_BASE_WIDTH / Math.max(1, vh);
       const app = document.getElementById('app');
       app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
     }
-    function clearScale(){
-      document.getElementById('app').style.transform = '';
-    }
-    rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn, true));
+    function clearScale(){ document.getElementById('app').style.transform = ''; }
+    rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
-    // 초기: 저장값 없으면 더 긴 변 기준으로 자동
-    if(localStorage.getItem('rotateOn') === null){
-      setRotate(true);
-    }else{
-      setRotate(state.rotateOn);
-    }
+    if(localStorage.getItem('rotateOn') === null){ setRotate(true); } else { setRotate(state.rotateOn); }
 
-    // 소품 + 파일 업로드(중심 배치 → 편집)
+    // 소품 프리셋
     document.querySelectorAll('.propPreset').forEach(btn=> btn.addEventListener('click', ()=> addProp(btn.dataset.url, true, {autoEdit:true})));
-    propAdd.addEventListener('click', ()=>{
-      const u=(propUrl.value||"").trim(); if(!u) return;
-      addProp(u, true, {autoEdit:true});
-      propUrl.value=""; closeDrawer.click();
-    });
-    // 파일 선택 스타일 개선 + 파일명 표시
+    // 파일 선택(라벨 파일명 표시) + 추가 시 중앙 최소배치 + 즉시 편집
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
       propFileName.textContent = f ? f.name : '선택 안 됨';
@@ -724,7 +712,12 @@
       propFile.value = ""; propFileName.textContent = "선택 안 됨";
       closeDrawer.click();
     });
-
+    // URL 추가도 중앙 최소 배치 + 즉시 편집
+    propAdd.addEventListener('click', ()=>{
+      const u=(propUrl.value||"").trim(); if(!u) return;
+      addProp(u, true, {autoEdit:true});
+      propUrl.value=""; closeDrawer.click();
+    });
     renderProps();
 
     // 내 공부시간 공개 토글 (기본 ON)
@@ -769,23 +762,67 @@
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
   function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
 
-  /* 음악 */
+  /* 음악: 스타일/트랙 필터링 */
+  function MOODS(){ return ["전체","Lo-Fi","Jazz","Loud","Piano","Noise"]; }
+  function filteredTrackIdxs(){
+    if(state.mood==="전체") return TRACKS.map((_,i)=>i);
+    return TRACKS.map((t,i)=> t.mood===state.mood ? i : -1).filter(i=>i>=0);
+  }
+  function initMoodsAndTracks(){
+    moodsWrap.innerHTML = "";
+    MOODS().forEach(m=>{
+      const b=document.createElement("button");
+      b.className="pill"; b.textContent=m; b.dataset.mood=m;
+      b.addEventListener("click", ()=>{ state.mood=m; highlightMood(); renderTracks(); });
+      moodsWrap.appendChild(b);
+    });
+    highlightMood();
+    renderTracks(true);
+  }
+  function renderTracks(initial=false){
+    tracksWrap.innerHTML = "";
+    const idxs = filteredTrackIdxs();
+    idxs.forEach(idx=>{
+      const t = TRACKS[idx];
+      const b=document.createElement("button");
+      b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
+      b.addEventListener("click", ()=> selectTrack(idx, state.playing));
+      tracksWrap.appendChild(b);
+    });
+    // 현재 선택곡이 필터에서 빠졌다면 첫 곡으로
+    if(!idxs.includes(state.trackIdx) && idxs.length){
+      selectTrack(idxs[0], false);
+    }
+    highlightTrack();
+    if(initial){ selectTrack(idxs[0] ?? 0, false); }
+  }
   function selectTrack(idx, autoplay=false){ state.trackIdx=idx; player.src=TRACKS[idx].url; highlightTrack(); if(autoplay) tryPlay(); }
   function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent="일시정지"; }).catch(()=>{}); }
   function highlightMood(){ [...moodsWrap.children].forEach(b=>{ b.style.boxShadow = (b.dataset.mood===state.mood) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
   function highlightTrack(){ [...tracksWrap.children].forEach(b=>{ b.style.boxShadow = (+b.dataset.idx===state.trackIdx) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
-  playPause.addEventListener("click", ()=>{
+  document.getElementById("playPause").addEventListener("click", ()=>{
     if(!player.src) selectTrack(state.trackIdx,false);
     if(!state.playing){ tryPlay(); } else { player.pause(); state.playing=false; playPause.textContent="재생"; }
   });
-  shuffleBtn.addEventListener("click", ()=>{ state.shuffle=!state.shuffle; shuffleBtn.textContent=state.shuffle?"랜덤 ON":"랜덤 OFF"; });
+  document.getElementById("shuffle").addEventListener("click", ()=>{ state.shuffle=!state.shuffle; shuffleBtn.textContent=state.shuffle?"랜덤 ON":"랜덤 OFF"; });
   function toggleRepeat(){ const order=["off","one","all"]; const i=order.indexOf(state.repeatMode); state.repeatMode=order[(i+1)%order.length]; updateRepeatUI(); }
   function updateRepeatUI(){ repeatBtn.textContent="반복: "+(state.repeatMode==="off"?"꺼짐":state.repeatMode==="one"?"한곡":"전체"); player.loop=(state.repeatMode==="one"); }
   updateRepeatUI();
   function onEnded(){
     if(state.repeatMode==="one") return;
-    if(state.shuffle){ let n=state.trackIdx; if(TRACKS.length>1){ while(n===state.trackIdx) n=Math.floor(Math.random()*TRACKS.length); } selectTrack(n,true); return; }
-    if(state.repeatMode==="all"){ const n=(state.trackIdx+1)%TRACKS.length; selectTrack(n,true); return; }
+    const list = filteredTrackIdxs();
+    if(state.shuffle){
+      let n = state.trackIdx;
+      if(list.length>1){
+        while(n===state.trackIdx) n = list[Math.floor(Math.random()*list.length)];
+      }
+      selectTrack(n,true); return;
+    }
+    if(state.repeatMode==="all" && list.length){
+      const cur = list.indexOf(state.trackIdx);
+      const n = list[(cur+1)%list.length];
+      selectTrack(n,true); return;
+    }
     state.playing=false; playPause.textContent="재생";
   }
 
@@ -1064,7 +1101,7 @@
     restorePositionsOnLoad();
   }
 
-  /* 소품(중앙 삽입 + 즉시 편집) */
+  /* 소품(중앙 "최소크기" 배치 + 즉시 편집) */
   function renderProps(){
     propsLayer.innerHTML = '';
     state.props.forEach(p=>{
@@ -1102,12 +1139,12 @@
       propList.appendChild(row);
     });
   }
-  function addProp(url, center=false, opts={}){
+  function addProp(url, center=true, opts={}){
     const id = 'prop-' + Date.now().toString(36);
-    let left=40, top=40, width=120;
+    let left=40, top=40, width=120;  // "최소크기" 우선
     if(center){
       const appRect = document.getElementById('app').getBoundingClientRect();
-      width = Math.min(240, Math.floor(appRect.width * 0.25));
+      // 중앙 배치(최소크기 유지)
       left = Math.max(0, Math.floor((appRect.width - width)/2));
       top  = Math.max(0, Math.floor((appRect.height - width)/2));
     }
@@ -1129,9 +1166,9 @@
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://jvpasqknlkeyshrevqpg.supabase.co";   // ← 본인 값
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2cGFzcWtubGtleXNocmV2cXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNDQyOTMsImV4cCI6MjA3NDYyMDI5M30.7zKRGoBFjoWksoRXjUj8n4KzLXdiF86lZwneNdZNF5k
-";          // ← 본인 값
+/* 사용자가 제공한 환경변수 (교체 완료) */
+const SUPABASE_URL = "https://jvpasqknlkeyshrevqpg.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2cGFzcWtubGtleXNocmV2cXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNDQyOTMsImV4cCI6MjA3NDYyMDI5M30.7zKRGoBFjoWksoRXjUj8n4KzLXdiF86lZwneNdZNF5k";
 
 const presencePanel = document.getElementById("presencePanel");
 const meNickEl      = document.getElementById("meNick");
@@ -1143,20 +1180,20 @@ let supabase = null;
 let channel  = null;
 let heartbeat= null;
 
-/* 기본 ON: 모듈 로드 시 자동 연결 시도 */
+/* 기본 ON: 로드 시 자동 연결 */
 window.addEventListener('load', ()=>{ if(cfgReady()) goOnline(); });
 
 function cfgReady(){
-  return SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== "YOUR_PUBLIC_ANON_KEY";
+  return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY;
 }
 function getSnapshot(){
   const st = window.state || {};
   let study = null;
   if(st.shareStudy){
     if(st.mode==='timer'){
-      study = st.remainSec||0;
+      study = st.remainSec||0;                       // 카운트업 전체 경과
     }else if(st.mode==='pomodoro' && st.isWork){
-      study = Math.max(0,(st.workSec|0) - (st.remainSec|0));
+      study = Math.max(0,(st.workSec|0) - (st.remainSec|0)); // 현재 집중 경과
     }
   }
   const status = (st.mode==='pomodoro') ? (st.isWork ? "work" : "break") : "timer";

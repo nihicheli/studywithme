@@ -53,7 +53,7 @@
   .panel{ padding: 1rem; }
 
   button, .pill{
-    cursor:pointer; user-select:none; outline:0;
+    cursor:pointer; user-select:none; outline:0; touch-action: manipulation;
     background: rgba(255,255,255,.08); color:var(--ink);
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -122,11 +122,11 @@
   /* === 소품 레이어 === */
   #propsLayer{
     position:absolute; inset:0; z-index:7;
-    pointer-events:none;
+    pointer-events:none; /* 기본은 클릭 통과 */
   }
   .prop{
     position:absolute; left:40px; top:40px; width:120px; z-index:80;
-    pointer-events:auto;
+    pointer-events:auto; /* 소품 자체는 클릭 가능 */
   }
   .prop img{ width:100%; height:auto; display:block; }
   .draggable { cursor: move; }
@@ -237,20 +237,23 @@
   }
   #adBanner img{ width:100%; height:100%; opacity:0; display:block; }
 
-  /* ========== 모바일 전용 오버라이드 ========== */
+  /* ========== 모바일 전용 오버라이드 (확대) ========== */
   @media (max-width: 720px){
-    /* 요청하신 모바일 전용 최대 높이/폭 */
-    :root{
-      --content-top: 14vh;      /* 기존 유지 */
-      --maxh-board: 80vh;
-      --maxh-timer: 35vh;
-      --maxh-window: 45vh;
-      --maxh-char: 60vh;
+    /* 전반적 확대 */
+    html, body{ font-size: clamp(15px, 4.6vw, 18px); }
 
-      --maxw-board: 35vw;
-      --maxw-window: 20vw;
-      --maxw-timer: 45vw;
-      --maxw-char: 80vw;
+    :root{
+      --content-top: 12vh;
+      --maxh-board: 80vh;
+      --maxh-timer: 40vh;
+      --maxh-window: 50vh;
+      --maxh-char: 65vh;
+
+      /* 폭 확대 */
+      --maxw-board: 70vw;
+      --maxw-window: 40vw;
+      --maxw-timer: 86vw;
+      --maxw-char: 98vw;
     }
 
     #bottombar{ flex-direction:column; }
@@ -451,7 +454,7 @@
     </section>
   </div>
 
-  <!-- (추가) 하단 중앙 투명 배너 자리 -->
+  <!-- (추후 광고) 하단 중앙 투명 배너 -->
   <div id="adBanner" aria-hidden="true">
     <img alt="ad-placeholder"
       src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="/>
@@ -481,8 +484,6 @@
   let winB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
   let showA = true, showWinA = true, blinkTimer = null;
 
-  const ROTATE_BASE_WIDTH = 1100; /* 세로에서 가로처럼 보여줄 때 목표 가로폭(px) */
-
   /* ===== 전역 상태 ===== */
   const lsShare = localStorage.getItem("shareStudy");
   const state = {
@@ -501,6 +502,18 @@
     rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1")
   };
   window.state = state;
+
+  /* 새로고침시 타이머 유지 */
+  window.addEventListener('beforeunload', ()=>{
+    try{
+      const snap = {
+        mode: state.mode, isWork: state.isWork, running: state.running,
+        workSec: state.workSec, restSec: state.restSec, remainSec: state.remainSec,
+        totalCycles: state.totalCycles, completedCycles: state.completedCycles
+      };
+      sessionStorage.setItem('timer-keep', JSON.stringify(snap));
+    }catch(e){}
+  });
 
   let __resumeAfterReload = false;
   (function restoreTimerFromSession(){
@@ -584,6 +597,18 @@
   const presenceToggle= document.getElementById("presenceToggle");
   const nicknameInput = document.getElementById("nickname");
 
+  /* 드로어 여닫기 보장 함수 (오버레이 잔존 방지) */
+  function openDrawerNow(){
+    drawer.classList.add("open");
+    overlay.classList.add("show");
+    overlay.style.pointerEvents = "auto";
+  }
+  function closeDrawerNow(){
+    drawer.classList.remove("open");
+    overlay.classList.remove("show");
+    overlay.style.pointerEvents = "none";
+  }
+
   function applyTheme(t){
     document.documentElement.setAttribute("data-theme", t);
     themeToggle.textContent = (t==="dark" ? "🌙" : "☀️");
@@ -593,10 +618,10 @@
   function init(){
     applyTheme(state.theme);
 
-    hamburgerBtn.addEventListener("click", ()=>{ drawer.classList.add("open"); overlay.classList.add("show"); });
-    closeDrawer  .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
-    overlay      .addEventListener("click", ()=>{ drawer.classList.remove("open"); overlay.classList.remove("show"); });
-    themeToggle  .addEventListener("click", ()=>{ state.theme = (state.theme==="dark")?"light":"dark"; applyTheme(state.theme); });
+    hamburgerBtn.addEventListener("click", openDrawerNow);
+    closeDrawer  .addEventListener("click", closeDrawerNow);
+    overlay      .addEventListener("click", closeDrawerNow);
+    themeToggle  .addEventListener("click", ()=>{ state.theme = (state.theme==="dark")?"light":"light"===state.theme?"dark":"dark"; applyTheme(state.theme); });
 
     modeRadios.forEach(r=>{
       r.checked = (r.value === state.mode);
@@ -702,6 +727,7 @@
 
     setupLayoutDrag();
 
+    /* 회전(간소화: 스케일 호출 제거) */
     function setRotate(on){
       state.rotateOn = !!on;
       localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
@@ -711,42 +737,51 @@
     function applyRotateState(){
       const portrait = window.innerHeight > window.innerWidth;
       document.documentElement.classList.toggle('portrait-force', state.rotateOn && portrait);
-      if (state.rotateOn && portrait) applyScaleToTarget();
-      else clearScale();
     }
-    function applyScaleTo1100(){
-      const vh = Math.max(1, window.innerHeight);
-      const vw = Math.max(1, window.innerWidth);
-      const targetW = ROTATE_BASE_WIDTH;
-      const targetH = ROTATE_BASE_HEIGHT;  /* (원본 로직 유지) */
-      const s = Math.min(targetW / vh, targetH / vw);
-      const app = document.getElementById('app');
-      app.style.transform = `rotate(90deg) translateY(-100%) scale(${s})`;
-    }
-    function clearScale(){ document.getElementById('app').style.transform = ''; }
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
     if(localStorage.getItem('rotateOn') === null){ setRotate(false); } else { setRotate(state.rotateOn); }
 
-    document.querySelectorAll('.propPreset').forEach(btn=> btn.addEventListener('click', ()=> addProp(btn.dataset.url, true, {autoEdit:true})));
+    /* 소품 프리셋 */
+    document.querySelectorAll('.propPreset').forEach(btn=>
+      btn.addEventListener('click', ()=>{
+        addProp(btn.dataset.url, true, {autoEdit:true});
+        closeDrawerNow();           /* 오버레이 잔존 방지 */
+      })
+    );
+
+    /* (개선) 소품 파일 선택: 모바일에서도 '선택 즉시 추가' */
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
       propFileName.textContent = f ? f.name : '선택 안 됨';
+      if(f){
+        const url = URL.createObjectURL(f);
+        addProp(url, true, {autoEdit:true});
+        // iOS에서 포커스/버튼 문제 방지: 드로어와 오버레이를 확실히 닫기
+        closeDrawerNow();
+        // 파일 입력 리셋 (같은 파일 재첨부 가능)
+        setTimeout(()=>{ propFile.value=""; propFileName.textContent="선택 안 됨"; }, 0);
+      }
     });
+
+    /* (유지) 별도의 '파일 추가' 버튼도 제공 */
     propFileAdd.addEventListener('click', ()=>{
       const f = propFile.files && propFile.files[0];
       if(!f) return;
       const url = URL.createObjectURL(f);
       addProp(url, true, {autoEdit:true});
       propFile.value = ""; propFileName.textContent = "선택 안 됨";
-      closeDrawer.click();
+      closeDrawerNow();
     });
+
     propAdd.addEventListener('click', ()=>{
       const u=(propUrl.value||"").trim(); if(!u) return;
       addProp(u, true, {autoEdit:true});
-      propUrl.value=""; closeDrawer.click();
+      propUrl.value="";
+      closeDrawerNow();
     });
+
     renderProps();
 
     function refreshShareStudyUI(){
@@ -844,7 +879,7 @@
     }
     if(state.repeatMode==="all" && list.length){
       const cur = list.indexOf(state.trackIdx);
-      const n = list[(cur+1)%cur.length];
+      const n = list[(cur+1)%list.length];
       selectTrack(n,true); return;
     }
     state.playing=false; playPause.textContent="재생";

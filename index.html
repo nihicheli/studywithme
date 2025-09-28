@@ -216,8 +216,12 @@
 
   /* 오른쪽 아래: 실시간 패널 */
   #presencePanel{
-    position:fixed; right:12px; bottom: calc(8px + 112px);
-    width: 260px; z-index: 8000;
+    position: fixed;
+    right: 0;                                /* 화면 우측에 딱 붙임 */
+    bottom: calc(8px + 112px);
+    width: 25vw;                              /* 화면 가로의 25% */
+    max-width: 25vw;                          /* 정확히 25%만 쓰도록 */
+    z-index: 8000;
   }
   #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
   #presencePanel .dot.work{ background:#7CFF7C; }
@@ -236,8 +240,11 @@
     :root{ --content-top: 14vh; --maxw-char: 90vw; }
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
-    #presencePanel{ width: 90vw; right:5vw; bottom: calc(8px + 160px); }
-  }
+    #presencePanel{
+      width: 25vw;               /* 모바일도 25% 유지 */
+      right: 0;
+      bottom: calc(8px + 160px); /* 기존 하단 여백 유지 */
+    }
 </style>
 </head>
 <body>

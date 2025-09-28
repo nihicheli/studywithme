@@ -742,7 +742,13 @@
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
-    if(localStorage.getItem('rotateOn') === null){ setRotate(false); } else { setRotate(state.rotateOn); }
+    // 저장된 값이 없으면: 스마트폰 = 기본 ON, 그 외 = 기본 OFF
+    const savedRotate = localStorage.getItem('rotateOn');
+    if (savedRotate === null) {
+      setRotate(isSmartphone());        // 스마트폰이면 true, 아니면 false
+    } else {
+      setRotate(savedRotate === '1');   // 사용자가 이전에 선택한 값 유지
+    }
 
     /* 소품 프리셋 */
     document.querySelectorAll('.propPreset').forEach(btn=>
@@ -1230,7 +1236,15 @@ const meNickEl      = document.getElementById("meNick");
 const presenceList  = document.getElementById("presenceList");
 const presenceToggle= document.getElementById("presenceToggle");
 const nicknameInput = document.getElementById("nickname");
+// --- smartphone detector (여기에 추가) ---
+function isSmartphone(){
+  const ua = navigator.userAgent || navigator.vendor || window.opera || "";
+  const looksMobileUA = /iPhone|iPod|Android.+Mobile|Mobi/i.test(ua);
+  const smallViewport = Math.min(window.innerWidth, window.innerHeight) <= 820; // 태블릿 제외용 여유값
+  return looksMobileUA && smallViewport;
+}
 
+  
 let supabase = null;
 let channel  = null;
 let heartbeat= null;

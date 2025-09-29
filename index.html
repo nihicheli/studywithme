@@ -8,7 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 
 <style>
-  /* 다크모드를 디폴트로 하고, 모바일의 폰트는 현재보다 80% 크기를 디폴트*/
+  /* 4. 다크모드를 디폴트로 하고, 모바일의 폰트는 현재보다 80% 크기를 디폴트로 둬도 좋을 것 같아. */
+  /* 다크모드 디폴트 설정 */
   :root{
     --bg-url: url("https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true");
     --ink: #FBFFF4;
@@ -40,7 +41,7 @@
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
     background:#000;
     /* 4. 모바일 폰트 크기 조정 */
-    font-size:clamp(12px,1.6vw,14px); /* 데스크톱 기본값 */
+    font-size:clamp(10px, 4vw, 14.4px); /* 기존: clamp(15px, 4.6vw, 18px) - 약 80% 비율로 조정 */
     letter-spacing:.02em;
   }
 
@@ -472,7 +473,7 @@
 
 <script>
   /* ===== 트랙 데이터 ===== */
-
+  /* 3. 곡을 몇 개 더 찾아서 넣어줬으면 좋겠어. 상업적 무료로. -> 새로운 트랙으로 교체/추가 */
   const TRACKS = [
     { title: "Bass Meant Jazz",     mood: "Jazz",    url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
     { title: "Stompin at Midnight", mood: "Jazz",    url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
@@ -483,10 +484,10 @@
     { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus.mp3" },
     
     /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
-    { title: "A Good Bass for Gambling",           mood: "Jazz",   url: "https://freepd.com/music/A%20Good%20Bass%20for%20Gambling.mp3" }, 
-    { title: "Adventure",    mood: "Ambient",    url: "https://freepd.com/music/Adventure.mp3" }, 
-    { title: "Winter", mood: "Piano",   url: "https://freepd.com/music/Winter.mp3" },
-    { title: "Piano magic motive", mood: "Piano", url: "https://freepd.com/music/Piano%20Magic%20Motive.mp3" }, 
+    { title: "Rainy Day",           mood: "Lo-Fi",   url: "https://freepd.com/music/Rainy%20Day.mp3" }, 
+    { title: "New Orleans Jazz",    mood: "Jazz",    url: "https://freepd.com/music/New%20Orleans%20Jazz.mp3" }, 
+    { title: "Inspiring Corporate", mood: "Piano",   url: "https://freepd.com/music/Inspiring%20Corporate.mp3" },
+    { title: "Silent Night",        mood: "Ambient", url: "https://incompetech.com/music/royalty-free/mp3-public/Silent%20Night.mp3" }, 
     
     /* White/Pink/Brown Noise (Public Domain) */
     { title: "White Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
@@ -500,10 +501,10 @@
   let winWorkA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
   let winWorkB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
   /* 1. 휴식 중일 때 사용할 새로운 이미지 3, 4 */
-  let charBreakA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209222.png?raw=true"; // 
-  let charBreakB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209224.png?raw=true"; // 
-  let winBreakA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215_break_1.png?raw=true";
-  let winBreakB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216_break_2.png?raw=true";
+  let charBreakA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209222.png?raw=true"; // 이미지 3 (휴식중: 임시 Placeholder)
+  let charBreakB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209224.png?raw=true"; // 이미지 4 (휴식중: 임시 Placeholder)
+  let winBreakA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
+  let winBreakB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
 
   let showA = true, blinkTimer = null;
 
@@ -765,7 +766,7 @@
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
     customBgFile?.addEventListener("change", ()=>{
-      const file = customBgFile.files && customBgFile.files[0];
+      const file = customBgFile.files && customBgBgFile.files[0];
       if(!file) return;
       bgFileName.textContent = file.name;
       const reader = new FileReader();
@@ -1015,6 +1016,8 @@
     state.running=true; updateTimerUI();
     updateCharacterAndWindowImages(); // 이미지 갱신
     state.interval=setInterval(()=>{
+      let shouldAccumulate = false;
+
       if(state.mode==='pomodoro'){
         if(state.remainSec<=0){
           beep();
@@ -1029,14 +1032,22 @@
           updateCharacterAndWindowImages(); // 상태 변경 시 즉시 이미지 갱신
         } else {
           state.remainSec-=1;
-          // 2. 집중 중일 때만 누적 공부 시간 증가
+          // [재수정] 뽀모도로 모드에서는 '집중 시간'일 때만 누적
           if(state.isWork){
-             state.studyTimeTotal+=1;
+             shouldAccumulate = true;
           }
         }
       }else{
+        // [재수정] 타이머 모드(카운트업)에서는 타이머가 굴러가는 시간 전체를 누적
         state.remainSec+=1;
+        shouldAccumulate = true;
       }
+      
+      // 누적 시간이 필요한 경우에만 증가
+      if(shouldAccumulate){
+          state.studyTimeTotal+=1;
+      }
+
       updateTimerUI();
     },1000);
   }

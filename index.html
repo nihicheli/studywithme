@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Studywithme</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-  /* 4. 다크모드를 디폴트로 하고, 모바일의 폰트는 현재보다 80% 크기를 디폴트로 둬도 좋을 것 같아. */
+
   /* 다크모드 디폴트 설정 */
   :root{
     --bg-url: url("https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true");
@@ -115,8 +115,64 @@
   #window{ position:absolute; left:2vw; top: var(--content-top); z-index:5; width: min(var(--maxw-window), 90vw); }
   #win-img{ display:block; width:100%; height:auto; max-height: var(--maxh-window); border-radius:16px; border:2px solid var(--line); }
 
-  #character{ position:absolute; left:50%; transform:translateX(-50%); top: calc(var(--content-top) + 20vh); z-index:6; width: min(var(--maxw-char), 96vw); }
+  #character{ 
+    position:absolute; left:50%; transform:translateX(-50%); 
+    top: calc(var(--content-top) + 20vh); z-index:6; 
+    width: min(var(--maxw-char), 96vw); 
+    /* 2. 터치 이벤트를 위해 포인터 커서 추가 */
+    cursor: pointer;
+  }
   #char-img{ display:block; width:100%; height:auto; max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); background:transparent center/contain no-repeat; }
+
+  /* 2. 말풍선 스타일 */
+  #fortune-bubble {
+    /* 캐릭터 상단 중앙, 타이머 아래에 위치하도록 position:absolute 사용 */
+    position: absolute;
+    /* 캐릭터 기본 위치 (top: calc(var(--content-top) + 20vh))보다 상단에 위치 */
+    top: calc(var(--content-top) + 20vh - 40px); 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9500; /* 타이머(9000)보다 높고, 드로어(10000)보다 낮게 */
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: #202020;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s;
+    white-space: nowrap;
+    font-weight: 700;
+    font-size: 1.1em;
+    font-family: 'Nanum Pen Script', cursive; 
+    pointer-events: none; /* 클릭 방지 */
+  }
+  :root[data-theme="dark"] #fortune-bubble {
+    background: rgba(30, 30, 30, 0.95);
+    color: #FBFFF4;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  }
+  #fortune-bubble.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  /* 말풍선 꼬리 (CSS 삼각형) */
+  #fortune-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid rgba(255, 255, 255, 0.95);
+  }
+  :root[data-theme="dark"] #fortune-bubble::after {
+    border-top: 10px solid rgba(30, 30, 30, 0.95);
+  }
+
 
   /* 하단: 음악패널 */
   #bottombar{
@@ -127,9 +183,11 @@
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
   /* === 소품 레이어 === */
+  /* 요청: 소품 관련 기능 숨김 (주석 처리) */
   #propsLayer{
     position:absolute; inset:0; z-index:7;
     pointer-events:none; /* 기본은 클릭 통과 */
+    display: none; /* 소품 레이어 자체 숨김 */
   }
   .prop{
     position:absolute; left:40px; top:40px; width:120px; z-index:80;
@@ -164,10 +222,10 @@
   .drawer-sec h4{ margin:.2rem 0 .8rem; font-weight:900; }
 
   .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; }
-  .drawer-sec input[type="number"], .drawer-sec input[type="text"]{
+  .drawer-sec input[type="number"], .drawer-sec input[type="text"], .drawer-sec select{
     width:100%; padding:.55rem .7rem; border:2px solid var(--line); border-radius:12px; background:transparent; color:#fff;
   }
-  :root[data-theme="light"] .drawer-sec input[type="number"], :root[data-theme="light"] .drawer-sec input[type="text"]{ color:#222; }
+  :root[data-theme="light"] .drawer-sec input[type="number"], :root[data-theme="light"] .drawer-sec input[type="text"], :root[data-theme="light"] .drawer-sec select{ color:#222; }
   .fill{ flex:1 }
 
   .chips{ display:flex; gap:.5rem; align-items:center; flex-wrap: wrap; }
@@ -248,35 +306,35 @@
 
   /* ========== 모바일 전용 오버라이드 (확대) ========== */
   @media (max-width: 720px){
-    #character{ transform: translateX(-70%); }
-    /* 4. 모바일 폰트 크기: 데스크톱 대비 80% 크기 적용 (기존 코드에서는 폰트 크기가 이미 모바일에서 커지고 있었으므로, clamp()의 최소/최대/뷰포트 비율을 조정하여 80% 비율에 가깝게 조정합니다.) */
-    html, body{ font-size: clamp(10px, 4vw, 14.4px); /* 기존: clamp(15px, 4.6vw, 18px) - 약 80% 비율로 조정 */ }
+    /* 1. 캐릭터 크기 1.5x (약 1.2x 비율로 조정) 및 왼쪽 당김 조정 */
+    #character{ transform: translateX(-75%); } 
 
     :root{
       --content-top: 12vh;
       --maxh-board: 80vh;
       --maxh-timer: 40vh;
       --maxh-window: 40vh;
-      --maxh-char: 65vh;
+      --maxh-char: 70vh; 
 
-      /* 폭 확대 */
-      --maxw-board: 70vw;
+      /* 1. 모바일에서 Todo List 및 실시간 패널 너비 조정 */
+      --maxw-board: 60vw; /* 70vw -> 60vw로 줄여서 덜 차지하도록 */
       --maxw-window: 30vw;
       --maxw-timer: 86vw;
-      --maxw-char: 98vw;
+      --maxw-char: 120vw; /* 98vw -> 120vw로 확대 (1.2배 이상) */
     }
 
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
 
-    /* “지금 공부중” 패널 → Todo list 규격을 따름 */
+    /* 1. “지금 공부중” 패널 위치 및 너비 조정 (오른쪽 아래로 더 내림) */
     #presencePanel{
       right: 12px;
-      bottom: calc(8px + 160px);
-      width: min(var(--maxw-board), 92vw);
+      bottom: 120px; /* 하단 음악 컨트롤 패널 위에 위치하도록 조정 */
+      width: min(var(--maxw-board), 92vw); /* 60vw 적용 */
       max-width: min(var(--maxw-board), 92vw);
-      max-height: var(--maxh-board);
+      max-height: 40vh; 
       overflow:auto;
+      top: unset;
     }
   }
 </style>
@@ -286,7 +344,7 @@
   <!-- 오른쪽 아래: 실시간 패널 -->
   <aside id="presencePanel" class="card panel" style="display:none">
     <div class="row" style="justify-content:space-between">
-      <div class="title">지금 공부중</div>
+      <div id="studyTimeTitle" class="title">오늘 누적 공부: 00:00</div>
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
@@ -295,116 +353,126 @@
   <!-- 소품 레이어 -->
   <div id="propsLayer"></div>
 
+  <!-- 2. 포춘 쿠키 말풍선 추가 -->
+  <div id="fortune-bubble" aria-live="polite"></div>
+
   <!-- 오버레이 + 드로어 -->
   <div id="overlay"></div>
   <aside id="drawer" aria-label="설정">
     <header class="drawer-head">
-      <h3 style="margin:0">설정</h3>
+      <h3 id="drawerTitle">설정</h3>
       <div class="row">
+        <!-- 언어 선택 드롭다운 (중국어 제거, 한국어/영어만) -->
+        <select id="languageSelect" class="pill" style="padding:0.6rem 0.7rem; border-radius:12px; flex-shrink:0;">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+        </select>
         <button id="themeToggle" class="pill" title="다크/라이트 전환">🌙</button>
-        <button id="closeDrawer" class="pill">닫기</button>
+        <button id="closeDrawer" class="pill" data-lang-key="close">닫기</button>
       </div>
     </header>
 
     <!-- 1) 뽀모도로 / 타이머 -->
     <section class="drawer-sec">
-      <h4>뽀모도로 / 타이머</h4>
+      <h4 data-lang-key="timer_pomodoro_title">뽀모도로 / 타이머</h4>
       <div class="row" id="modeRow">
-        <label><input type="radio" name="mode" value="pomodoro" checked> 뽀모도로</label>
-        <label><input type="radio" name="mode" value="timer"> 타이머(카운트업)</label>
+        <label><input type="radio" name="mode" value="pomodoro" checked> <span data-lang-key="pomodoro">뽀모도로</span></label>
+        <label><input type="radio" name="mode" value="timer"> <span data-lang-key="timer_up">타이머(카운트업)</span></label>
       </div>
       <div class="grid2" id="pomodoroFields" style="margin-top:.5rem">
-        <label>집중(분)
+        <label><span data-lang-key="focus_min">집중(분)</span>
           <input id="workMin" type="number" min="1" value="25">
         </label>
-        <label>휴식(분)
+        <label><span data-lang-key="rest_min">휴식(분)</span>
           <input id="restMin" type="number" min="1" value="5">
         </label>
       </div>
-      <label style="display:block; margin-top:.5rem" id="cyclesWrap">사이클 수(N회)
+      <label style="display:block; margin-top:.5rem" id="cyclesWrap"><span data-lang-key="cycles_count">사이클 수(N회)</span>
         <input id="totalCycles" type="number" min="1" value="4">
       </label>
       <div class="row" style="margin-top:.6rem">
-        <button id="applyPom" class="pill">적용</button>
+        <button id="applyPom" class="pill" data-lang-key="apply">적용</button>
       </div>
     </section>
 
     <!-- 2) 실시간 보기 -->
     <section class="drawer-sec">
-      <h4>실시간 보기</h4>
+      <h4 data-lang-key="presence_title">실시간 보기</h4>
       <div class="row">
         <input id="nickname" class="fill pill-input" placeholder="닉네임(예: do)">
-        <button id="presenceToggle" class="pill">공개: 켜짐</button>
+        <button id="presenceToggle" class="pill" data-lang-key="public_on">공개: 켜짐</button>
       </div>
       <div class="row" style="margin-top:.5rem">
-        <button id="shareStudyBtn" class="pill">내 공부시간 공개: 켜짐</button>
+        <button id="shareStudyBtn" class="pill" data-lang-key="share_study_on">내 공부시간 공개: 켜짐</button>
       </div>
-      <div style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시.</div>
+      <div id="presenceInfo" style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시.</div>
     </section>
 
     <!-- 3) 음악 -->
     <section class="drawer-sec">
-      <h4>음악 스타일</h4>
+      <h4 data-lang-key="music_style">음악 스타일</h4>
       <div id="moods" class="chips list-scroll"></div>
     </section>
 
     <section class="drawer-sec">
-      <h4>곡 선택</h4>
+      <h4 data-lang-key="track_select">곡 선택</h4>
       <div id="tracks" class="chips list-scroll"></div>
     </section>
 
     <!-- 화면 표시 / 레이아웃 / 배경 / 소품 / 크레딧 -->
     <section class="drawer-sec">
-      <h4>창문/캐릭터 표시</h4>
+      <h4 data-lang-key="ui_visibility">창문/캐릭터 표시</h4>
       <div class="row">
-        <button id="toggleWindow" class="pill">창문: 보임</button>
-        <button id="toggleCharacter" class="pill">캐릭터: 보임</button>
+        <button id="toggleWindow" class="pill" data-lang-key="window_show">창문: 보임</button>
+        <button id="toggleCharacter" class="pill" data-lang-key="character_show">캐릭터: 보임</button>
+      </div>
+    </section>
+
+    <section class="drawer-sec" id="layoutSettings">
+      <h4 data-lang-key="screen_settings">화면 설정</h4>
+      <div class="row">
+        <!-- 배치 편집 버튼 숨김 처리 -->
+        <button id="layoutEdit" class="pill" data-lang-key="layout_edit_off" style="display:none;">배치 편집: 꺼짐</button> 
+        <button id="layoutReset" class="pill" title="원상복구" data-lang-key="reset_layout">원상복구</button>
+        <button id="rotateToggle" class="pill" title="세로에서 가로로 표시" data-lang-key="rotate_on">회전: 켜짐</button>
       </div>
     </section>
 
     <section class="drawer-sec">
-      <h4>화면 설정</h4>
-      <div class="row">
-        <button id="layoutEdit" class="pill">배치 편집: 꺼짐</button>
-        <button id="layoutReset" class="pill" title="원상복구">원상복구</button>
-        <button id="rotateToggle" class="pill" title="세로에서 가로로 표시">회전: 켜짐</button>
-      </div>
-    </section>
-
-    <section class="drawer-sec">
-      <h4>배경 선택</h4>
+      <h4 data-lang-key="bg_select">배경 선택</h4>
       <div id="bgChips" class="chips"></div>
 
       <!-- 파일로 배경 선택 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="customBgFile" type="file" accept="image/*" class="input-file-hidden">
         <label for="customBgFile" class="pill file-pill" title="배경 이미지 선택">
-          <span class="icon">📁</span> 배경 파일 선택
+          <span class="icon">📁</span> <span data-lang-key="bg_file_select">배경 파일 선택</span>
         </label>
-        <span id="bgFileName">선택 안 됨</span>
+        <span id="bgFileName" data-lang-key="not_selected">선택 안 됨</span>
         <span id="bgPreview" class="bg-thumb" aria-hidden="true"></span>
       </div>
 
       <div class="row" style="margin-top:.5rem">
         <input id="customBgUrl" placeholder="배경 이미지 URL 붙여넣기" class="fill pill-input">
-        <button id="applyBg" class="pill">적용</button>
+        <button id="applyBg" class="pill" data-lang-key="apply">적용</button>
       </div>
     </section>
 
-    <section class="drawer-sec">
-      <h4>소품</h4>
+    <!-- 소품 관련 섹션 숨김 처리 -->
+    <section class="drawer-sec" id="propsSection" style="display:none;">
+      <h4 data-lang-key="props">소품</h4>
       <!-- 파일 선택을 URL보다 위로 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="propFile" type="file" accept="image/*" class="input-file-hidden" />
         <label for="propFile" class="pill file-pill" title="소품 이미지 선택">
-          <span class="icon">📁</span> 소품 파일 선택
+          <span class="icon">📁</span> <span data-lang-key="prop_file_select">소품 파일 선택</span>
         </label>
-        <span id="propFileName">선택 안 됨</span>
-        <button id="propFileAdd" class="pill">파일 추가</button>
+        <span id="propFileName" data-lang-key="not_selected">선택 안 됨</span>
+        <button id="propFileAdd" class="pill" data-lang-key="add_file">파일 추가</button>
       </div>
       <div class="row" style="margin-top:.5rem">
         <input id="propUrl" class="fill pill-input" placeholder="소품 이미지 URL">
-        <button id="propAdd" class="pill">추가</button>
+        <button id="propAdd" class="pill" data-lang-key="add">추가</button>
       </div>
 
       <div class="chips" style="margin-top:.5rem">
@@ -414,12 +482,13 @@
         <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg">📚</button>
       </div>
       <div id="propList" class="list-scroll" style="margin-top:.6rem"></div>
-      <div style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)</div>
+      <div id="propInfo" style="opacity:.8; margin-top:.4rem">※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)</div>
     </section>
 
     <section class="drawer-sec">
-      <h4>Credits</h4>
-      <a id="creditLink" href="#" target="_blank" rel="noopener">Made by do</a>
+      <h4 data-lang-key="credits">Credits</h4>
+      <!-- 링크 업데이트 -->
+      <a id="creditLink" href="https://dashing-leek-81d.notion.site/Study-with-me-27c4376fbca680629fe3e6e31281b9e2?pvs=74" target="_blank" rel="noopener">Made by do</a>
     </section>
   </aside>
 
@@ -428,17 +497,17 @@
     <button id="hamburger" class="card panel" aria-label="메뉴 열기">⋯</button>
 
     <section id="timer" class="card panel resizable" aria-label="타이머">
-      <div id="state">집중중</div>
+      <div id="state" data-lang-key="focusing">집중중</div>
       <div id="time">25:00</div>
       <div class="row">
-        <button class="pill" id="startPause">시작</button>
-        <button class="pill" id="reset">리셋</button>
+        <button class="pill" id="startPause" data-lang-key="start">시작</button>
+        <button class="pill" id="reset" data-lang-key="reset">리셋</button>
         <button class="pill" id="cyclesBtn" title="사이클 진행 상황">0/4회</button>
       </div>
     </section>
 
     <section id="board" class="card panel" aria-label="Todo list">
-      <div class="title">Todo list</div>
+      <div id="todoTitle" class="title">Todo list</div>
       <div id="todo-list"></div>
       <div id="inputRow">
         <input id="todo-input" type="text" placeholder="할 일을 적고 Enter" />
@@ -448,17 +517,18 @@
   </div>
 
   <!-- 메인: 창문 + 캐릭터 -->
+  <!-- 2. 캐릭터 터치 이벤트를 위해 role="button" tabindex="0" 추가 -->
   <div id="window" class="resizable"><img id="win-img" alt="창문" /></div>
-  <div id="character" class="resizable"><img id="char-img" alt="캐릭터" /></div>
+  <div id="character" class="resizable" role="button" tabindex="0"><img id="char-img" alt="캐릭터" /></div>
 
   <!-- 하단: 음악 -->
   <div id="bottombar">
     <section id="music-controls" class="card panel" aria-label="음악 재생">
-      <h4>음악 재생</h4>
+      <h4 data-lang-key="music_player">음악 재생</h4>
       <div class="hwrap">
-        <button class="pill" id="playPause">재생</button>
-        <button class="pill" id="shuffle">랜덤 OFF</button>
-        <button class="pill" id="repeat">반복: 꺼짐</button>
+        <button class="pill" id="playPause" data-lang-key="play">재생</button>
+        <button class="pill" id="shuffle" data-lang-key="shuffle_off">랜덤: 꺼짐</button>
+        <button class="pill" id="repeat" data-lang-key="repeat_off">반복: 꺼짐</button>
       </div>
       <audio id="player" preload="metadata"></audio>
     </section>
@@ -472,6 +542,220 @@
 </div>
 
 <script>
+  /* ===== 언어 번역 데이터 (Translation Data) ===== */
+  const TRANSLATIONS = {
+    en: {
+      settings: "Settings",
+      close: "Close",
+      theme_toggle: "🌙",
+      today_study: "Today's Study: ",
+      todo_list: "Todo List",
+      add_todo_placeholder: "Add a task and Enter",
+      delete: "Delete", // 임시 추가
+      
+      // Timer/Pomodoro
+      timer_pomodoro_title: "Timer / Pomodoro",
+      pomodoro: "Pomodoro",
+      timer_up: "Timer (Count Up)",
+      focus_min: "Focus (min)",
+      rest_min: "Rest (min)",
+      cycles_count: "Cycles (N)",
+      apply: "Apply",
+      
+      // Timer State
+      focusing: "Focusing",
+      resting: "Resting",
+      timer_mode: "Timer Mode",
+      start: "Start",
+      pause: "Pause",
+      reset: "Reset",
+      
+      // Presence
+      presence_title: "Live Presence",
+      nickname_placeholder: "Nickname (e.g. do)",
+      public_on: "Public: ON",
+      public_off: "Public: OFF",
+      share_study_on: "Share Time: ON",
+      share_study_off: "Share Time: OFF",
+      presence_info: "※ Max 5 people shown in list.",
+      
+      // Music
+      music_player: "Music Player",
+      music_style: "Music Style",
+      track_select: "Track Select",
+      play: "Play",
+      pause_music: "Pause",
+      shuffle_on: "Shuffle: ON",
+      shuffle_off: "Shuffle: OFF",
+      repeat_off: "Repeat: OFF",
+      repeat_one: "Repeat: One",
+      repeat_all: "Repeat: All",
+      
+      // UI/Layout
+      ui_visibility: "Visibility",
+      window_show: "Window: Show",
+      window_hide: "Window: Hide",
+      character_show: "Character: Show",
+      character_hide: "Character: Hide",
+      screen_settings: "Screen Settings",
+      layout_edit_off: "Layout Edit: OFF",
+      layout_edit_on: "Layout Edit: ON",
+      reset_layout: "Reset Layout",
+      rotate_on: "Rotate: ON",
+      rotate_off: "Rotate: OFF",
+
+      // Background/Props
+      bg_select: "Background Select",
+      bg_file_select: "Select BG File",
+      not_selected: "Not Selected",
+      props: "Props",
+      prop_file_select: "Select Prop File",
+      add_file: "Add File",
+      add: "Add",
+      prop_info: "※ Props are editable immediately after adding (placed center min size)",
+      
+      // Credits
+      credits: "Credits",
+      
+      // Presence Status
+      status_work: "Focusing",
+      status_break: "Resting",
+      status_idle: "Idle",
+      no_one_online: "No one online yet"
+    },
+    ko: {
+      settings: "설정",
+      close: "닫기",
+      theme_toggle: "🌙",
+      today_study: "오늘 누적 공부: ",
+      todo_list: "Todo list",
+      add_todo_placeholder: "할 일을 적고 Enter",
+      delete: "삭제", // 임시 추가
+      
+      // Timer/Pomodoro
+      timer_pomodoro_title: "뽀모도로 / 타이머",
+      pomodoro: "뽀모도로",
+      timer_up: "타이머(카운트업)",
+      focus_min: "집중(분)",
+      rest_min: "휴식(분)",
+      cycles_count: "사이클 수(N회)",
+      apply: "적용",
+      
+      // Timer State
+      focusing: "집중중",
+      resting: "휴식중",
+      timer_mode: "타이머",
+      start: "시작",
+      pause: "일시정지",
+      reset: "리셋",
+      
+      // Presence
+      presence_title: "실시간 보기",
+      nickname_placeholder: "닉네임(예: do)",
+      public_on: "공개: 켜짐",
+      public_off: "공개: 꺼짐",
+      share_study_on: "내 공부시간 공개: 켜짐",
+      share_study_off: "내 공부시간 공개: 꺼짐",
+      presence_info: "※ 목록엔 최대 5명 표시.",
+      
+      // Music
+      music_player: "음악 재생",
+      music_style: "음악 스타일",
+      track_select: "곡 선택",
+      play: "재생",
+      pause_music: "일시정지",
+      shuffle_on: "랜덤: 켜짐",
+      shuffle_off: "랜덤: 꺼짐",
+      repeat_off: "반복: 꺼짐",
+      repeat_one: "반복: 한곡",
+      repeat_all: "반복: 전체",
+      
+      // UI/Layout
+      ui_visibility: "창문/캐릭터 표시",
+      window_show: "창문: 보임",
+      window_hide: "창문: 숨김",
+      character_show: "캐릭터: 보임",
+      character_hide: "캐릭터: 숨김",
+      screen_settings: "화면 설정",
+      layout_edit_off: "배치 편집: 꺼짐",
+      layout_edit_on: "배치 편집: 켜짐",
+      reset_layout: "원상복구",
+      rotate_on: "회전: 켜짐",
+      rotate_off: "회전: 꺼짐",
+
+      // Background/Props
+      bg_select: "배경 선택",
+      bg_file_select: "배경 파일 선택",
+      not_selected: "선택 안 됨",
+      props: "소품",
+      prop_file_select: "소품 파일 선택",
+      add_file: "파일 추가",
+      add: "추가",
+      prop_info: "※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)",
+      
+      // Credits
+      credits: "Credits",
+      
+      // Presence Status
+      status_work: "집중중",
+      status_break: "휴식중",
+      status_idle: "대기중",
+      no_one_online: "아직 아무도 없어요"
+    }
+  };
+
+  function getTranslation(key) {
+      const lang = state.lang;
+      return TRANSLATIONS[lang][key] || TRANSLATIONS['en'][key] || key;
+  }
+  
+  function updateTextByLanguage() {
+      // 1. HTML lang 속성 업데이트
+      document.documentElement.lang = state.lang;
+      
+      // 2. data-lang-key 속성을 가진 모든 요소 업데이트
+      document.querySelectorAll('[data-lang-key]').forEach(el => {
+          const key = el.getAttribute('data-lang-key');
+          const translation = getTranslation(key);
+          // 텍스트 내용 업데이트
+          el.textContent = translation;
+          
+          // input placeholder 업데이트
+          if (el.tagName === 'INPUT' && el.id === 'todo-input') {
+              el.placeholder = getTranslation('add_todo_placeholder');
+          } else if (el.id === 'bgFileName' || el.id === 'propFileName') {
+              // '선택 안 됨' 상태 텍스트 처리
+              if (el.textContent.trim() === getTranslation('not_selected')) {
+                   el.textContent = getTranslation('not_selected');
+              }
+          }
+      });
+      
+      // 3. 특수 요소 업데이트 (하드코딩된 부분)
+      document.getElementById('drawerTitle').textContent = getTranslation('settings');
+      document.getElementById('todoTitle').textContent = getTranslation('todo_list');
+      
+      // 4. 동적으로 업데이트되는 UI 텍스트 재호출
+      updateStudyTimeDisplay(); // 오늘 누적 공부
+      updateTimerUI();         // 타이머 상태, 시작/일시정지/리셋
+      updateCyclesBtn();       // 사이클 버튼
+      updateWindowToggleUI();  // 창문 표시
+      updateCharacterToggleUI(); // 캐릭터 표시
+      updateRepeatUI();        // 반복 모드
+      
+      // 5. 배치 편집 상태 업데이트 (버튼이 숨겨져 있지만 로직은 유지)
+      layoutEditBtn.textContent = getTranslation(window.editOn ? 'layout_edit_on' : 'layout_edit_off');
+      
+      // 6. 햄버거 버튼 '닫기' 텍스트 업데이트
+      document.getElementById('closeDrawer').textContent = getTranslation('close');
+      
+      // 7. 실시간 보기 정보 업데이트
+      document.getElementById('presenceInfo').textContent = getTranslation('presence_info');
+      
+      // 8. 소품 정보 업데이트 (숨김 처리되었으므로 불필요하지만 안전을 위해 유지)
+      // document.getElementById('propInfo').textContent = getTranslation('prop_info'); 
+  }
+
   /* ===== 트랙 데이터 ===== */
   /* 3. 곡을 몇 개 더 찾아서 넣어줬으면 좋겠어. 상업적 무료로. -> 새로운 트랙으로 교체/추가 */
   const TRACKS = [
@@ -483,11 +767,10 @@
     { title: "Study and Relax",     mood: "Lo-Fi",   url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
     { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus.mp3" },
     
-    /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
-    { title: "Rainy Day",           mood: "Lo-Fi",   url: "https://freepd.com/music/Rainy%20Day.mp3" }, 
-    { title: "New Orleans Jazz",    mood: "Jazz",    url: "https://freepd.com/music/New%20Orleans%20Jazz.mp3" }, 
-    { title: "Inspiring Corporate", mood: "Piano",   url: "https://freepd.com/music/Inspiring%20Corporate.mp3" },
-    { title: "Silent Night",        mood: "Ambient", url: "https://incompetech.com/music/royalty-free/mp3-public/Silent%20Night.mp3" }, 
+    { title: "Adventure",           mood: "Lo-Fi",   url: "https://freepd.com/music/Adventure.mp3" }, 
+    { title: "Compy Jazz",    mood: "Jazz",    url: "https://freepd.com/music/Compy%20Jazz.mp3" }, 
+    { title: "Overture", mood: "Piano",   url: "https://freepd.com/music/Overture.mp3" },
+    { title: "Winter",        mood: "Piano", url: "https://freepd.com/music/Winter.mp3" }, 
     
     /* White/Pink/Brown Noise (Public Domain) */
     { title: "White Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
@@ -507,6 +790,31 @@
   let winBreakB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
 
   let showA = true, blinkTimer = null;
+  let fortuneBubbleTimeout = null;
+
+  // 2. 따뜻한 메시지 목록
+  const FORTUNE_MESSAGES = [
+    "오늘의 노력은 내일의 빛이 될 거예요!",
+    "잠시 쉬어가도 괜찮아요, 당신은 이미 충분히 잘하고 있어요.",
+    "포기하지 않는 마음이 가장 소중한 자산입니다.",
+    "지금 이 순간에도 당신은 성장하고 있어요.",
+    "작은 성취라도 괜찮아요. 스스로를 칭찬해 주세요!",
+    "따뜻한 차 한 잔과 함께 에너지를 채워보세요.",
+    "당신의 꿈은 반짝이고 있어요. 조금만 더 힘내요!",
+    "가끔은 먼 곳을 바라보는 것도 필요해요.",
+    "최고의 공부는 즐기는 공부입니다. 오늘도 화이팅!",
+    "천천히 꾸준히 하는 것이 중요해요. 오늘도 화이팅!",
+    "숨을 크게 쉬고, 다시 집중해 봐요!",
+    "당신은 이 모든 것을 해낼 능력이 있어요.",
+    "당신의 오늘은 누군가에게 큰 힘이 되고 있어요.",
+    "작은 웃음 하나가 하루를 더 빛나게 해줄 거예요.",
+    "마음이 지칠 땐 하늘을 올려다보세요. 위로가 될 거예요.",
+    "당신이 걸어온 길은 분명 의미 있는 발자취예요.",
+    "누구보다 소중한 건 바로 당신 자신이에요.",
+    "조금 늦더라도 괜찮아요. 중요한 건 멈추지 않는 거예요.",
+    "어제보다 나은 오늘을 만들고 있는 당신을 응원합니다.",
+    "당신의 따뜻한 마음은 언제나 빛나고 있어요."
+  ];
 
   /* ===== 전역 상태 ===== */
   const lsShare = localStorage.getItem("shareStudy");
@@ -527,7 +835,9 @@
     windowVisible: (localStorage.getItem("ui-window-visible") ?? "1") === "1",
     characterVisible: (localStorage.getItem("ui-character-visible") ?? "1") === "1",
     props: JSON.parse(localStorage.getItem("props-v1")||"[]"),
-    rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1")
+    rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1"),
+    // 언어 설정: 한국어를 기본값으로 변경
+    lang: localStorage.getItem("lang") || 'ko' 
   };
   window.state = state;
 
@@ -613,6 +923,8 @@
   const shuffleBtn= document.getElementById("shuffle");
   const repeatBtn = document.getElementById("repeat");
   const player    = document.getElementById("player");
+  const fortuneBubble = document.getElementById("fortune-bubble");
+  const characterBox = document.getElementById("character");
 
   const overlay   = document.getElementById("overlay");
   const drawer    = document.getElementById("drawer");
@@ -641,8 +953,7 @@
   const toggleWindowBtn    = document.getElementById("toggleWindow");
   const toggleCharacterBtn = document.getElementById("toggleCharacter");
   const windowBox          = document.getElementById("window");
-  const characterBox       = document.getElementById("character");
-
+  
   const layoutEditBtn  = document.getElementById("layoutEdit");
   const layoutResetBtn = document.getElementById("layoutReset");
   const rotateToggle   = document.getElementById("rotateToggle");
@@ -655,12 +966,15 @@
   const propFileName = document.getElementById("propFileName");
   const propList     = document.getElementById("propList");
   const propPresets  = document.querySelectorAll(".propPreset");
+  const propsSection = document.getElementById("propsSection"); // 소품 섹션
+  const layoutSettings = document.getElementById("layoutSettings"); // 화면 설정 섹션
 
   const presencePanel = document.getElementById("presencePanel");
   const meNickEl      = document.getElementById("meNick");
   const presenceList  = document.getElementById("presenceList");
   const presenceToggle= document.getElementById("presenceToggle");
   const nicknameInput = document.getElementById("nickname");
+  const languageSelect= document.getElementById("languageSelect"); // 새 언어 선택 요소
 
   /* 드로어 여닫기 보장 함수 (오버레이 잔존 방지) */
   function openDrawerNow(){
@@ -689,8 +1003,29 @@
     // 현재 공부중 섹션의 타이틀을 업데이트 (Todo list 섹션 옆)
     const title = presencePanel.querySelector(".title");
     if (title) {
-        title.textContent = `오늘 누적 공부: ${getStudyTimeToday()}`;
+        title.textContent = getTranslation('today_study') + getStudyTimeToday();
     }
+  }
+
+  // 2. 포춘 쿠키 메시지 표시 함수
+  function showFortuneMessage(){
+    clearTimeout(fortuneBubbleTimeout);
+    
+    // 1. 메시지 선택
+    const message = FORTUNE_MESSAGES[Math.floor(Math.random() * FORTUNE_MESSAGES.length)];
+    
+    // 2. 메시지 설정 및 표시 (fade-in)
+    fortuneBubble.textContent = message;
+    fortuneBubble.classList.remove('show');
+    // DOM 업데이트를 보장한 후 클래스 추가
+    setTimeout(() => {
+        fortuneBubble.classList.add('show');
+    }, 50);
+
+    // 3. 3초 후 사라짐 (fade-out)
+    fortuneBubbleTimeout = setTimeout(() => {
+        fortuneBubble.classList.remove('show');
+    }, 3000);
   }
 
 
@@ -722,6 +1057,14 @@
   function init(){
     /* 4. 다크모드를 디폴트로 - 이미 state.theme='dark'로 기본 설정되어있음 */
     applyTheme(state.theme);
+    
+    // 언어 선택 기능 초기화
+    languageSelect.value = state.lang;
+    languageSelect.addEventListener('change', (e) => {
+        state.lang = e.target.value;
+        localStorage.setItem('lang', state.lang);
+        updateTextByLanguage();
+    });
 
     hamburgerBtn.addEventListener("click", openDrawerNow);
     closeDrawer  .addEventListener("click", closeDrawerNow);
@@ -828,13 +1171,17 @@
       updateCharacterToggleUI();
     });
 
+    // 2. 캐릭터 터치 시 말풍선 표시 이벤트 추가
+    characterBox.addEventListener('click', showFortuneMessage);
+    characterBox.addEventListener('touchstart', showFortuneMessage);
+
     setupLayoutDrag();
 
     /* 회전(간소화: 스케일 호출 제거) */
     function setRotate(on){
       state.rotateOn = !!on;
       localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
-      rotateToggle.textContent = `회전: ${state.rotateOn ? "켜짐" : "꺼짐"}`;
+      rotateToggle.textContent = getTranslation(state.rotateOn ? 'rotate_on' : 'rotate_off');
       applyRotateState();
     }
     function applyRotateState(){
@@ -863,14 +1210,14 @@
     /* (개선) 소품 파일 선택: 모바일에서도 '선택 즉시 추가' */
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
-      propFileName.textContent = f ? f.name : '선택 안 됨';
+      propFileName.textContent = f ? f.name : getTranslation('not_selected');
       if(f){
         const url = URL.createObjectURL(f);
         addProp(url, true, {autoEdit:true});
         // iOS에서 포커스/버튼 문제 방지: 드로어와 오버레이를 확실히 닫기
         closeDrawerNow();
         // 파일 입력 리셋 (같은 파일 재첨부 가능)
-        setTimeout(()=>{ propFile.value=""; propFileName.textContent="선택 안 됨"; }, 0);
+        setTimeout(()=>{ propFile.value=""; propFileName.textContent=getTranslation('not_selected'); }, 0);
       }
     });
 
@@ -880,7 +1227,7 @@
       if(!f) return;
       const url = URL.createObjectURL(f);
       addProp(url, true, {autoEdit:true});
-      propFile.value = ""; propFileName.textContent = "선택 안 됨";
+      propFile.value = ""; propFileName.textContent = getTranslation('not_selected');
       closeDrawerNow();
     });
 
@@ -894,7 +1241,7 @@
     renderProps();
 
     function refreshShareStudyUI(){
-      shareStudyBtn.textContent = `내 공부시간 공개: ${state.shareStudy ? "켜짐" : "꺼짐"}`;
+      shareStudyBtn.textContent = getTranslation(state.shareStudy ? 'share_study_on' : 'share_study_off');
     }
     shareStudyBtn.addEventListener('click', ()=>{
       state.shareStudy = !state.shareStudy;
@@ -904,7 +1251,8 @@
     });
     refreshShareStudyUI();
 
-    updateStudyTimeDisplay(); // 2. 누적 공부 시간 UI 업데이트
+    // 언어 설정 후 마지막에 UI 텍스트 일괄 업데이트
+    updateTextByLanguage();
     updateTimerUI();
     if(__resumeAfterReload){ startTimer(); }
   }
@@ -913,7 +1261,7 @@
     const isPom = (state.mode === 'pomodoro');
     pomodoroFields.style.display = isPom ? '' : 'none';
     cyclesWrap.style.display     = isPom ? '' : 'none';
-    stateEl.textContent = isPom ? (state.isWork?"집중중":"휴식중") : "타이머";
+    stateEl.textContent = isPom ? (state.isWork?getTranslation('focusing'):getTranslation('resting')) : getTranslation('timer_mode');
   }
 
   function renderTodos(){
@@ -925,7 +1273,7 @@
       cb.addEventListener("change",()=>{ t.done=cb.checked; persistTodos(); renderTodos(); });
       const tx=document.createElement("div"); tx.className="txt"; tx.textContent=t.text;
       tx.style.textDecoration=t.done?"line-through":"none"; tx.style.opacity=t.done?".6":"1";
-      const del=document.createElement("button"); del.className="del"; del.textContent="삭제";
+      const del=document.createElement("button"); del.className="del"; del.textContent=getTranslation('delete'); 
       del.addEventListener("click",()=>{ state.todos.splice(idx,1); persistTodos(); renderTodos(); });
       row.append(cb,tx,del); boardList.appendChild(row);
     });
@@ -966,16 +1314,29 @@
     if(initial){ selectTrack(idxs[0] ?? 0, false); }
   }
   function selectTrack(idx, autoplay=false){ state.trackIdx=idx; player.src=TRACKS[idx].url; highlightTrack(); if(autoplay) tryPlay(); }
-  function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent="일시정지"; }).catch(()=>{}); }
+  function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent=getTranslation('pause_music'); }).catch(()=>{}); }
   function highlightMood(){ [...moodsWrap.children].forEach(b=>{ b.style.boxShadow = (b.dataset.mood===state.mood) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
   function highlightTrack(){ [...tracksWrap.children].forEach(b=>{ b.style.boxShadow = (+b.dataset.idx===state.trackIdx) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
   document.getElementById("playPause").addEventListener("click", ()=>{
     if(!player.src) selectTrack(state.trackIdx,false);
-    if(!state.playing){ tryPlay(); } else { player.pause(); state.playing=false; playPause.textContent="재생"; }
+    if(!state.playing){ tryPlay(); } else { player.pause(); state.playing=false; playPause.textContent=getTranslation('play'); }
   });
-  document.getElementById("shuffle").addEventListener("click", ()=>{ state.shuffle=!state.shuffle; shuffleBtn.textContent=state.shuffle?"랜덤 ON":"랜덤 OFF"; });
-  function toggleRepeat(){ const order=["off","one","all"]; const i=order.indexOf(state.repeatMode); state.repeatMode=order[(i+1)%order.length]; updateRepeatUI(); }
-  function updateRepeatUI(){ repeatBtn.textContent="반복: "+(state.repeatMode==="off"?"꺼짐":state.repeatMode==="one"?"한곡":"전체"); player.loop=(state.repeatMode==="one"); }
+  document.getElementById("shuffle").addEventListener("click", ()=>{ state.shuffle=!state.shuffle; shuffleBtn.textContent=getTranslation(state.shuffle?'shuffle_on':'shuffle_off'); });
+  function toggleRepeat(){ 
+      const order=["off","one","all"]; 
+      const i=order.indexOf(state.repeatMode); 
+      state.repeatMode=order[(i+1)%order.length]; 
+      updateRepeatUI(); 
+  }
+  function getRepeatKey(mode) {
+      if (mode === 'one') return 'repeat_one';
+      if (mode === 'all') return 'repeat_all';
+      return 'repeat_off';
+  }
+  function updateRepeatUI(){ 
+      repeatBtn.textContent=getTranslation(getRepeatKey(state.repeatMode)); 
+      player.loop=(state.repeatMode==="one"); 
+  }
   updateRepeatUI();
   function onEnded(){
     if(state.repeatMode==="one") return;
@@ -992,7 +1353,7 @@
       const n = list[(cur+1)%list.length];
       selectTrack(n,true); return;
     }
-    state.playing=false; playPause.textContent="재생";
+    state.playing=false; playPause.textContent=getTranslation('play');
   }
 
   function fmt(sec){
@@ -1003,11 +1364,18 @@
   }
   function updateTimerUI(){
     timeEl.textContent=fmt(state.remainSec);
-    stateEl.textContent=(state.mode==='pomodoro') ? (state.isWork?"집중중":"휴식중") : "타이머";
-    startPause.textContent=state.running?"일시정지":"시작";
+    
+    let statusKey = 'timer_mode';
+    if(state.mode === 'pomodoro') {
+        statusKey = state.isWork ? 'focusing' : 'resting';
+    }
+    stateEl.textContent=getTranslation(statusKey);
+    
+    startPause.textContent=getTranslation(state.running?'pause':'start');
+    
     document.title = `${fmt(state.remainSec)} • Studywithme`;
     window.__presence_broadcastNow?.();
-    updateStudyTimeDisplay(); // 2. 누적 공부 시간 UI 업데이트
+    updateStudyTimeDisplay(); // 누적 공부 시간 UI 업데이트
   }
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
@@ -1066,10 +1434,22 @@
   }
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
-  function updateCyclesBtn(){ cyclesBtn.textContent = `${state.completedCycles}/${state.totalCycles}회`; }
+  function updateCyclesBtn(){ 
+      const text = `${state.completedCycles}/${state.totalCycles}`;
+      cyclesBtn.textContent = text;
+      cyclesBtn.title = text;
+  }
 
-  function updateWindowToggleUI(){ toggleWindowBtn.textContent = `창문: ${state.windowVisible ? "보임" : "숨김"}`; windowBox.style.display = state.windowVisible ? "" : "none"; }
-  function updateCharacterToggleUI(){ toggleCharacterBtn.textContent = `캐릭터: ${state.characterVisible ? "보임" : "숨김"}`; characterBox.style.display = state.characterVisible ? "" : "none"; }
+  function updateWindowToggleUI(){ 
+      const show = state.windowVisible;
+      toggleWindowBtn.textContent = getTranslation(show ? 'window_show' : 'window_hide');
+      windowBox.style.display = show ? "" : "none"; 
+  }
+  function updateCharacterToggleUI(){ 
+      const show = state.characterVisible;
+      toggleCharacterBtn.textContent = getTranslation(show ? 'character_show' : 'character_hide');
+      characterBox.style.display = show ? "" : "none"; 
+  }
 
   function setupLayoutDrag(){
     const APP = document.getElementById('app');
@@ -1078,7 +1458,8 @@
     const Z_TOP_CAP = 8999;
 
     const registry = new Map();
-    let editOn = false;
+    // window.editOn 전역 변수화 (layoutEditBtn 텍스트 업데이트를 위해)
+    window.editOn = false; 
     let zTop = 100;
 
     const posKey = id => `pos-${id}`;
@@ -1130,9 +1511,9 @@
     }
 
     function setEditable(on){
-      editOn = on;
+      window.editOn = on;
       document.getElementById('app').classList.toggle('edit-on', on);
-      layoutEditBtn.textContent = `배치 편집: ${on ? '켜짐' : '꺼짐'}`;
+      layoutEditBtn.textContent = getTranslation(on ? 'layout_edit_on' : 'layout_edit_off');
 
       DRAG_IDS.forEach(id=>{
         const el = document.getElementById(id);
@@ -1169,7 +1550,7 @@
     function enableDrag(el){
       if(el._dragBound) return;
       const onDown = (e)=>{
-        if(!editOn) return;
+        if(!window.editOn) return;
         if(e.target.classList && e.target.classList.contains('resizer')) return;
 
         e.preventDefault();
@@ -1216,7 +1597,7 @@
     function enableResize(el){
       if(el._resizeBound) return;
       const onDown = (e)=>{
-        if(!editOn) return;
+        if(!window.editOn) return;
         if(!e.target.classList || !e.target.classList.contains('resizer')) return;
         e.preventDefault();
         el.classList.add('dragging');
@@ -1286,7 +1667,7 @@
       location.reload();
     });
 
-    layoutEditBtn.addEventListener('click', ()=> setEditable(!editOn));
+    layoutEditBtn.addEventListener('click', ()=> setEditable(!window.editOn));
     restorePositionsOnLoad();
   }
 
@@ -1316,7 +1697,7 @@
       const row = document.createElement('div'); row.className='todo';
       const tx  = document.createElement('div'); tx.className='txt';
       tx.innerHTML = `<img src="${p.url}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:.5rem"> ${p.id}`;
-      const del = document.createElement('button'); del.className='del'; del.textContent='삭제';
+      const del = document.createElement('button'); del.className='del'; del.textContent=getTranslation('delete');
       del.addEventListener('click', ()=>{
         const idx = state.props.findIndex(x=>x.id===p.id);
         if(idx>=0) state.props.splice(idx,1);
@@ -1393,33 +1774,61 @@ function getSnapshot(){
 function fmtMin(sec){
     const h = Math.floor((sec|0)/3600);
     const m = Math.floor(((sec|0)%3600)/60);
-    if(h > 0) return `${h}시간 ${m}분`;
-    return `${m}분`;
+    if(h > 0) return `${h}${getTranslation('hour_short')} ${m}${getTranslation('min_short')}`;
+    return `${m}${getTranslation('min_short')}`;
+}
+
+function getTranslation(key) {
+    const lang = window.state.lang;
+    return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key;
 }
 
 function renderOnline(presenceState){
   const items = [];
+  
+  // 임시: translate helper에 시간 단위 추가 (Supabase 스크립트 내에서만 사용)
+  if (!window.TRANSLATIONS) {
+      window.TRANSLATIONS = {
+        en: { status_work: "Focusing", status_break: "Resting", status_idle: "Idle", no_one_online: "No one online yet", hour_short: "h", min_short: "m" },
+        ko: { status_work: "집중중", status_break: "휴식중", status_idle: "대기중", no_one_online: "아직 아무도 없어요", hour_short: "시간", min_short: "분" }
+      };
+      window.state = { lang: localStorage.getItem("lang") || 'ko' };
+  }
+  
   for(const [nick, metas] of Object.entries(presenceState)){
     const meta = metas[metas.length-1] || {};
     const status = meta?.status || "idle";
     const study  = typeof meta?.study  === "number" ? meta.study  : null;
-
-    let rightTxt = "";
-    if(status === "break"){
-      rightTxt = "휴식중";
-    }else{
-      rightTxt = "집중중";
-      if(study!=null) rightTxt += ` · 누적 ${fmtMin(study)}`;
+    
+    let statusKey = '';
+    let dotClass = 'dot';
+    if (status === 'work') {
+        statusKey = 'status_work';
+        dotClass += ' work';
+    } else if (status === 'break') {
+        statusKey = 'status_break';
+        dotClass += ' break';
+    } else {
+        statusKey = 'status_idle';
     }
 
+    let rightTxt = getTranslation(statusKey);
+    if (study != null) {
+      const studyTimeText = fmtMin(study);
+      rightTxt += ` · ${studyTimeText}`;
+    }
+    
     items.push(
       `<div class="person">
-         <div><span class="${status==="work"?"dot work":status==="break"?"dot break":"dot"}"></span><span class="nick">${nick}</span></div>
+         <div><span class="${dotClass}"></span><span class="nick">${nick}</span></div>
          <div style="opacity:.8">${rightTxt}</div>
        </div>`
     );
   }
-  presenceList.innerHTML = items.slice(0,5).join("") || `<div style="opacity:.8">아직 아무도 없어요</div>`;
+  
+  const noOneOnlineText = getTranslation('no_one_online')
+  
+  presenceList.innerHTML = items.slice(0,5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
 }
 
 window.__presence_broadcastNow = async function(){
@@ -1447,13 +1856,13 @@ async function goOnline(){
     }
   });
 
-  presenceToggle.textContent = "공개: 켜짐";
+  presenceToggle.textContent = getTranslation('public_on');
 }
 async function goOffline(){
   if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
   if(channel){ try{ await channel.unsubscribe(); }catch{} }
   channel = null;
-  presenceToggle.textContent = "공개: 꺼짐";
+  presenceToggle.textContent = getTranslation('public_off');
   presencePanel.style.display = "none";
   presenceList.innerHTML = "";
 }

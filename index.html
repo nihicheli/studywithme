@@ -427,9 +427,10 @@
       <h4 data-lang-key="presence_title">실시간 보기</h4>
       <div class="row">
         <input id="nickname" class="fill pill-input" placeholder="닉네임(예: do)">
-        <button id="presenceToggle" class="pill" data-lang-key="public_on">공개: 켜짐</button>
+        <button id="applyNick" class="pill" data-lang-key="apply">적용</button>
       </div>
       <div class="row" style="margin-top:.5rem">
+        <button id="presenceToggle" class="pill" data-lang-key="public_on">공개: 켜짐</button>
         <button id="shareStudyBtn" class="pill" data-lang-key="share_study_on">내 공부시간 공개: 켜짐</button>
       </div>
       <div id="presenceInfo" style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시.</div>
@@ -461,7 +462,7 @@
         <!-- 배치 편집 버튼 숨김 처리 -->
         <button id="layoutEdit" class="pill" data-lang-key="layout_edit_off" style="display:none;">배치 편집: 꺼짐</button> 
         <button id="layoutReset" class="pill" title="원상복구" data-lang-key="reset_layout">원상복구</button>
-        <button id="rotateToggle" class="pill" title="세로에서 가로로 표시" data-lang-key="rotate_on">회전: 켜짐</button>
+        <button id="rotateToggle" class="pill" data-lang-key="rotate_on">회전: 켜짐</button>
       </div>
     </section>
 
@@ -565,6 +566,7 @@
   <div id="adBanner" aria-hidden="true">
     <img alt="ad-placeholder"
       src="https://github.com/nihicheli/studywithme/blob/main/image/Group%209225.png?raw=true"/>
+    <span class="ad-inquiry">광고문의 주세요</span>
   </div>
 </div>
 
@@ -769,7 +771,7 @@
       document.getElementById('todoTitle').textContent = getTranslation('todo_list');
       
       // 4. 동적으로 업데이트되는 UI 텍스트 재호출
-      // 1. "오늘 누적 공부" 타이틀 삭제했으므로 주석 처리
+      // 1. "오늘 누적 공부" 타이틀 제거에 따라 함수 롤백 (더 이상 사용하지 않음)
       // updateStudyTimeDisplay(); 
       updateTimerUI();         // 타이머 상태, 시작/일시정지/리셋
       updateCyclesBtn();       // 사이클 버튼
@@ -1010,6 +1012,7 @@
   const presenceToggle= document.getElementById("presenceToggle");
   const nicknameInput = document.getElementById("nickname");
   const languageSelect= document.getElementById("languageSelect"); // 새 언어 선택 요소
+  const applyNick     = document.getElementById("applyNick"); // 닉네임 적용 버튼
 
   /* 드로어 여닫기 보장 함수 (오버레이 잔존 방지) */
   function openDrawerNow(){
@@ -1288,6 +1291,10 @@
       window.__presence_broadcastNow?.();
     });
     refreshShareStudyUI();
+    
+    // 닉네임 적용 버튼 이벤트
+    applyNick.addEventListener('click', goOnline);
+
 
     // 언어 설정 후 마지막에 UI 텍스트 일괄 업데이트
     updateTextByLanguage();
@@ -1781,6 +1788,8 @@ const meNickEl      = document.getElementById("meNick");
 const presenceList  = document.getElementById("presenceList");
 const presenceToggle= document.getElementById("presenceToggle");
 const nicknameInput = document.getElementById("nickname");
+const applyNick     = document.getElementById("applyNick"); // 추가된 닉네임 적용 버튼
+
 // --- smartphone detector (여기에 추가) ---
 function isSmartphone(){
   const ua = navigator.userAgent || navigator.vendor || window.opera || "";
@@ -1797,8 +1806,14 @@ let heartbeat= null;
 /* [수정] 닉네임이 있으면 자동 연결 */
 window.addEventListener('load', ()=>{ 
     const savedNick = localStorage.getItem("nickname");
+    // 닉네임 로드 및 UI 업데이트
+    if (savedNick) {
+        nicknameInput.value = savedNick;
+        meNickEl.textContent = savedNick; // 닉네임 UI에 표시
+    }
+    
+    // 닉네임이 있고, 설정 준비가 되었으면 goOnline() 시도
     if (cfgReady() && savedNick && savedNick.trim() !== "") { 
-        nicknameInput.value = savedNick; // 닉네임 로드
         goOnline(); 
     }
 });
@@ -1825,17 +1840,32 @@ function getSnapshot(){
   return { status, study };
 }
 function fmtMin(sec){
-    const h = Math.floor((sec|0)/3600);
-    const m = Math.floor(((sec|0)%3600)/60);
-    // [수정] 30분 미만일 경우 1분 미만은 표시하지 않음 (Study with me 포맷)
-    if (sec < 60) return `0${getTranslation('min_short')}`; 
+    const s = sec|0; // 초 정수화
+    const h = Math.floor(s/3600);
+    const m = Math.floor((s%3600)/60);
+    
+    // 1분 미만은 0분으로 표시
+    if (s < 60) return `0${getTranslation('min_short')}`; 
+    
+    // 1시간 이상일 경우 "X시간 Y분" 포맷
     if(h > 0) return `${h}${getTranslation('hour_short')} ${m}${getTranslation('min_short')}`;
+    
+    // 1시간 미만일 경우 "Y분" 포맷
     return `${m}${getTranslation('min_short')}`;
 }
 
 function getTranslation(key) {
     const lang = window.state.lang;
-    return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key;
+    // 윈도우 객체에 TRANSLATIONS가 있을 경우 사용 (실제 앱 로직)
+    if (window.TRANSLATIONS) {
+        return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key;
+    }
+    // 디버그 용 기본값
+    const debugTranslations = {
+        ko: { status_work: "집중중", status_break: "휴식중", status_idle: "대기중", timer_mode: "타이머", hour_short: "시간", min_short: "분" },
+        en: { status_work: "Focusing", status_break: "Resting", status_idle: "Idle", timer_mode: "Timer Mode", hour_short: "h", min_short: "m" }
+    };
+    return debugTranslations[lang]?.[key] || key;
 }
 
 function renderOnline(presenceState){
@@ -1844,7 +1874,8 @@ function renderOnline(presenceState){
   for(const [nick, metas] of Object.entries(presenceState)){
     const meta = metas[metas.length-1] || {};
     const status = meta?.status || "idle";
-    const study  = typeof meta?.study  === "number" ? meta.study  : null; // null이면 공부시간 공개 OFF
+    // study가 null이면 공개 OFF, number면 공개 ON
+    const study  = typeof meta?.study  === "number" ? meta.study  : null; 
 
     let statusKey = '';
     let dotClass = 'dot';
@@ -1859,18 +1890,18 @@ function renderOnline(presenceState){
     } else if (status === 'timer') {
         statusKey = 'timer_mode';
         dotClass += ' work';
-    } else { // status === 'idle'
+    } else { // status === 'idle' (타이머 정지/미시작 상태)
         statusKey = 'status_idle';
     }
 
     let rightTxt = getTranslation(statusKey);
     
-    // 2. 공부시간 공개 여부에 따라 텍스트 결정 (롤백된 로직)
+    // 2. 공부시간 공개 여부에 따라 텍스트 결정
     if (study !== null) {
-      // 공부시간 공개 ON: 상태 + 공부 시간
+      // 공부시간 공개 ON: 상태 + 누적 공부 시간
       const studyTimeText = fmtMin(study);
-      // [수정] "집중중 · 30분" 형태로 롤백
-      rightTxt = `${getTranslation(statusKey)} · ${studyTimeText}`;
+      // [수정] "집중중 · 누적 57분" 형태로 표시
+      rightTxt = `${getTranslation(statusKey)} · 누적 ${studyTimeText}`; 
     } else {
         // 공부시간 공개 OFF: 상태 텍스트만 유지 (rightTxt = getTranslation(statusKey))
     }
@@ -1885,7 +1916,10 @@ function renderOnline(presenceState){
   
   const noOneOnlineText = getTranslation('no_one_online')
   
-  presenceList.innerHTML = items.slice(0,5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
+  // 닉네임이 'anonymous'인 사용자는 필터링 (로컬 유저가 닉네임 설정을 하지 않았을 경우)
+  const filteredItems = items.filter(item => !item.includes('<span class="nick">anonymous</span>'));
+
+  presenceList.innerHTML = filteredItems.slice(0,5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
 }
 
 window.__presence_broadcastNow = async function(){
@@ -1896,22 +1930,28 @@ window.__presence_goOnline = goOnline;
 window.__presence_goOffline = goOffline;
 
 async function goOnline(){
-  if(!cfgReady()){ return; }
-  if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const myNick = (nicknameInput.value || "").trim() || "anonymous";
-  // [추가] 닉네임이 없으면 연결 시도 안 함 (자동 연결 방지)
-  if (myNick === "anonymous") {
+  if(!cfgReady()){ 
+      console.error("Supabase configuration not ready.");
       presencePanel.style.display = "none";
       return; 
   }
+  if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const myNick = (nicknameInput.value || "").trim();
   
-  localStorage.setItem("nickname", myNick); // 닉네임 저장
+  // 닉네임이 유효하지 않으면 연결하지 않고 종료
+  if (myNick === "" || myNick === "anonymous") {
+      goOffline(); // 연결되어 있을 경우 끊음
+      return; 
+  }
+  
+  // 닉네임 변경/설정 로직
+  localStorage.setItem("nickname", myNick); 
   meNickEl.textContent = myNick;
   presencePanel.style.display = "block";
 
+  // 채널이 이미 존재하거나 닉네임이 변경되었다면 재연결
   if (channel) {
-      // 기존 채널이 있으면 끊고 재연결 (닉네임 변경 시 대비)
       await channel.unsubscribe();
       if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
   }
@@ -1939,15 +1979,18 @@ async function goOffline(){
   presenceList.innerHTML = "";
 }
 
-// [추가] 닉네임 입력 시 goOnline 호출 (연결 상태가 아닐 때)
-nicknameInput.addEventListener('change', ()=>{ 
-    if (!channel) goOnline(); 
-});
-// [추가] 닉네임 입력 시 localStorage 업데이트
+// 닉네임 적용 버튼 이벤트 리스너
+applyNick.addEventListener('click', goOnline);
+
+// [수정] 닉네임 입력 시 localStorage 업데이트 및 UI 반영만. 연결은 적용 버튼으로 분리.
 nicknameInput.addEventListener('input', ()=>{
-    localStorage.setItem("nickname", nicknameInput.value.trim());
-    meNickEl.textContent = nicknameInput.value.trim();
-    if (nicknameInput.value.trim() === "") goOffline();
+    const currentNick = nicknameInput.value.trim();
+    localStorage.setItem("nickname", currentNick);
+    meNickEl.textContent = currentNick; // 즉시 UI 반영
+    if (currentNick === "" && channel) {
+        // 닉네임이 비어 있고 현재 연결되어 있다면, 오프라인으로 전환
+        goOffline(); 
+    }
 });
 
 

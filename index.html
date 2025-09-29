@@ -41,7 +41,7 @@
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
     background:#000;
     /* 4. 모바일 폰트 크기 조정 */
-    font-size:clamp(10px, 4vw, 14.4px); /* 기존: clamp(15px, 4.6vw, 18px) - 약 80% 비율로 조정 */
+    font-size:clamp(10px, 4vw, 14.4px);
     letter-spacing:.02em;
   }
 
@@ -116,7 +116,9 @@
   #win-img{ display:block; width:100%; height:auto; max-height: var(--maxh-window); border-radius:16px; border:2px solid var(--line); }
 
   #character{ 
-    position:absolute; left:50%; transform:translateX(-50%); 
+    position:absolute; left:50%; 
+    /* 데스크톱: 중앙 정렬 */
+    transform:translateX(-50%); 
     top: calc(var(--content-top) + 20vh); z-index:6; 
     width: min(var(--maxw-char), 96vw); 
     /* 2. 터치 이벤트를 위해 포인터 커서 추가 */
@@ -128,7 +130,7 @@
   #fortune-bubble {
     /* 캐릭터 상단 중앙, 타이머 아래에 위치하도록 position:absolute 사용 */
     position: absolute;
-    /* 캐릭터 기본 위치 (top: calc(var(--content-top) + 20vh))보다 상단에 위치 */
+    /* 데스크톱/기본 위치: 캐릭터 상단에서 40px 위 */
     top: calc(var(--content-top) + 20vh - 40px); 
     left: 50%;
     transform: translateX(-50%);
@@ -225,7 +227,7 @@
   .drawer-sec input[type="number"], .drawer-sec input[type="text"], .drawer-sec select{
     width:100%; padding:.55rem .7rem; border:2px solid var(--line); border-radius:12px; background:transparent; color:#fff;
   }
-  :root[data-theme="light"] .drawer-sec input[type="number"], :root[data-theme="light"] .drawer-sec input[type="text"], :root[data-theme="light"] .drawer-sec select{ color:#222; }
+  :root[data-theme="light"] .drawer-sec input[type="number"], :root[data-theme="light"] .drawer-sec input[type="text"], :root[data-theme="light"] .drawer-sec select{ color:#222 }
   .fill{ flex:1 }
 
   .chips{ display:flex; gap:.5rem; align-items:center; flex-wrap: wrap; }
@@ -302,12 +304,21 @@
     position:fixed; left:50%; bottom:0; transform:translateX(-50%);
     width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
   }
-  #adBanner img{ width:100%; height:100%; opacity:0; display:block; }
+  #adBanner img{ width:100%; height:100%; opacity:0.2; display:block; }
 
   /* ========== 모바일 전용 오버라이드 (확대) ========== */
   @media (max-width: 720px){
     /* 1. 캐릭터 크기 1.5x (약 1.2x 비율로 조정) 및 왼쪽 당김 조정 */
-    #character{ transform: translateX(-75%); } 
+    #character{ 
+        /* 중앙 정렬: translateX(-50%)를 사용 */
+        transform: translateX(-50%); 
+        width: min(120vw, 96vw); /* 기존 120vw (1.2배) 유지 */
+    } 
+    /* 1. 말풍선 위치 수정: 캐릭터가 중앙에 맞춰졌으므로, 말풍선의 top 값 조정 */
+    #fortune-bubble {
+        /* 캐릭터의 중앙 위치 (top: calc(var(--content-top) + 20vh))보다 상단에 위치 */
+        top: calc(var(--content-top) + 20vh - 80px); /* 값을 더 올려서 중앙 정렬 개선 */
+    }
 
     :root{
       --content-top: 12vh;
@@ -517,7 +528,7 @@
   </div>
 
   <!-- 메인: 창문 + 캐릭터 -->
-  <!-- 2. 캐릭터 터치 이벤트를 위해 role="button" tabindex="0" 추가 -->
+  <!-- 2. 포춘 쿠키 말풍선 추가 -->
   <div id="window" class="resizable"><img id="win-img" alt="창문" /></div>
   <div id="character" class="resizable" role="button" tabindex="0"><img id="char-img" alt="캐릭터" /></div>
 
@@ -537,7 +548,7 @@
   <!-- (추후 광고) 하단 중앙 투명 배너 -->
   <div id="adBanner" aria-hidden="true">
     <img alt="ad-placeholder"
-      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="/>
+      src="https://github.com/nihicheli/studywithme/blob/main/image/Group%209225.png?raw=true"/>
   </div>
 </div>
 
@@ -767,6 +778,7 @@
     { title: "Study and Relax",     mood: "Lo-Fi",   url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
     { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus.mp3" },
     
+    /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
     { title: "Adventure",           mood: "Lo-Fi",   url: "https://freepd.com/music/Adventure.mp3" }, 
     { title: "Compy Jazz",    mood: "Jazz",    url: "https://freepd.com/music/Compy%20Jazz.mp3" }, 
     { title: "Overture", mood: "Piano",   url: "https://freepd.com/music/Overture.mp3" },
@@ -1109,7 +1121,8 @@
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
     customBgFile?.addEventListener("change", ()=>{
-      const file = customBgFile.files && customBgBgFile.files[0];
+      // [오류 수정] customBgBgFile.files[0] -> customBgFile.files[0]
+      const file = customBgFile.files && customBgFile.files[0]; 
       if(!file) return;
       bgFileName.textContent = file.name;
       const reader = new FileReader();

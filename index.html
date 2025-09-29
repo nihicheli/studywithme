@@ -8,15 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 
 <style>
+  /* 다크모드를 디폴트로 하고, 모바일의 폰트는 현재보다 80% 크기를 디폴트*/
   :root{
     --bg-url: url("https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true");
     --ink: #FBFFF4;
-    --ink-sub: rgba(0,0,0,.7);
+    --ink-sub: rgba(255,255,255,.7); /* 다크모드에 맞춰 잉크 서브색 변경 */
     --line: transparent;
     --top-gap: 12px;
     --content-top: 20vh;
 
-    /* 데스크톱 기본값(그대로 유지) */
+    /* 데스크톱 기본값 */
     --maxh-board: 80vh;
     --maxh-timer: 35vh;
     --maxh-window: 40vh;
@@ -37,7 +38,10 @@
   html,body{
     height:100%; margin:0; color:var(--ink);
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
-    background:#000; font-size:clamp(12px,1.6vw,14px); letter-spacing:.02em;
+    background:#000;
+    /* 4. 모바일 폰트 크기 조정 */
+    font-size:clamp(12px,1.6vw,14px); /* 데스크톱 기본값 */
+    letter-spacing:.02em;
   }
 
   /* 배경 + 10% 검정 오버레이 */
@@ -68,6 +72,8 @@
   }
   *{ -webkit-tap-highlight-color: transparent; }
   input, textarea, select{ font-family: inherit; font-size: 1rem; color:#fff }
+  :root[data-theme="light"] input, :root[data-theme="light"] textarea, :root[data-theme="light"] select{ color:#222 }
+
 
   .row{display:flex; gap:.75rem; align-items:center; flex-wrap:wrap}
   .hwrap{ display:flex; gap:.5rem; align-items:center; overflow-x:auto; }
@@ -169,6 +175,8 @@
   .list-scroll{ max-height: 40vh; overflow: auto; padding-bottom: .25rem; }
   .list-scroll::-webkit-scrollbar{ width:10px; height:10px; }
   .list-scroll::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.22); border-radius:999px; }
+  :root[data-theme="light"] .list-scroll::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.22); }
+
 
   a#creditLink{ color:#9db7ff; text-decoration:none; border-bottom:1px dashed #9db7ff; }
   a#creditLink:hover{ opacity:.85; }
@@ -240,8 +248,8 @@
   /* ========== 모바일 전용 오버라이드 (확대) ========== */
   @media (max-width: 720px){
     #character{ transform: translateX(-70%); }
-    /* 전반적 확대 */
-    html, body{ font-size: clamp(15px, 4.6vw, 18px); }
+    /* 4. 모바일 폰트 크기: 데스크톱 대비 80% 크기 적용 (기존 코드에서는 폰트 크기가 이미 모바일에서 커지고 있었으므로, clamp()의 최소/최대/뷰포트 비율을 조정하여 80% 비율에 가깝게 조정합니다.) */
+    html, body{ font-size: clamp(10px, 4vw, 14.4px); /* 기존: clamp(15px, 4.6vw, 18px) - 약 80% 비율로 조정 */ }
 
     :root{
       --content-top: 12vh;
@@ -464,14 +472,22 @@
 
 <script>
   /* ===== 트랙 데이터 ===== */
+
   const TRACKS = [
-    { title: "Bass Meant Jazz",     mood: "Jazz",  url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
-    { title: "Stompin at Midnight", mood: "Jazz",  url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
-    { title: "Abstract Anxiety",    mood: "Loud",  url: "https://freepd.com/music/Abstract%20Anxiety.mp3" },
-    { title: "Adding the Sun",      mood: "Lo-Fi", url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
-    { title: "Bleu",                mood: "Lo-Fi", url: "https://freepd.com/music/Bleu.mp3" },
-    { title: "Study and Relax",     mood: "Lo-Fi", url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
-    { title: "Deep Focus",          mood: "Lo-Fi", url: "https://freepd.com/music/Deep%20Focus.mp3" },
+    { title: "Bass Meant Jazz",     mood: "Jazz",    url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
+    { title: "Stompin at Midnight", mood: "Jazz",    url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
+    { title: "Abstract Anxiety",    mood: "Loud",    url: "https://freepd.com/music/Abstract%20Anxiety.mp3" },
+    { title: "Adding the Sun",      mood: "Lo-Fi",   url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
+    { title: "Bleu",                mood: "Lo-Fi",   url: "https://freepd.com/music/Bleu.mp3" },
+    { title: "Study and Relax",     mood: "Lo-Fi",   url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
+    { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus.mp3" },
+    
+    /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
+    { title: "A Good Bass for Gambling",           mood: "Jazz",   url: "https://freepd.com/music/A%20Good%20Bass%20for%20Gambling.mp3" }, 
+    { title: "Adventure",    mood: "Ambient",    url: "https://freepd.com/music/Adventure.mp3" }, 
+    { title: "Winter", mood: "Piano",   url: "https://freepd.com/music/Winter.mp3" },
+    { title: "Piano magic motive", mood: "Piano", url: "https://freepd.com/music/Piano%20Magic%20Motive.mp3" }, 
+    
     /* White/Pink/Brown Noise (Public Domain) */
     { title: "White Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
     { title: "Pink Noise",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
@@ -479,11 +495,17 @@
   ];
 
   /* 창문/캐릭터 0.5s 교차 */
-  let charA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true";
-  let charB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true";
-  let winA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
-  let winB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
-  let showA = true, showWinA = true, blinkTimer = null;
+  let charWorkA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true"; // 이미지 1 (집중중)
+  let charWorkB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true"; // 이미지 2 (집중중)
+  let winWorkA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
+  let winWorkB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
+  /* 1. 휴식 중일 때 사용할 새로운 이미지 3, 4 */
+  let charBreakA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209222.png?raw=true"; // 
+  let charBreakB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209224.png?raw=true"; // 
+  let winBreakA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215_break_1.png?raw=true";
+  let winBreakB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216_break_2.png?raw=true";
+
+  let showA = true, blinkTimer = null;
 
   /* ===== 전역 상태 ===== */
   const lsShare = localStorage.getItem("shareStudy");
@@ -495,7 +517,11 @@
     interval: null, shuffle: false, playing: false,
     mood: "전체", trackIdx: 0, repeatMode: "off",
     totalCycles: 4, completedCycles: 0,
+    /* 2. 새벽 4시 기점으로 하루 공부시간 누적을 위해 studyTimeTotal 및 lastStudyTime 추가 */
+    studyTimeTotal: parseInt(localStorage.getItem("studyTimeTotal") || "0", 10),
+    lastStudyTime: parseInt(localStorage.getItem("lastStudyTime") || "0", 10),
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]"),
+    /* 4. 다크모드를 디폴트로 */
     theme: localStorage.getItem("theme") || "dark",
     windowVisible: (localStorage.getItem("ui-window-visible") ?? "1") === "1",
     characterVisible: (localStorage.getItem("ui-character-visible") ?? "1") === "1",
@@ -503,6 +529,40 @@
     rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1")
   };
   window.state = state;
+
+  /* 2. 새벽 4시를 기점으로 공부 시간 초기화 확인 */
+  (function checkAndResetDailyStudyTime(){
+      const now = new Date();
+      const last = new Date(state.lastStudyTime);
+
+      const isNewDay = (now.getFullYear() > last.getFullYear() || now.getMonth() > last.getMonth() || now.getDate() > last.getDate());
+
+      // 오늘 새벽 4시 (4:00:00)
+      const resetTime = new Date(now);
+      resetTime.setHours(4, 0, 0, 0);
+
+      // (1) 마지막 기록 시점 (last)이 오늘 새벽 4시 이전이고, 현재 시점(now)이 오늘 새벽 4시 이후일 경우
+      const shouldReset = (last.getTime() < resetTime.getTime() && now.getTime() >= resetTime.getTime());
+
+      // (2) 또는 날짜 자체가 바뀌었는데, 아직 오늘 4시를 지나지 않았을 경우 (예: 3일 3시에 기록하고 4일 1시에 접속)
+      // 이 경우, 전날의 4시와 오늘 4시 사이에 접속했다면 리셋을 건너뛸 수 있으므로, (1) 조건으로 충분합니다.
+      // 리셋은 "4시가 되었을 때 처음 접속/액션 시"에만 일어나도록 설계합니다.
+
+      if(shouldReset || (isNewDay && now.getHours() >= 4)){
+          // 4시가 지났으므로 리셋
+          state.studyTimeTotal = 0;
+          localStorage.setItem("studyTimeTotal", "0");
+          // lastStudyTime을 현재 시간으로 업데이트 (다시 리셋되지 않도록 방지)
+          state.lastStudyTime = now.getTime();
+          localStorage.setItem("lastStudyTime", state.lastStudyTime.toString());
+      }
+      // lastStudyTime이 0이거나 (첫 실행), 4시 리셋 조건이 아니면 현재 시간으로 업데이트만 합니다.
+      if (state.lastStudyTime === 0 || shouldReset || isNewDay) {
+          state.lastStudyTime = now.getTime();
+          localStorage.setItem("lastStudyTime", state.lastStudyTime.toString());
+      }
+  })();
+
 
   /* 새로고침시 타이머 유지 */
   window.addEventListener('beforeunload', ()=>{
@@ -513,6 +573,9 @@
         totalCycles: state.totalCycles, completedCycles: state.completedCycles
       };
       sessionStorage.setItem('timer-keep', JSON.stringify(snap));
+      /* 2. 최종 공부 시간 업데이트 */
+      localStorage.setItem("studyTimeTotal", state.studyTimeTotal.toString());
+      localStorage.setItem("lastStudyTime", Date.now().toString());
     }catch(e){}
   });
 
@@ -616,7 +679,47 @@
     localStorage.setItem("theme", t);
   }
 
+  function getStudyTimeToday(){
+    // 2. 누적 공부 시간 (초)을 포맷하여 반환
+    return fmt(state.studyTimeTotal);
+  }
+
+  function updateStudyTimeDisplay(){
+    // 현재 공부중 섹션의 타이틀을 업데이트 (Todo list 섹션 옆)
+    const title = presencePanel.querySelector(".title");
+    if (title) {
+        title.textContent = `오늘 누적 공부: ${getStudyTimeToday()}`;
+    }
+  }
+
+
+  /* 1. 이미지 깜빡임 로직 분리 및 업데이트 */
+  function updateCharacterAndWindowImages() {
+    // running 상태 또는 isWork 상태에 따라 사용할 이미지 쌍을 결정
+    let charA, charB, winA, winB;
+
+    if (state.running && state.isWork) {
+        // 타이머가 돌아가고 집중중일 때: Work 이미지 1, 2 사용 (기존)
+        charA = charWorkA; charB = charWorkB;
+        winA  = winWorkA;  winB  = winWorkB;
+    } else if (!state.running || (state.running && !state.isWork)) {
+        // 타이머가 돌아가지 않거나 (running: false), 휴식 중일 때 (isWork: false)
+        // Break 이미지 3, 4 사용 (요청 사항)
+        charA = charBreakA; charB = charBreakB;
+        winA  = winBreakA;  winB  = winBreakB;
+    } else {
+        // 비상시 대비 (기본 이미지 사용)
+        charA = charWorkA; charB = charWorkB;
+        winA  = winWorkA;  winB  = winWorkB;
+    }
+
+    showA = !showA;
+    charImg.src = showA ? charA : charB;
+    winImg.src  = showA ? winA  : winB;
+  }
+
   function init(){
+    /* 4. 다크모드를 디폴트로 - 이미 state.theme='dark'로 기본 설정되어있음 */
     applyTheme(state.theme);
 
     hamburgerBtn.addEventListener("click", openDrawerNow);
@@ -674,11 +777,9 @@
       reader.readAsDataURL(file);
     });
 
-    charImg.src = charA; winImg.src = winA;
-    blinkTimer = setInterval(()=>{
-      showA = !showA; charImg.src = showA ? charA : charB;
-      showWinA = !showWinA; winImg.src = showWinA ? winA : winB;
-    }, 500);
+    /* 1. 이미지 깜빡임 로직: 기존 코드를 updateCharacterAndWindowImages로 대체 */
+    updateCharacterAndWindowImages(); // 초기 이미지 설정
+    blinkTimer = setInterval(updateCharacterAndWindowImages, 500);
 
     renderTodos();
     todoAdd.addEventListener("click", addTodo);
@@ -802,6 +903,7 @@
     });
     refreshShareStudyUI();
 
+    updateStudyTimeDisplay(); // 2. 누적 공부 시간 UI 업데이트
     updateTimerUI();
     if(__resumeAfterReload){ startTimer(); }
   }
@@ -830,7 +932,7 @@
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
   function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
 
-  function MOODS(){ return ["전체","Lo-Fi","Jazz","Loud","Piano","Noise"]; }
+  function MOODS(){ return ["전체","Lo-Fi","Jazz","Loud","Piano","Ambient","Noise"]; } /* Ambient 추가 */
   function filteredTrackIdxs(){
     if(state.mood==="전체") return TRACKS.map((_,i)=>i);
     return TRACKS.map((t,i)=> t.mood===state.mood ? i : -1).filter(i=>i>=0);
@@ -904,12 +1006,14 @@
     startPause.textContent=state.running?"일시정지":"시작";
     document.title = `${fmt(state.remainSec)} • Studywithme`;
     window.__presence_broadcastNow?.();
+    updateStudyTimeDisplay(); // 2. 누적 공부 시간 UI 업데이트
   }
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
   function startTimer(){
     if(state.running) return;
     state.running=true; updateTimerUI();
+    updateCharacterAndWindowImages(); // 이미지 갱신
     state.interval=setInterval(()=>{
       if(state.mode==='pomodoro'){
         if(state.remainSec<=0){
@@ -922,8 +1026,13 @@
             updateCyclesBtn();
             if(state.completedCycles>=state.totalCycles){ stopTimer(); }
           }
+          updateCharacterAndWindowImages(); // 상태 변경 시 즉시 이미지 갱신
         } else {
           state.remainSec-=1;
+          // 2. 집중 중일 때만 누적 공부 시간 증가
+          if(state.isWork){
+             state.studyTimeTotal+=1;
+          }
         }
       }else{
         state.remainSec+=1;
@@ -931,12 +1040,18 @@
       updateTimerUI();
     },1000);
   }
-  function stopTimer(){ state.running=false; if(state.interval){ clearInterval(state.interval); state.interval=null; } updateTimerUI(); }
+  function stopTimer(){
+    state.running=false;
+    if(state.interval){ clearInterval(state.interval); state.interval=null; }
+    updateTimerUI();
+    updateCharacterAndWindowImages(); // 정지 시 즉시 이미지 갱신 (휴식/정지 모드)
+  }
   function resetTimer(){
     stopTimer();
     state.isWork=true;
     state.remainSec = (state.mode==='pomodoro') ? state.workSec : 0;
     updateTimerUI();
+    updateCharacterAndWindowImages(); // 리셋 시 즉시 이미지 갱신
   }
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
@@ -1258,16 +1373,18 @@ function getSnapshot(){
   const st = window.state || {};
   let study = null;
   if(st.shareStudy){
-    if(st.mode==='timer'){
-      study = st.remainSec||0;
-    }else if(st.mode==='pomodoro' && st.isWork){
-      study = Math.max(0,(st.workSec|0) - (st.remainSec|0));
-    }
+    /* 2. 누적 공부 시간 대신 오늘 총 공부 시간 전송 */
+    study = st.studyTimeTotal || 0;
   }
   const status = (st.mode==='pomodoro') ? (st.isWork ? "work" : "break") : "timer";
   return { status, study };
 }
-function fmtMin(sec){ return `${Math.floor((sec|0)/60)}분`; }
+function fmtMin(sec){
+    const h = Math.floor((sec|0)/3600);
+    const m = Math.floor(((sec|0)%3600)/60);
+    if(h > 0) return `${h}시간 ${m}분`;
+    return `${m}분`;
+}
 
 function renderOnline(presenceState){
   const items = [];
@@ -1280,8 +1397,8 @@ function renderOnline(presenceState){
     if(status === "break"){
       rightTxt = "휴식중";
     }else{
-      rightTxt = "공부중";
-      if(study!=null) rightTxt += ` · ${fmtMin(study)}`;
+      rightTxt = "집중중";
+      if(study!=null) rightTxt += ` · 누적 ${fmtMin(study)}`;
     }
 
     items.push(

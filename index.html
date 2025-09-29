@@ -296,6 +296,7 @@
   #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
   #presencePanel .dot.work{ background:#7CFF7C; }
   #presencePanel .dot.break{ background:#FFC66D; }
+  /* 1. 실시간 패널 디자인 롤백: study time이 보일 때 공간이 부족하지 않도록 조정 */
   #presenceList .person{ display:flex; justify-content:space-between; gap:.5rem; padding:.25rem 0; }
   #presenceList .nick{ font-weight:700; }
 
@@ -304,20 +305,34 @@
     position:fixed; left:50%; bottom:0; transform:translateX(-50%);
     width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
   }
-  #adBanner img{ width:100%; height:100%; opacity:0.2; display:block; }
+  /* 3. 배너 이미지 투명도 및 URL 업데이트 */
+  #adBanner img{ width:100%; height:100%; opacity:0.2; display:block; } 
+  
+  /* 배너 위에 텍스트 추가 */
+  .ad-inquiry {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+    font-weight: 500;
+  }
+  :root[data-theme="light"] .ad-inquiry {
+    color: rgba(0, 0, 0, 0.6);
+  }
 
   /* ========== 모바일 전용 오버라이드 (확대) ========== */
   @media (max-width: 720px){
-    /* 1. 캐릭터 크기 1.5x (약 1.2x 비율로 조정) 및 왼쪽 당김 조정 */
+    /* 2. 캐릭터 크기 및 정렬 재조정 */
     #character{ 
-        /* 중앙 정렬: translateX(-50%)를 사용 */
         transform: translateX(-50%); 
-        width: min(120vw, 96vw); /* 기존 120vw (1.2배) 유지 */
+        width: min(120vw, 96vw); /* 130vw -> 120vw로 조정 (1.2배) */
     } 
-    /* 1. 말풍선 위치 수정: 캐릭터가 중앙에 맞춰졌으므로, 말풍선의 top 값 조정 */
+    /* 2. 말풍선 위치 수정: 중앙 정렬 개선 */
     #fortune-bubble {
         /* 캐릭터의 중앙 위치 (top: calc(var(--content-top) + 20vh))보다 상단에 위치 */
-        top: calc(var(--content-top) + 20vh - 80px); /* 값을 더 올려서 중앙 정렬 개선 */
+        top: calc(var(--content-top) + 20vh - 80px); /* 다시 -80px로 미세 조정 */
     }
 
     :root{
@@ -328,10 +343,10 @@
       --maxh-char: 70vh; 
 
       /* 1. 모바일에서 Todo List 및 실시간 패널 너비 조정 */
-      --maxw-board: 60vw; /* 70vw -> 60vw로 줄여서 덜 차지하도록 */
+      --maxw-board: 60vw;
       --maxw-window: 30vw;
       --maxw-timer: 86vw;
-      --maxw-char: 120vw; /* 98vw -> 120vw로 확대 (1.2배 이상) */
+      --maxw-char: 120vw; /* 130vw -> 120vw로 조정 (크기 재조정) */
     }
 
     #bottombar{ flex-direction:column; }
@@ -355,7 +370,8 @@
   <!-- 오른쪽 아래: 실시간 패널 -->
   <aside id="presencePanel" class="card panel" style="display:none">
     <div class="row" style="justify-content:space-between">
-      <div id="studyTimeTitle" class="title">오늘 누적 공부: 00:00</div>
+      <!-- 1. "오늘 누적 공부" 타이틀 삭제 -->
+      <div class="title" data-lang-key="presence_title">실시간 보기</div>
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
@@ -562,7 +578,7 @@
       today_study: "Today's Study: ",
       todo_list: "Todo List",
       add_todo_placeholder: "Add a task and Enter",
-      delete: "Delete", // 임시 추가
+      delete: "Delete", 
       
       // Timer/Pomodoro
       timer_pomodoro_title: "Timer / Pomodoro",
@@ -632,7 +648,10 @@
       status_work: "Focusing",
       status_break: "Resting",
       status_idle: "Idle",
-      no_one_online: "No one online yet"
+      timer_mode: "Timer Mode",
+      no_one_online: "No one online yet",
+      hour_short: "h",
+      min_short: "m"
     },
     ko: {
       settings: "설정",
@@ -641,7 +660,7 @@
       today_study: "오늘 누적 공부: ",
       todo_list: "Todo list",
       add_todo_placeholder: "할 일을 적고 Enter",
-      delete: "삭제", // 임시 추가
+      delete: "삭제", 
       
       // Timer/Pomodoro
       timer_pomodoro_title: "뽀모도로 / 타이머",
@@ -711,7 +730,10 @@
       status_work: "집중중",
       status_break: "휴식중",
       status_idle: "대기중",
-      no_one_online: "아직 아무도 없어요"
+      timer_mode: "타이머",
+      no_one_online: "아직 아무도 없어요",
+      hour_short: "시간",
+      min_short: "분"
     }
   };
 
@@ -747,7 +769,8 @@
       document.getElementById('todoTitle').textContent = getTranslation('todo_list');
       
       // 4. 동적으로 업데이트되는 UI 텍스트 재호출
-      updateStudyTimeDisplay(); // 오늘 누적 공부
+      // 1. "오늘 누적 공부" 타이틀 삭제했으므로 주석 처리
+      // updateStudyTimeDisplay(); 
       updateTimerUI();         // 타이머 상태, 시작/일시정지/리셋
       updateCyclesBtn();       // 사이클 버튼
       updateWindowToggleUI();  // 창문 표시
@@ -767,7 +790,7 @@
       // document.getElementById('propInfo').textContent = getTranslation('prop_info'); 
   }
 
-  /* ===== 트랙 데이터 ===== */
+  /* ===== 트랙 데이터 (Track Data) ===== */
   /* 3. 곡을 몇 개 더 찾아서 넣어줬으면 좋겠어. 상업적 무료로. -> 새로운 트랙으로 교체/추가 */
   const TRACKS = [
     { title: "Bass Meant Jazz",     mood: "Jazz",    url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
@@ -1011,13 +1034,15 @@
     return fmt(state.studyTimeTotal);
   }
 
+  // 1. "오늘 누적 공부" 타이틀 제거에 따라 함수 롤백 (더 이상 사용하지 않음)
+  /*
   function updateStudyTimeDisplay(){
-    // 현재 공부중 섹션의 타이틀을 업데이트 (Todo list 섹션 옆)
     const title = presencePanel.querySelector(".title");
     if (title) {
         title.textContent = getTranslation('today_study') + getStudyTimeToday();
     }
   }
+  */
 
   // 2. 포춘 쿠키 메시지 표시 함수
   function showFortuneMessage(){
@@ -1256,7 +1281,7 @@
     function refreshShareStudyUI(){
       shareStudyBtn.textContent = getTranslation(state.shareStudy ? 'share_study_on' : 'share_study_off');
     }
-    shareStudyBtn.addEventListener('click', ()=>{
+    shareStudyBtn.addEventListener("click", ()=>{
       state.shareStudy = !state.shareStudy;
       localStorage.setItem('shareStudy', state.shareStudy ? "1" : "0");
       refreshShareStudyUI();
@@ -1388,7 +1413,8 @@
     
     document.title = `${fmt(state.remainSec)} • Studywithme`;
     window.__presence_broadcastNow?.();
-    updateStudyTimeDisplay(); // 누적 공부 시간 UI 업데이트
+    // 1. "오늘 누적 공부" 타이틀 제거에 따라 주석 처리
+    // updateStudyTimeDisplay(); 
   }
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
@@ -1448,7 +1474,7 @@
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
   function updateCyclesBtn(){ 
-      const text = `${state.completedCycles}/${state.totalCycles}`;
+      const text = `${state.completedCycles}/${state.totalCycles}회`;
       cyclesBtn.textContent = text;
       cyclesBtn.title = text;
   }
@@ -1768,8 +1794,14 @@ let supabase = null;
 let channel  = null;
 let heartbeat= null;
 
-/* 기본 ON: 로드 시 자동 연결 */
-window.addEventListener('load', ()=>{ if(cfgReady()) goOnline(); });
+/* [수정] 닉네임이 있으면 자동 연결 */
+window.addEventListener('load', ()=>{ 
+    const savedNick = localStorage.getItem("nickname");
+    if (cfgReady() && savedNick && savedNick.trim() !== "") { 
+        nicknameInput.value = savedNick; // 닉네임 로드
+        goOnline(); 
+    }
+});
 
 function cfgReady(){
   return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY;
@@ -1777,16 +1809,26 @@ function cfgReady(){
 function getSnapshot(){
   const st = window.state || {};
   let study = null;
+  
+  // 1. 공부 시간 공개가 ON일 때만 studyTimeTotal 전송 (롤백된 로직)
   if(st.shareStudy){
-    /* 2. 누적 공부 시간 대신 오늘 총 공부 시간 전송 */
     study = st.studyTimeTotal || 0;
   }
-  const status = (st.mode==='pomodoro') ? (st.isWork ? "work" : "break") : "timer";
+  
+  let status = "idle"; // 기본 상태를 'idle'로 설정
+  
+  if (st.running) {
+      // 타이머가 작동 중일 때만 상태를 work/break/timer로 설정
+      status = (st.mode === 'pomodoro') ? (st.isWork ? "work" : "break") : "timer";
+  }
+  
   return { status, study };
 }
 function fmtMin(sec){
     const h = Math.floor((sec|0)/3600);
     const m = Math.floor(((sec|0)%3600)/60);
+    // [수정] 30분 미만일 경우 1분 미만은 표시하지 않음 (Study with me 포맷)
+    if (sec < 60) return `0${getTranslation('min_short')}`; 
     if(h > 0) return `${h}${getTranslation('hour_short')} ${m}${getTranslation('min_short')}`;
     return `${m}${getTranslation('min_short')}`;
 }
@@ -1799,36 +1841,38 @@ function getTranslation(key) {
 function renderOnline(presenceState){
   const items = [];
   
-  // 임시: translate helper에 시간 단위 추가 (Supabase 스크립트 내에서만 사용)
-  if (!window.TRANSLATIONS) {
-      window.TRANSLATIONS = {
-        en: { status_work: "Focusing", status_break: "Resting", status_idle: "Idle", no_one_online: "No one online yet", hour_short: "h", min_short: "m" },
-        ko: { status_work: "집중중", status_break: "휴식중", status_idle: "대기중", no_one_online: "아직 아무도 없어요", hour_short: "시간", min_short: "분" }
-      };
-      window.state = { lang: localStorage.getItem("lang") || 'ko' };
-  }
-  
   for(const [nick, metas] of Object.entries(presenceState)){
     const meta = metas[metas.length-1] || {};
     const status = meta?.status || "idle";
-    const study  = typeof meta?.study  === "number" ? meta.study  : null;
-    
+    const study  = typeof meta?.study  === "number" ? meta.study  : null; // null이면 공부시간 공개 OFF
+
     let statusKey = '';
     let dotClass = 'dot';
+    
+    // 1. 상태 및 점 색상 결정
     if (status === 'work') {
         statusKey = 'status_work';
         dotClass += ' work';
     } else if (status === 'break') {
         statusKey = 'status_break';
         dotClass += ' break';
-    } else {
+    } else if (status === 'timer') {
+        statusKey = 'timer_mode';
+        dotClass += ' work';
+    } else { // status === 'idle'
         statusKey = 'status_idle';
     }
 
     let rightTxt = getTranslation(statusKey);
-    if (study != null) {
+    
+    // 2. 공부시간 공개 여부에 따라 텍스트 결정 (롤백된 로직)
+    if (study !== null) {
+      // 공부시간 공개 ON: 상태 + 공부 시간
       const studyTimeText = fmtMin(study);
-      rightTxt += ` · ${studyTimeText}`;
+      // [수정] "집중중 · 30분" 형태로 롤백
+      rightTxt = `${getTranslation(statusKey)} · ${studyTimeText}`;
+    } else {
+        // 공부시간 공개 OFF: 상태 텍스트만 유지 (rightTxt = getTranslation(statusKey))
     }
     
     items.push(
@@ -1856,8 +1900,21 @@ async function goOnline(){
   if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const myNick = (nicknameInput.value || "").trim() || "anonymous";
+  // [추가] 닉네임이 없으면 연결 시도 안 함 (자동 연결 방지)
+  if (myNick === "anonymous") {
+      presencePanel.style.display = "none";
+      return; 
+  }
+  
+  localStorage.setItem("nickname", myNick); // 닉네임 저장
   meNickEl.textContent = myNick;
   presencePanel.style.display = "block";
+
+  if (channel) {
+      // 기존 채널이 있으면 끊고 재연결 (닉네임 변경 시 대비)
+      await channel.unsubscribe();
+      if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
+  }
 
   channel = supabase.channel("studyroom", { config: { presence: { key: myNick } } });
   channel.on("presence", { event: "sync" }, ()=>{ renderOnline(channel.presenceState()); });
@@ -1865,7 +1922,9 @@ async function goOnline(){
   channel.subscribe(async (status)=>{
     if(status === "SUBSCRIBED"){
       try{ await channel.track(getSnapshot()); }catch{}
-      heartbeat = setInterval(async ()=>{ try{ await channel.track(getSnapshot()); }catch{} }, 15000);
+      heartbeat = setInterval(async ()=>{ 
+          try{ await channel.track(getSnapshot()); }catch{} 
+      }, 15000);
     }
   });
 
@@ -1879,6 +1938,18 @@ async function goOffline(){
   presencePanel.style.display = "none";
   presenceList.innerHTML = "";
 }
+
+// [추가] 닉네임 입력 시 goOnline 호출 (연결 상태가 아닐 때)
+nicknameInput.addEventListener('change', ()=>{ 
+    if (!channel) goOnline(); 
+});
+// [추가] 닉네임 입력 시 localStorage 업데이트
+nicknameInput.addEventListener('input', ()=>{
+    localStorage.setItem("nickname", nicknameInput.value.trim());
+    meNickEl.textContent = nicknameInput.value.trim();
+    if (nicknameInput.value.trim() === "") goOffline();
+});
+
 
 presenceToggle?.addEventListener("click", async ()=>{
   if(!channel){ await goOnline(); } else { await goOffline(); }

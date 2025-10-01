@@ -1434,11 +1434,9 @@
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
   
   function startTimer(){
-    if(state.running) {
-        // 이미 실행 중일 경우: 재시작 시점만 업데이트 (스스로 재귀 호출되지 않도록 방지)
-        if (state.interval) clearInterval(state.interval);
-        state.interval = null;
-    }
+    // [수정] startTimer가 호출되면, 실행 중인 타이머가 있으면 정리만 하고, running 상태는 유지
+    if (state.interval) clearInterval(state.interval);
+    state.interval = null;
     
     state.running=true; 
     
@@ -1519,16 +1517,20 @@
   }
   
   function stopTimer(){
-    state.running=false;
     // [수정] 타이머 정지 시 studyTimeTotal 최종 업데이트
     const now = Date.now();
     const elapsedSec = Math.floor((now - lastActiveTime) / 1000);
-    if (state.mode === 'pomodoro' && state.isWork) {
-        state.studyTimeTotal += elapsedSec;
-    } else if (state.mode === 'timer') {
-        state.studyTimeTotal += elapsedSec;
+    
+    // 타이머가 running 상태였을 때만 누적 보정
+    if (state.running) {
+        if (state.mode === 'pomodoro' && state.isWork) {
+            state.studyTimeTotal += elapsedSec;
+        } else if (state.mode === 'timer') {
+            state.studyTimeTotal += elapsedSec;
+        }
     }
-    // lastActiveTime 업데이트
+    
+    state.running=false;
     lastActiveTime = now;
     
     if(state.interval){ clearInterval(state.interval); state.interval=null; }
@@ -1571,8 +1573,8 @@
               }
               
               // 2. 타이머 재시작 및 보정
-              // startTimer 내부에서 이전 interval을 정리하고 savedRemainSec/startTime을 업데이트하며
-              // 정확하게 타이머를 재개함.
+              // running 상태가 true라면 (일시정지 버튼을 누르지 않았다면) startTimer를 호출하여
+              // 새로운 startTime과 savedRemainSec으로 interval을 재설정함.
               startTimer(); 
           }
           
@@ -1580,16 +1582,17 @@
       } else {
           // 탭 비활성화 시 (사용자가 다른 탭으로 이동할 때)
           
-          // 1. 타이머가 작동 중이었다면, 현재 상태를 저장하고 startTime을 리셋하여
-          //    다시 돌아왔을 때 정확한 오프셋을 계산할 수 있도록 준비.
+          // 1. 타이머가 작동 중이었다면, interval만 해제하여 자원 소모를 줄임.
           if (state.running) {
-             // stopTimer를 호출하지 않고, 내부 값만 업데이트하여 running 상태 유지
-             state.savedRemainSec = state.remainSec;
-             state.startTime = Date.now(); 
+             // running 상태는 그대로 유지
              if (state.interval) {
                 clearInterval(state.interval);
                 state.interval = null;
              }
+             // savedRemainSec와 startTime을 현재 값으로 업데이트하여,
+             // 돌아왔을 때 정확한 오프셋을 계산할 수 있도록 준비.
+             state.savedRemainSec = state.remainSec;
+             state.startTime = Date.now(); 
           }
           
           lastActiveTime = Date.now();

@@ -28,12 +28,6 @@
     --maxw-window: 15vw;
     --maxw-timer: 35vw;
     --maxw-char: 70vw;
-    
-    /* 1. 이미지 깜빡임 최적화: CSS 변수 추가 */
-    --char-main-url: url("https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true");
-    --char-alt-url: url("https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true");
-    --win-main-url: url("https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true");
-    --win-alt-url: url("https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true");
   }
   :root[data-theme="light"]{
     --ink:#202020;
@@ -131,20 +125,10 @@
     cursor: pointer;
   }
   #char-img{ 
-    /* 1. 이미지 깜빡임 최적화: background-image로 변경 */
+    /* 디자인 복원: src를 사용하며, 배경은 투명하게 유지 */
     display:block; width:100%; height:auto; max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); 
-    /* 기존 src를 덮고 background-image를 사용하도록 설정 */
-    content: ''; 
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    background:transparent center/contain no-repeat; 
   }
-
-  /* 이미지 깜빡임 최적화 (2개의 이미지 사용) */
-  #char-img.alt-img{ background-image: var(--char-alt-url) !important; }
-  #win-img.alt-img{ background-image: var(--win-alt-url) !important; }
-  #char-img:not(.alt-img){ background-image: var(--char-main-url); }
-  #win-img:not(.alt-img){ background-image: var(--win-main-url); }
 
   /* 2. 말풍선 스타일 */
   #fortune-bubble {
@@ -815,7 +799,7 @@
     { title: "Adding the Sun",      mood: "Lo-Fi",   url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
     { title: "Bleu",                mood: "Lo-Fi",   url: "https://freepd.com/music/Bleu.mp3" },
     { title: "Study and Relax",     mood: "Lo-Fi",   url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
-    { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus.mp3" },
+    { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus. основным" },
     
     /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
     { title: "Adventure",           mood: "Lo-Fi",   url: "https://freepd.com/music/Adventure.mp3" }, 
@@ -843,8 +827,7 @@
   let showA = true, blinkTimer = null;
   let fortuneBubbleTimeout = null;
   
-  // 이미지 깜빡임 최적화를 위한 캐시
-  const BLINK_CACHE = {}; 
+  /* [삭제] 이미지 깜빡임 최적화를 위한 BLINK_CACHE 제거 */
 
   // 2. 따뜻한 메시지 목록
   const FORTUNE_MESSAGES = [
@@ -880,7 +863,7 @@
     interval: null, shuffle: false, playing: false,
     mood: "전체", trackIdx: 0, repeatMode: "off",
     totalCycles: 4, completedCycles: 0,
-    /* [수정] 타이머 지연 문제 해결을 위한 타임스탬프 추가 */
+    /* [유지] 타이머 지연 문제 해결을 위한 타임스탬프 */
     startTimeStamp: 0, // 타이머가 시작된 실제 시점 (ms)
     lastUpdateTimestamp: 0, // studyTimeTotal 업데이트를 위한 마지막 시점 (ms)
     /* 2. 새벽 4시 기점으로 하루 공부시간 누적을 위해 studyTimeTotal 및 lastStudyTime 추가 */
@@ -931,7 +914,7 @@
       }
   })();
   
-  /* [추가] 현재 정확한 남은 시간 계산 (탭 전환 문제 해결 핵심) */
+  /* [유지] 현재 정확한 남은 시간 계산 (탭 전환 문제 해결 핵심) */
   function calculateAccurateRemaining() {
     if (!state.running || state.startTimeStamp === 0) return state.remainSec;
     
@@ -984,7 +967,7 @@
       state.isWork = !!s.isWork;
       state.workSec = +s.workSec || state.workSec;
       state.restSec = +s.restSec || state.restSec;
-      // [수정] 저장된 remainSec를 사용 (정확한 시간임)
+      // [유지] 저장된 remainSec를 사용 (정확한 시간임)
       state.remainSec = +s.remainSec || state.remainSec; 
       state.totalCycles = +s.totalCycles || state.totalCycles;
       state.completedCycles = +s.completedCycles || 0;
@@ -1107,23 +1090,7 @@
   }
 
 
-  /* 1. 이미지 깜빡임 로직 분리 및 업데이트 */
-  // :root의 CSS 변수를 업데이트하여 이미지 변경 (성능 최적화)
-  function setBlinkImages(charMain, charAlt, winMain, winAlt) {
-    // 이미 적용된 경우 스킵 (DOM 조작 최소화)
-    if (BLINK_CACHE.charMain === charMain && BLINK_CACHE.charAlt === charAlt) return; 
-    
-    document.documentElement.style.setProperty('--char-main-url', `url("${charMain}")`);
-    document.documentElement.style.setProperty('--char-alt-url',  `url("${charAlt}")`);
-    document.documentElement.style.setProperty('--win-main-url',  `url("${winMain}")`);
-    document.documentElement.style.setProperty('--win-alt-url',   `url("${winAlt}")`);
-
-    BLINK_CACHE.charMain = charMain; BLINK_CACHE.charAlt = charAlt;
-    // CSS 변수 업데이트 후, 현재 상태에 맞춰 클래스 업데이트
-    charImg.classList.toggle('alt-img', !showA);
-    winImg.classList.toggle('alt-img', !showA);
-  }
-
+  /* 1. [복원] 이미지 깜빡임 로직 분리 및 업데이트 - src 변경 방식 사용 */
   function updateCharacterAndWindowImages() {
     // running 상태 또는 isWork 상태에 따라 사용할 이미지 쌍을 결정
     let charA, charB, winA, winB;
@@ -1138,15 +1105,10 @@
         winA  = winBreakA;  winB  = winBreakB;
     }
 
-    // 1. 이미지 그룹이 변경되었는지 확인하고, 변경되었으면 CSS 변수를 업데이트
-    if (charA !== BLINK_CACHE.charMain || charB !== BLINK_CACHE.charAlt) {
-        setBlinkImages(charA, charB, winA, winB);
-    }
-
-    // 2. showA 상태를 토글하여 CSS 클래스만 변경 (DOM 조작 최소화)
+    // [복원] src 속성을 직접 변경하는 방식 사용
     showA = !showA;
-    charImg.classList.toggle('alt-img', !showA);
-    winImg.classList.toggle('alt-img', !showA);
+    charImg.src = showA ? charA : charB;
+    winImg.src  = showA ? winA  : winB;
   }
 
 
@@ -1218,13 +1180,10 @@
       reader.readAsDataURL(file);
     });
 
-    // [수정] 이미지 최적화를 위해 src 속성 제거
-    charImg.removeAttribute('src'); 
-    winImg.removeAttribute('src');
+    /* [복원] 이미지 깜빡임 로직: setInterval 복원 */
+    updateCharacterAndWindowImages(); // 초기 이미지 설정 (src 설정)
+    blinkTimer = setInterval(updateCharacterAndWindowImages, 500);
 
-    /* 1. 이미지 깜빡임 로직: 기존 코드를 updateCharacterAndWindowImages로 대체 */
-    updateCharacterAndWindowImages(); // 초기 이미지 설정
-    // 기존 setInterval 대신, startTimer/stopTimer에서 재귀적 setTimeout을 제어함
 
     renderTodos();
     todoAdd.addEventListener("click", addTodo);
@@ -1375,7 +1334,7 @@
     stateEl.textContent = isPom ? (state.isWork?getTranslation('focusing'):getTranslation('resting')) : getTranslation('timer_mode');
   }
 
-  /* [수정] Todo List 렌더링 최적화: DocumentFragment 사용 */
+  /* [유지] Todo List 렌더링 최적화: DocumentFragment 사용 */
   function renderTodos(){
     boardList.innerHTML = "";
     if(state.todos.length === 0) return;
@@ -1417,7 +1376,7 @@
     highlightMood();
     renderTracks(true);
   }
-  /* [수정] 음악 트랙 렌더링 최적화: DocumentFragment 사용 */
+  /* [유지] 음악 트랙 렌더링 최적화: DocumentFragment 사용 */
   function renderTracks(initial=false){
     tracksWrap.innerHTML = "";
     const idxs = filteredTrackIdxs();
@@ -1488,7 +1447,7 @@
     return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`;
   }
   function updateTimerUI(){
-    // [수정] UI 업데이트 시 calculateAccurateRemaining을 사용하여 정확한 남은 시간 반영
+    // [유지] UI 업데이트 시 calculateAccurateRemaining을 사용하여 정확한 남은 시간 반영
     state.remainSec = calculateAccurateRemaining(); 
     timeEl.textContent=fmt(state.remainSec);
     
@@ -1506,7 +1465,7 @@
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
   
-  /* [수정] 실시간 타임스탬프 기반의 Timer Tick 함수 (SetTimeout 재귀) */
+  /* [유지] 실시간 타임스탬프 기반의 Timer Tick 함수 (SetTimeout 재귀) */
   function timerTick() {
     if (!state.running) {
       return;
@@ -1567,7 +1526,7 @@
     state.interval = setTimeout(timerTick, nextTick);
   }
 
-  /* [수정] 타이머 시작 (setInterval 대신 setTimeout 재귀 시작) */
+  /* [유지] 타이머 시작 (setInterval 대신 setTimeout 재귀 시작) */
   function startTimer(){
     if(state.running) return;
     
@@ -1589,7 +1548,7 @@
     window.__presence_broadcastNow?.();
   }
   
-  /* [수정] 타이머 중지 (정확한 최종 시간 반영) */
+  /* [유지] 타이머 중지 (정확한 최종 시간 반영) */
   function stopTimer(){
     if(!state.running) return;
     state.running=false;
@@ -1621,7 +1580,7 @@
     window.__presence_broadcastNow?.();
   }
   
-  /* [수정] 타이머 리셋 */
+  /* [유지] 타이머 리셋 */
   function resetTimer(){
     stopTimer();
     state.isWork=true;
@@ -1853,7 +1812,7 @@
     }
 
     layoutResetBtn.addEventListener('click', ()=>{
-      // [수정] 리셋 전 정확한 remainSec을 계산하여 저장
+      // [유지] 리셋 전 정확한 remainSec을 계산하여 저장
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
         workSec: state.workSec, restSec: state.restSec, 
@@ -1985,7 +1944,7 @@ function getSnapshot(){
   
   // 1. 공부 시간 공개가 ON일 때만 studyTimeTotal 전송 (롤백된 로직)
   if(st.shareStudy){
-    // [수정] 실시간 업데이트 시 studyTimeTotal을 정확히 반영
+    // [유지] 실시간 업데이트 시 studyTimeTotal을 정확히 반영
     const now = Date.now();
     let currentStudyTotal = st.studyTimeTotal;
     
@@ -2132,7 +2091,7 @@ async function goOnline(){
   channel.subscribe(async (status)=>{
     if(status === "SUBSCRIBED"){
       try{ await channel.track(getSnapshot()); }catch{}
-      // [수정] heartbeat는 그대로 15초 간격 유지 (실시간 반영 위함)
+      // [유지] heartbeat는 그대로 15초 간격 유지 (실시간 반영 위함)
       heartbeat = setInterval(async ()=>{ 
           try{ await channel.track(getSnapshot()); }catch{} 
       }, 15000);

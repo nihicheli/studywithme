@@ -1459,7 +1459,12 @@
     
     startPause.textContent=getTranslation(state.running?'pause':'start');
     
-    document.title = `${fmt(state.remainSec)} • Studywithme`;
+    // [수정] document.title 업데이트 로직을 분리/개선합니다.
+    // 이전에는 updateTimerUI 내에서 document.title을 업데이트했지만,
+    // timerTick에서 직접 업데이트하도록 변경하여 1초마다 정확히 반영되게 합니다. 
+    // 여기서는 window.__presence_broadcastNow만 남깁니다.
+    // document.title = `${fmt(state.remainSec)} • Studywithme`; // 제거
+    
     window.__presence_broadcastNow?.();
   }
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
@@ -1517,6 +1522,9 @@
 
     updateTimerUI();
     updateCharacterAndWindowImages();
+    
+    // [추가] 1초마다 페이지 제목 업데이트 (지연 감소)
+    document.title = `${fmt(state.remainSec)} • Studywithme`;
 
     // 다음 틱을 정확히 1초 후에 실행되도록 스케줄링
     const timeSinceLastSecond = (now - state.startTimeStamp) % 1000;
@@ -1578,6 +1586,9 @@
     updateTimerUI();
     updateCharacterAndWindowImages();
     window.__presence_broadcastNow?.();
+    
+    // [추가] 정지 시 제목을 기본값으로 복구
+    document.title = `Studywithme`;
   }
   
   /* [유지] 타이머 리셋 */
@@ -1589,6 +1600,9 @@
     state.lastUpdateTimestamp = 0;
     updateTimerUI();
     updateCharacterAndWindowImages(); 
+    
+    // [추가] 리셋 시 제목을 기본값으로 복구
+    document.title = `Studywithme`;
   }
   
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());

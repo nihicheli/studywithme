@@ -1433,6 +1433,54 @@
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
   
+  // [새로운 함수] 타이머의 핵심 틱 로직을 분리
+  function tick(){
+      if (!state.running) return;
+      
+      const elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
+      let newRemainSec = 0;
+      
+      if(state.mode==='pomodoro'){
+        // 뽀모도로: (시작 남은 시간) - (실제 경과 시간)
+        newRemainSec = state.savedRemainSec - elapsedTime;
+        
+        if(newRemainSec <= 0){
+          beep();
+          const wasWork = state.isWork;
+          const overshoot = Math.abs(newRemainSec); 
+          
+          state.isWork = !state.isWork;
+          
+          if(state.isWork && !wasWork){
+            // 휴식 -> 집중 전환: 사이클 증가
+            state.completedCycles = Math.min(state.totalCycles, state.completedCycles + 1);
+            updateCyclesBtn();
+            if(state.completedCycles >= state.totalCycles){ 
+              // 타이머 종료 로직: interval을 정리하고 running=false로 변경
+              stopTimer(); 
+              return; 
+            }
+          }
+          
+          // 새 남은 시간 설정
+          const nextDuration = state.isWork ? state.workSec : state.restSec;
+          newRemainSec = nextDuration - overshoot; // 초과된 시간만큼 새 타이머에서 차감
+          
+          // 상태 전환 시 savedRemainSec 및 startTime 재설정 (핵심 보정)
+          state.savedRemainSec = nextDuration;
+          state.startTime = Date.now() - overshoot * 1000; 
+          
+          updateCharacterAndWindowImages(); 
+        }
+      }else{
+        // 타이머(카운트업): (시작 남은 시간/0) + (실제 경과 시간)
+        newRemainSec = state.savedRemainSec + elapsedTime;
+      }
+      
+      state.remainSec = newRemainSec;
+      updateTimerUI();
+  }
+  
   function startTimer(){
     // [수정] startTimer가 호출되면, 실행 중인 타이머가 있으면 정리만 하고, running 상태는 유지
     if (state.interval) clearInterval(state.interval);
@@ -1445,80 +1493,23 @@
     // 2. 남은 시간을 절대값으로 저장 (뽀모도로/카운트다운 시점)
     state.savedRemainSec = state.remainSec; 
 
-    updateTimerUI();
-    updateCharacterAndWindowImages(); // 이미지 갱신
+    // [추가] 3. 타이머를 시작하자마자 즉시 한번 계산하여 UI에 반영 (느린 시작 방지)
+    tick();
+
+    updateCharacterAndWindowImages(); // 이미지 갱신 (running 상태에 의존)
     
-    state.interval=setInterval(()=>{
-      // 3. 현재 시간과 시작 시간을 비교하여 실제 경과 시간을 초 단위로 계산
-      const elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
-      let newRemainSec = 0;
-      let shouldAccumulate = false;
-
-      if(state.mode==='pomodoro'){
-        // 4. 뽀모도로: (시작 남은 시간) - (실제 경과 시간)
-        newRemainSec = state.savedRemainSec - elapsedTime;
-        
-        // 5. 남은 시간이 0 이하일 경우 상태 전환
-        if(newRemainSec <= 0){
-          beep();
-          const wasWork = state.isWork;
-          
-          // 이미 초과된 시간
-          const overshoot = Math.abs(newRemainSec); 
-          
-          state.isWork = !state.isWork;
-          
-          if(state.isWork && !wasWork){
-            // 휴식 -> 집중 전환: 사이클 증가
-            state.completedCycles = Math.min(state.totalCycles, state.completedCycles + 1);
-            updateCyclesBtn();
-            if(state.completedCycles >= state.totalCycles){ 
-              stopTimer(); 
-              return; // 타이머 종료
-            }
-          }
-          
-          // 새 남은 시간 설정
-          const nextDuration = state.isWork ? state.workSec : state.restSec;
-          newRemainSec = nextDuration - overshoot; // 초과된 시간만큼 새 타이머에서 차감
-          
-          // 6. 새로운 시작 시점과 남은 시간으로 상태 초기화
-          state.savedRemainSec = nextDuration;
-          state.startTime = Date.now() - overshoot * 1000; // startTime도 overshoot만큼 보정
-          
-          updateCharacterAndWindowImages(); // 상태 변경 시 즉시 이미지 갱신
-        }
-        
-        // 집중 중일 때만 누적
-        if(state.isWork){
-           shouldAccumulate = true;
-        }
-
-      }else{
-        // 7. 타이머(카운트업): (시작 남은 시간/0) + (실제 경과 시간)
-        newRemainSec = state.savedRemainSec + elapsedTime;
-        shouldAccumulate = true;
-      }
-      
-      // 8. 상태 업데이트
-      state.remainSec = newRemainSec;
-      
-      // 누적 시간이 필요한 경우: elapsedSec이 1초 증가했을 때만 studyTimeTotal 증가
-      if(shouldAccumulate && state.remainSec !== newRemainSec) { // 이 조건은 사실 필요 없지만, 안전을 위해 남겨둠
-          // 이전 로직: 매 1초마다 1씩 누적해야 함. 
-          // elapsedTime이 1초 증가했는지 확인하는 것이 정확하지만,
-          // 여기서는 elapsedTime이 1씩 증가할 때만 UI를 업데이트한다고 가정하고,
-          // 탭 활성화 시 보정 로직을 통해 누락된 시간을 보충하겠습니다. 
-      }
-
-
-      updateTimerUI();
-    }, 1000); // 1초 간격 유지 (브라우저가 느리게 실행하더라도 보정 가능)
+    state.interval=setInterval(tick, 1000);
   }
   
   function stopTimer(){
     // [수정] 타이머 정지 시 studyTimeTotal 최종 업데이트
     const now = Date.now();
+    // 탭이 활성화된 상태에서 stopTimer가 호출되면, lastActiveTime과 now는 비슷함.
+    // 탭이 비활성화된 상태에서 stopTimer가 호출될 경우, lastActiveTime은 hidden 상태로 바뀔 때의 시간
+    // 이므로, 여기서 studyTimeTotal을 보정하는 것은 정확하지 않을 수 있음.
+    // 따라서, stopTimer는 오직 UI 버튼을 눌러 정지할 때만 호출된다고 가정하고,
+    // 마지막 틱 이후의 시간만 보정합니다. (가장 최근에 업데이트된 시간은 lastActiveTime으로 처리)
+    
     const elapsedSec = Math.floor((now - lastActiveTime) / 1000);
     
     // 타이머가 running 상태였을 때만 누적 보정
@@ -1591,7 +1582,8 @@
              }
              // savedRemainSec와 startTime을 현재 값으로 업데이트하여,
              // 돌아왔을 때 정확한 오프셋을 계산할 수 있도록 준비.
-             state.savedRemainSec = state.remainSec;
+             // savedRemainSec는 마지막 틱이 반영된 state.remainSec 값.
+             state.savedRemainSec = state.remainSec; 
              state.startTime = Date.now(); 
           }
           
@@ -1900,7 +1892,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://jvpasqknlkeyshrevqpg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2cGFzcWtubGtleXNocmV2cXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNDQyOTMsImV4cCI6MjA3NDYyMDI5M30.7zKRGoBFjoWksoRXjUj8n4KzLXdiF86lZwneNdZNF5k";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2cGFzcWtubGtleXNocmV2cXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNDQyOTMsImV4cCI6MjA3NDYyMDI5M30.7zKRGoBFjoWksoRXjUj8nKzLXdiF86lZwneNdZNF5k";
 
 const presencePanel = document.getElementById("presencePanel");
 const meNickEl      = document.getElementById("meNick");

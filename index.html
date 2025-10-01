@@ -944,7 +944,7 @@
       sessionStorage.setItem('timer-keep', JSON.stringify(snap));
       
       // [수정] 마지막에 studyTimeTotal 업데이트
-      if (state.running && state.isWork) {
+      if (state.running && (state.mode === 'timer' || state.isWork)) {
         // running 중이었다면, stopTimer에서 누적되었어야 함. 
         // 여기서 다시 한 번 정확한 누적 시간을 계산하여 저장
         const now = Date.now();
@@ -1090,7 +1090,7 @@
   }
 
 
-  /* 1. [복원] 이미지 깜빡임 로직 분리 및 업데이트 - src 변경 방식 사용 */
+  /* [복원] 이미지 깜빡임 로직 분리 및 업데이트 - src 변경 방식 사용 */
   function updateCharacterAndWindowImages() {
     // running 상태 또는 isWork 상태에 따라 사용할 이미지 쌍을 결정
     let charA, charB, winA, winB;
@@ -1180,8 +1180,9 @@
       reader.readAsDataURL(file);
     });
 
-    /* [복원] 이미지 깜빡임 로직: setInterval 복원 */
+    /* [재수정] 이미지 깜빡임 로직: 500ms setInterval 복원 (타이머 로직과 독립) */
     updateCharacterAndWindowImages(); // 초기 이미지 설정 (src 설정)
+    if (blinkTimer) clearInterval(blinkTimer); // 혹시 모를 중복 방지
     blinkTimer = setInterval(updateCharacterAndWindowImages, 500);
 
 
@@ -1459,12 +1460,6 @@
     
     startPause.textContent=getTranslation(state.running?'pause':'start');
     
-    // [수정] document.title 업데이트 로직을 분리/개선합니다.
-    // 이전에는 updateTimerUI 내에서 document.title을 업데이트했지만,
-    // timerTick에서 직접 업데이트하도록 변경하여 1초마다 정확히 반영되게 합니다. 
-    // 여기서는 window.__presence_broadcastNow만 남깁니다.
-    // document.title = `${fmt(state.remainSec)} • Studywithme`; // 제거
-    
     window.__presence_broadcastNow?.();
   }
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
@@ -1502,7 +1497,7 @@
           updateCyclesBtn();
           if (state.completedCycles >= state.totalCycles) { stopTimer(); return; }
         }
-        updateCharacterAndWindowImages();
+        // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
         shouldAccumulate = true; // 새로운 페이즈 시작 시도
       } else {
         state.remainSec = nextRemainSec;
@@ -1521,9 +1516,9 @@
     state.lastUpdateTimestamp = now;
 
     updateTimerUI();
-    updateCharacterAndWindowImages();
+    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
     
-    // [추가] 1초마다 페이지 제목 업데이트 (지연 감소)
+    // [유지] 1초마다 페이지 제목 업데이트 (지연 감소)
     document.title = `${fmt(state.remainSec)} • Studywithme`;
 
     // 다음 틱을 정확히 1초 후에 실행되도록 스케줄링
@@ -1547,7 +1542,7 @@
 
     state.running=true;
     updateTimerUI();
-    updateCharacterAndWindowImages();
+    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
 
     // 첫 번째 틱을 바로 시작
     if(state.interval) clearTimeout(state.interval);
@@ -1584,10 +1579,10 @@
     state.lastUpdateTimestamp = 0; 
 
     updateTimerUI();
-    updateCharacterAndWindowImages();
+    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
     window.__presence_broadcastNow?.();
     
-    // [추가] 정지 시 제목을 기본값으로 복구
+    // [유지] 정지 시 제목을 기본값으로 복구
     document.title = `Studywithme`;
   }
   
@@ -1599,9 +1594,9 @@
     state.startTimeStamp = 0;
     state.lastUpdateTimestamp = 0;
     updateTimerUI();
-    updateCharacterAndWindowImages(); 
+    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
     
-    // [추가] 리셋 시 제목을 기본값으로 복구
+    // [유지] 리셋 시 제목을 기본값으로 복구
     document.title = `Studywithme`;
   }
   

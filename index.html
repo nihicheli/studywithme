@@ -763,15 +763,14 @@
   }
 
   /* ===== 트랙 데이터 (Track Data) ===== */
-  // mp3 폴더 안의 1~7번 파일 구조와 매핑되도록 확실하게 7곡으로 조절했습니다.
   const TRACKS = [
-    { title: "음악 1", mood: "Lo-Fi",   url: "mp3/1.mp3" },
-    { title: "음악 2", mood: "Lo-Fi",   url: "mp3/2.mp3" },
-    { title: "음악 3", mood: "Lo-Fi",   url: "mp3/3.mp3" },
-    { title: "음악 4", mood: "Jazz",    url: "mp3/4.mp3" },
-    { title: "음악 5", mood: "Jazz",    url: "mp3/5.mp3" },
-    { title: "음악 6", mood: "Piano",   url: "mp3/6.mp3" },
-    { title: "음악 7", mood: "Piano",   url: "mp3/7.mp3" }
+    { title: "Rain 1", mood: "Rain",   url: "mp3/1.mp3" },
+    { title: "Rain 2", mood: "Rain",   url: "mp3/2.mp3" },
+    { title: "Rain 3", mood: "Rain",   url: "mp3/3.mp3" },
+    { title: "Rain 4", mood: "Rain",    url: "mp3/4.mp3" },
+    { title: "Rain 5", mood: "Rain",    url: "mp3/5.mp3" },
+    { title: "Rain 6", mood: "Rain",   url: "mp3/6.mp3" },
+    { title: "Rain 7", mood: "Rain",   url: "mp3/7.mp3" }
   ];
 
   /* 창문/캐릭터 이미지 */
@@ -1266,7 +1265,7 @@
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
   function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
 
-  function MOODS(){ return ["전체","Lo-Fi","Jazz","Piano","Ambient","Noise"]; }
+  function MOODS(){ return ["전체","Rain","Jazz","Piano","Ambient","Noise"]; }
   function filteredTrackIdxs(){
     if(state.mood==="전체") return TRACKS.map((_,i)=>i);
     return TRACKS.map((t,i)=> t.mood===state.mood ? i : -1).filter(i=>i>=0);
@@ -1790,12 +1789,11 @@
   init();
 </script>
 
-<!-- ===== Supabase Presence (실시간) ===== -->
+<!-- ===== Supabase Presence & SQL Sync (실시간 및 데이터베이스 동기화) ===== -->
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://qdmeeqtumsstgfjhtuvt.supabase.co";
-// 제공해주신 ANON KEY 사용
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbWVlcXR1bXNzdGdmamh0dXZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODE2MTMsImV4cCI6MjA5NDg1NzYxM30.Ei705_4svL6bhIa8kPfce6MKk3-XouH_pJ6K68QvKFU";
 
 const presencePanel = document.getElementById("presencePanel");
@@ -1878,17 +1876,121 @@ function getTranslation(key) {
     return debugTranslations[lang]?.[key] || key;
 }
 
-function renderOnline(presenceState){
-  const items = [];
+// profiles & presence_status & study_records 테이블 동시 연동을 위한 함수 추가
+async function writeDbPresence(profileId) {
+  if (!supabase || !profileId) return;
+  const snapshot = getSnapshot();
+  const isFocusing = (snapshot.status === 'work' || snapshot.status === 'timer');
+  const todaySeconds = snapshot.study || 0;
   
-  for(const [nick, metas] of Object.entries(presenceState)){
-    // 실시간 동기화 데이터 안정성 확보를 위한 방어 코드 추가
-    if (!metas || metas.length === 0) continue;
-    const meta = metas[metas.length-1] || {};
-    const status = meta?.status || "idle";
-    const study  = typeof meta?.study  === "number" ? meta.study  : null; 
+  try {
+    // 1. 실시간 대시보드 상태 동기화 (presence_status)
+    await supabase
+      .from('presence_status')
+      .upsert({
+        profile_id: profileId,
+        is_focusing: isFocusing,
+        today_seconds: todaySeconds,
+        last_seen: new Date().toISOString()
+      }, { onConflict: 'profile_id' });
+  } catch(e) {
+    console.error("DB Presence 기록 실패:", e);
+  }
+}
 
-    let statusKey = '';
+async function syncDailyStudyRecordToDb() {
+  const profileId = localStorage.getItem("profile_id");
+  if (!supabase || !profileId) return;
+  
+  // 한국 표준시(KST) 기준 날짜 구하기 (YYYY-MM-DD)
+  const todayKst = new Date(Date.now() + 9 * 3600000).toISOString().split('T')[0];
+  const totalSeconds = window.state?.studyTimeTotal || 0;
+  
+  try {
+    // 2. 일일 누적 공부 시간 백업 (study_records)
+    await supabase
+      .from('study_records')
+      .upsert({
+        profile_id: profileId,
+        study_date: todayKst,
+        seconds: totalSeconds,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'profile_id, study_date' });
+  } catch(e) {
+    console.error("DB 일일 기록 백업 실패:", e);
+  }
+}
+
+// DB의 presence_status 테이블과 Supabase Presence(실시간 채널) 목록을 병합하여 렌더링
+async function fetchAndRenderCombinedPresence() {
+  if (!supabase) return;
+  
+  const presenceMap = new Map(); // nick -> { status, study }
+  const myNick = (nicknameInput.value || "").trim();
+  
+  // 1. 데이터베이스에서 최근 3분 동안 업데이트된 활성 사용자 정보 가져오기
+  try {
+    const threeMinutesAgo = new Date(Date.now() - 180000).toISOString();
+    const { data, error } = await supabase
+      .from('presence_status')
+      .select(`
+        today_seconds,
+        is_focusing,
+        last_seen,
+        profiles ( nickname )
+      `)
+      .gt('last_seen', threeMinutesAgo)
+      .order('last_seen', { ascending: false });
+
+    if (!error && data) {
+      data.forEach(row => {
+        const nick = row.profiles?.nickname;
+        if (!nick || nick === 'anonymous') return;
+        
+        const isMe = (nick === myNick);
+        
+        let status = "idle";
+        if (isMe) {
+          status = getSnapshot().status;
+        } else {
+          status = row.is_focusing ? "work" : "idle";
+        }
+        
+        const study = isMe ? (window.state?.studyTimeTotal || 0) : row.today_seconds;
+
+        presenceMap.set(nick, {
+          status,
+          study: window.state?.shareStudy || !isMe ? study : null
+        });
+      });
+    }
+  } catch(e) {
+    console.error("SQL 실시간 목록 로드 실패:", e);
+  }
+
+  // 2. 인메모리 Presence 채널의 유저 정보 병합 (DB 미반영분 보정)
+  if (channel) {
+    const realtimeState = channel.presenceState();
+    for (const [nick, metas] of Object.entries(realtimeState)) {
+      if (nick === 'anonymous' || !metas || metas.length === 0) continue;
+      const meta = metas[metas.length - 1] || {};
+      
+      if (!presenceMap.has(nick)) {
+        presenceMap.set(nick, {
+          status: meta.status || "idle",
+          study: meta.study
+        });
+      }
+    }
+  }
+
+  // 3. 렌더링
+  const items = [];
+  for (const [nick, info] of presenceMap.entries()) {
+    const status = info.status;
+    const study = info.study;
+
+    let statusKey = 'status_idle';
     let dotClass = 'dot';
     
     if (status === 'work') {
@@ -1906,7 +2008,7 @@ function renderOnline(presenceState){
 
     let rightTxt = getTranslation(statusKey);
     
-    if (study !== null) {
+    if (study !== null && typeof study === 'number') {
       const studyTimeText = fmtMin(study);
       rightTxt = `${getTranslation(statusKey)} · 누적 ${studyTimeText}`; 
     }
@@ -1919,18 +2021,27 @@ function renderOnline(presenceState){
     );
   }
   
-  const noOneOnlineText = getTranslation('no_one_online')
+  const noOneOnlineText = getTranslation('no_one_online');
   const filteredItems = items.filter(item => !item.includes('<span class="nick">anonymous</span>'));
 
-  presenceList.innerHTML = filteredItems.slice(0,5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
+  presenceList.innerHTML = filteredItems.slice(0, 5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
 }
 
+// 타이머 작동이나 상태 변경 시 DB 및 실시간 채널에 동시 통보하는 함수로 개선
 window.__presence_broadcastNow = async function(){
   if(!channel) return;
-  try{ await channel.track(getSnapshot()); }catch(e){
-    console.error("공부 상태 브로드캐스트 실패:", e);
+  try {
+    await channel.track(getSnapshot()); 
+    const profileId = localStorage.getItem("profile_id");
+    if (profileId) {
+      await writeDbPresence(profileId);
+      await syncDailyStudyRecordToDb();
+    }
+  } catch(e) {
+    console.error("공부 상태 동기화 실패:", e);
   }
 };
+
 window.__presence_goOnline = goOnline;
 window.__presence_goOffline = goOffline;
 
@@ -1952,40 +2063,95 @@ async function goOnline(){
   meNickEl.textContent = myNick;
   presencePanel.style.display = "block";
 
+  // --- DB 연동: profiles 조회 및 생성 ---
+  try {
+    let { data: profile, error: pErr } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('nickname', myNick)
+      .maybeSingle();
+
+    let profileId;
+    if (profile) {
+      profileId = profile.id;
+    } else {
+      const { data: newProfile, error: insErr } = await supabase
+        .from('profiles')
+        .insert({ nickname: myNick, share_study: window.state?.shareStudy ?? true })
+        .select('id')
+        .single();
+      if (!insErr && newProfile) {
+        profileId = newProfile.id;
+      }
+    }
+    
+    if (profileId) {
+      localStorage.setItem("profile_id", profileId);
+      await writeDbPresence(profileId);
+      await syncDailyStudyRecordToDb();
+    }
+  } catch(e) {
+    console.error("DB 사용자 연동 실패:", e);
+  }
+
+  // 실시간 Presence 채널 구독 및 동기화
   if (channel) {
       await channel.unsubscribe();
       if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
   }
 
-  // Supabase 실시간 수신률과 안정성을 높이기 위한 구성 파라미터 세팅
   channel = supabase.channel("studyroom", { config: { presence: { key: myNick } } });
   
   channel.on("presence", { event: "sync" }, ()=>{ 
-    renderOnline(channel.presenceState()); 
+    fetchAndRenderCombinedPresence(); 
   });
 
-  // 채널 연결 시의 실시간 상태 변화 및 에러 진단을 위한 디버깅 캡처
   channel.subscribe(async (status, err)=>{
     if (status === "SUBSCRIBED") {
       console.log("Supabase Realtime 연결 성공!");
       try{ await channel.track(getSnapshot()); }catch(e){ console.error("Track 에러:", e); }
       
       if(heartbeat) clearInterval(heartbeat);
+      // 15초 간격으로 실시간 채널 Track, DB Presence 상태 업데이트 및 리스트 갱신 수행
       heartbeat = setInterval(async ()=>{ 
-          try{ await channel.track(getSnapshot()); }catch{} 
+          try {
+            await channel.track(getSnapshot()); 
+            const profileId = localStorage.getItem("profile_id");
+            if (profileId) {
+              await writeDbPresence(profileId);
+              await syncDailyStudyRecordToDb();
+            }
+            await fetchAndRenderCombinedPresence();
+          } catch(e){} 
       }, 15000);
     } else if (status === "CHANNEL_ERROR") {
-      console.error("Supabase Realtime 채널 오류 발생! 프로젝트의 Realtime 기능이 켜져 있는지 확인하세요.", err);
+      console.error("Supabase Realtime 채널 오류 발생! Realtime 기능 활성화를 점검하세요.", err);
     } else if (status === "TIMED_OUT") {
       console.warn("Supabase Realtime 연결 제한 시간 초과. 재연결을 시도합니다.");
     }
   });
 
+  await fetchAndRenderCombinedPresence();
   presenceToggle.textContent = getTranslation('public_on');
 }
 
 async function goOffline(){
   if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
+  
+  // 오프라인 전환 시 DB의 presence_status에서 실시간 갱신 시간을 과거로 밀어 목록에서 즉시 제거
+  const profileId = localStorage.getItem("profile_id");
+  if (profileId && supabase) {
+    try {
+      await supabase
+        .from('presence_status')
+        .upsert({
+          profile_id: profileId,
+          is_focusing: false,
+          last_seen: new Date(Date.now() - 300000).toISOString() // 5분 전으로 처리하여 목록 즉각 제외
+        }, { onConflict: 'profile_id' });
+    } catch(e){}
+  }
+
   if(channel){ try{ await channel.unsubscribe(); }catch{} }
   channel = null;
   presenceToggle.textContent = getTranslation('public_off');

@@ -366,7 +366,7 @@
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
-  </aside>
+  </</aside>
 
   <!-- 소품 레이어 (숨김) -->
   <div id="propsLayer"></div>
@@ -767,8 +767,8 @@
     { title: "Rain 1", mood: "Rain",   url: "mp3/1.mp3" },
     { title: "Rain 2", mood: "Rain",   url: "mp3/2.mp3" },
     { title: "Rain 3", mood: "Rain",   url: "mp3/3.mp3" },
-    { title: "Rain 4", mood: "Rain",    url: "mp3/4.mp3" },
-    { title: "Rain 5", mood: "Rain",    url: "mp3/5.mp3" },
+    { title: "Rain 4", mood: "Rain",   url: "mp3/4.mp3" },
+    { title: "Rain 5", mood: "Rain",   url: "mp3/5.mp3" },
     { title: "Rain 6", mood: "Rain",   url: "mp3/6.mp3" },
     { title: "Rain 7", mood: "Rain",   url: "mp3/7.mp3" }
   ];
@@ -1304,7 +1304,6 @@
     if(initial){ selectTrack(idxs[0] ?? 0, false); }
   }
   
-  // selectTrack 함수에 player.load() 명시적 호출 추가 (상대 경로 갱신 강제화)
   function selectTrack(idx, autoplay=false){ 
     state.trackIdx=idx; 
     player.src=TRACKS[idx].url; 
@@ -1830,6 +1829,15 @@ function cfgReady(){
   return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY;
 }
 
+function getKstIsoString() {
+  const kstOffset = 9 * 60 * 60 * 1000;
+  return new Date(Date.now() + kstOffset).toISOString();
+}
+
+function getKstDateString() {
+  return getKstIsoString().split('T')[0];
+}
+
 function getSnapshot(){
   const st = window.state || {};
   let study = null;
@@ -1876,7 +1884,7 @@ function getTranslation(key) {
     return debugTranslations[lang]?.[key] || key;
 }
 
-// profiles & presence_status & study_records 테이블 동시 연동을 위한 함수 추가
+// profiles & presence_status & study_records 테이블 동시 연동을 위한 함수
 async function writeDbPresence(profileId) {
   if (!supabase || !profileId) return;
   const snapshot = getSnapshot();
@@ -1903,7 +1911,7 @@ async function syncDailyStudyRecordToDb() {
   if (!supabase || !profileId) return;
   
   // 한국 표준시(KST) 기준 날짜 구하기 (YYYY-MM-DD)
-  const todayKst = new Date(Date.now() + 9 * 3600000).toISOString().split('T')[0];
+  const todayKst = getKstDateString();
   const totalSeconds = window.state?.studyTimeTotal || 0;
   
   try {
@@ -1921,7 +1929,7 @@ async function syncDailyStudyRecordToDb() {
   }
 }
 
-// DB의 presence_status 테이블과 Supabase Presence(실시간 채널) 목록을 병합하여 렌더링
+// DB의 presence_status 테이블과 Supabase Presence(실시간 채널) 목록을 안전하게 가공하여 병합 렌더링 (Rule 2: Join 에러 원천 차단)
 async function fetchAndRenderCombinedPresence() {
   if (!supabase) return;
   
@@ -1937,14 +1945,16 @@ async function fetchAndRenderCombinedPresence() {
         today_seconds,
         is_focusing,
         last_seen,
-        profiles ( nickname )
+        profiles ( nickname, is_public )
       `)
-      .gt('last_seen', threeMinutesAgo)
-      .order('last_seen', { ascending: false });
+      .gt('last_seen', threeMinutesAgo);
 
     if (!error && data) {
       data.forEach(row => {
-        const nick = row.profiles?.nickname;
+        const profile = row.profiles;
+        if (!profile || profile.is_public === false) return; // 비공개 사용자 제외
+        
+        const nick = profile.nickname;
         if (!nick || nick === 'anonymous') return;
         
         const isMe = (nick === myNick);
@@ -1993,15 +2003,12 @@ async function fetchAndRenderCombinedPresence() {
     let statusKey = 'status_idle';
     let dotClass = 'dot';
     
-    if (status === 'work') {
+    if (status === 'work' || status === 'timer') {
         statusKey = 'status_work';
         dotClass += ' work';
     } else if (status === 'break') {
         statusKey = 'status_break';
         dotClass += ' break';
-    } else if (status === 'timer') {
-        statusKey = 'timer_mode';
-        dotClass += ' work';
     } else {
         statusKey = 'status_idle';
     }
@@ -2077,7 +2084,7 @@ async function goOnline(){
     } else {
       const { data: newProfile, error: insErr } = await supabase
         .from('profiles')
-        .insert({ nickname: myNick, share_study: window.state?.shareStudy ?? true })
+        .insert({ nickname: myNick, is_public: true, share_study: window.state?.shareStudy ?? true })
         .select('id')
         .single();
       if (!insErr && newProfile) {

@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Studywithme</title>
-
+  
+<link rel="icon" href="https://github.com/nihicheli/studywithme/blob/main/image/thumnail-eye-dark.png?raw=true" type="image/png" />
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -40,7 +41,7 @@
     height:100%; margin:0; color:var(--ink);
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
     background:#000;
-    /* 4. 모바일 폰트 크기 조정 */
+    /* 모바일 폰트 크기 조정 */
     font-size:clamp(10px, 4vw, 14.4px);
     letter-spacing:.02em;
   }
@@ -121,24 +122,20 @@
     transform:translateX(-50%); 
     top: calc(var(--content-top) + 20vh); z-index:6; 
     width: min(var(--maxw-char), 96vw); 
-    /* 2. 터치 이벤트를 위해 포인터 커서 추가 */
     cursor: pointer;
   }
   #char-img{ 
-    /* 디자인 복원: src를 사용하며, 배경은 투명하게 유지 */
     display:block; width:100%; height:auto; max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); 
     background:transparent center/contain no-repeat; 
   }
 
-  /* 2. 말풍선 스타일 */
+  /* 말풍선 스타일 */
   #fortune-bubble {
-    /* 캐릭터 상단 중앙, 타이머 아래에 위치하도록 position:absolute 사용 */
     position: absolute;
-    /* 데스크톱/기본 위치: 캐릭터 상단에서 40px 위 */
     top: calc(var(--content-top) + 20vh - 40px); 
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9500; /* 타이머(9000)보다 높고, 드로어(10000)보다 낮게 */
+    z-index: 9500;
     padding: 0.5rem 1rem;
     background: rgba(255, 255, 255, 0.95);
     color: #202020;
@@ -151,7 +148,7 @@
     font-weight: 700;
     font-size: 1.1em;
     font-family: 'Nanum Pen Script', cursive; 
-    pointer-events: none; /* 클릭 방지 */
+    pointer-events: none;
   }
   :root[data-theme="dark"] #fortune-bubble {
     background: rgba(30, 30, 30, 0.95);
@@ -162,7 +159,6 @@
     opacity: 1;
     visibility: visible;
   }
-  /* 말풍선 꼬리 (CSS 삼각형) */
   #fortune-bubble::after {
     content: '';
     position: absolute;
@@ -188,16 +184,15 @@
   #bottombar .card{ flex:1 1 0; min-width:260px; }
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
-  /* === 소품 레이어 === */
-  /* 요청: 소품 관련 기능 숨김 (주석 처리) */
+  /* === 소품 레이어 (사용 안함) === */
   #propsLayer{
     position:absolute; inset:0; z-index:7;
-    pointer-events:none; /* 기본은 클릭 통과 */
-    display: none; /* 소품 레이어 자체 숨김 */
+    pointer-events:none;
+    display: none;
   }
   .prop{
     position:absolute; left:40px; top:40px; width:120px; z-index:80;
-    pointer-events:auto; /* 소품 자체는 클릭 가능 */
+    pointer-events:auto;
   }
   .prop img{ width:100%; height:auto; display:block; }
   .draggable { cursor: move; }
@@ -210,7 +205,7 @@
   }
   .edit-on .resizable .resizer{ display:block; }
 
-  /* 드로어/오버레이 — 절대 최상단 */
+  /* 드로어/오버레이 */
   #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index: 10000; }
   #overlay.show{ opacity:1; pointer-events:auto; }
 
@@ -257,7 +252,7 @@
   .pill-input:focus{ box-shadow: inset 0 0 0 3px #7C9AFF; background: rgba(124,154,255,.15); }
   .drawer-sec .row .pill-input{ flex:1; min-width:0; }
 
-  /* 파일 선택을 pill처럼 */
+  /* 파일 선택 */
   .input-file-hidden{
     position:absolute; width:0.1px; height:0.1px;
     opacity:0; overflow:hidden; z-index:-1;
@@ -288,7 +283,7 @@
     transform-origin: top left;
   }
 
-  /* 오른쪽 아래: 실시간 패널 (데스크톱 기본) */
+  /* 오른쪽 아래: 실시간 패널 */
   #presencePanel{
     position: fixed;
     right: 0;
@@ -300,19 +295,16 @@
   #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
   #presencePanel .dot.work{ background:#7CFF7C; }
   #presencePanel .dot.break{ background:#FFC66D; }
-  /* 1. 실시간 패널 디자인 롤백: study time이 보일 때 공간이 부족하지 않도록 조정 */
   #presenceList .person{ display:flex; justify-content:space-between; gap:.5rem; padding:.25rem 0; }
   #presenceList .nick{ font-weight:700; }
 
-  /* (추가) 하단 중앙 투명 배너 */
+  /* 하단 중앙 투명 배너 */
   #adBanner{
     position:fixed; left:50%; bottom:0; transform:translateX(-50%);
     width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
   }
-  /* 3. 배너 이미지 투명도 및 URL 업데이트 */
   #adBanner img{ width:100%; height:100%; opacity:0.2; display:block; } 
   
-  /* 배너 위에 텍스트 추가 */
   .ad-inquiry {
     position: absolute;
     top: 5px;
@@ -326,17 +318,14 @@
     color: rgba(0, 0, 0, 0.6);
   }
 
-  /* ========== 모바일 전용 오버라이드 (확대) ========== */
+  /* ========== 모바일 전용 오버라이드 ========== */
   @media (max-width: 720px){
-    /* 2. 캐릭터 크기 및 정렬 재조정 */
     #character{ 
         transform: translateX(-50%); 
-        width: min(120vw, 96vw); /* 130vw -> 120vw로 조정 (1.2배) */
+        width: min(120vw, 96vw);
     } 
-    /* 2. 말풍선 위치 수정: 중앙 정렬 개선 */
     #fortune-bubble {
-        /* 캐릭터의 중앙 위치 (top: calc(var(--content-top) + 20vh))보다 상단에 위치 */
-        top: calc(var(--content-top) + 20vh - 80px); /* 다시 -80px로 미세 조정 */
+        top: calc(var(--content-top) + 20vh - 80px);
     }
 
     :root{
@@ -346,21 +335,19 @@
       --maxh-window: 40vh;
       --maxh-char: 70vh; 
 
-      /* 1. 모바일에서 Todo List 및 실시간 패널 너비 조정 */
       --maxw-board: 60vw;
       --maxw-window: 30vw;
       --maxw-timer: 86vw;
-      --maxw-char: 120vw; /* 130vw -> 120vw로 조정 (크기 재조정) */
+      --maxw-char: 120vw;
     }
 
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
 
-    /* 1. “지금 공부중” 패널 위치 및 너비 조정 (오른쪽 아래로 더 내림) */
     #presencePanel{
       right: 12px;
-      bottom: 120px; /* 하단 음악 컨트롤 패널 위에 위치하도록 조정 */
-      width: min(var(--maxw-board), 92vw); /* 60vw 적용 */
+      bottom: 120px;
+      width: min(var(--maxw-board), 92vw);
       max-width: min(var(--maxw-board), 92vw);
       max-height: 40vh; 
       overflow:auto;
@@ -374,17 +361,16 @@
   <!-- 오른쪽 아래: 실시간 패널 -->
   <aside id="presencePanel" class="card panel" style="display:none">
     <div class="row" style="justify-content:space-between">
-      <!-- 1. "오늘 누적 공부" 타이틀 삭제 -->
       <div class="title" data-lang-key="presence_title">실시간 보기</div>
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
   </aside>
 
-  <!-- 소품 레이어 -->
+  <!-- 소품 레이어 (숨김) -->
   <div id="propsLayer"></div>
 
-  <!-- 2. 포춘 쿠키 말풍선 추가 -->
+  <!-- 포춘 쿠키 말풍선 -->
   <div id="fortune-bubble" aria-live="polite"></div>
 
   <!-- 오버레이 + 드로어 -->
@@ -393,7 +379,7 @@
     <header class="drawer-head">
       <h3 id="drawerTitle">설정</h3>
       <div class="row">
-        <!-- 언어 선택 드롭다운 (중국어 제거, 한국어/영어만) -->
+        <!-- 언어 선택 드롭다운 -->
         <select id="languageSelect" class="pill" style="padding:0.6rem 0.7rem; border-radius:12px; flex-shrink:0;">
           <option value="ko">한국어</option>
           <option value="en">English</option>
@@ -463,7 +449,6 @@
     <section class="drawer-sec" id="layoutSettings">
       <h4 data-lang-key="screen_settings">화면 설정</h4>
       <div class="row">
-        <!-- 배치 편집 버튼 숨김 처리 -->
         <button id="layoutEdit" class="pill" data-lang-key="layout_edit_off" style="display:none;">배치 편집: 꺼짐</button> 
         <button id="layoutReset" class="pill" title="원상복구" data-lang-key="reset_layout">원상복구</button>
         <button id="rotateToggle" class="pill" data-lang-key="rotate_on">회전: 켜짐</button>
@@ -490,10 +475,9 @@
       </div>
     </section>
 
-    <!-- 소품 관련 섹션 숨김 처리 -->
+    <!-- 소품 관련 섹션 (숨김) -->
     <section class="drawer-sec" id="propsSection" style="display:none;">
       <h4 data-lang-key="props">소품</h4>
-      <!-- 파일 선택을 URL보다 위로 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="propFile" type="file" accept="image/*" class="input-file-hidden" />
         <label for="propFile" class="pill file-pill" title="소품 이미지 선택">
@@ -519,7 +503,6 @@
 
     <section class="drawer-sec">
       <h4 data-lang-key="credits">Credits</h4>
-      <!-- 링크 업데이트 -->
       <a id="creditLink" href="https://dashing-leek-81d.notion.site/Study-with-me-27c4376fbca680629fe3e6e31281b9e2?pvs=74" target="_blank" rel="noopener">Made by do</a>
     </section>
   </aside>
@@ -549,7 +532,6 @@
   </div>
 
   <!-- 메인: 창문 + 캐릭터 -->
-  <!-- 2. 포춘 쿠키 말풍선 추가 -->
   <div id="window" class="resizable"><img id="win-img" alt="창문" /></div>
   <div id="character" class="resizable" role="button" tabindex="0"><img id="char-img" alt="캐릭터" /></div>
 
@@ -566,7 +548,7 @@
     </section>
   </div>
 
-  <!-- (추후 광고) 하단 중앙 투명 배너 -->
+  <!-- 하단 중앙 투명 배너 -->
   <div id="adBanner" aria-hidden="true">
     <img alt="ad-placeholder"
       src="https://github.com/nihicheli/studywithme/blob/main/image/Group%209225.png?raw=true"/>
@@ -749,87 +731,66 @@
   }
   
   function updateTextByLanguage() {
-      // 1. HTML lang 속성 업데이트
       document.documentElement.lang = state.lang;
       
-      // 2. data-lang-key 속성을 가진 모든 요소 업데이트
       document.querySelectorAll('[data-lang-key]').forEach(el => {
           const key = el.getAttribute('data-lang-key');
           const translation = getTranslation(key);
-          // 텍스트 내용 업데이트
           el.textContent = translation;
           
-          // input placeholder 업데이트
           if (el.tagName === 'INPUT' && el.id === 'todo-input') {
               el.placeholder = getTranslation('add_todo_placeholder');
           } else if (el.id === 'bgFileName' || el.id === 'propFileName') {
-              // '선택 안 됨' 상태 텍스트 처리
               if (el.textContent.trim() === getTranslation('not_selected')) {
                    el.textContent = getTranslation('not_selected');
               }
           }
       });
       
-      // 3. 특수 요소 업데이트 (하드코딩된 부분)
       document.getElementById('drawerTitle').textContent = getTranslation('settings');
       document.getElementById('todoTitle').textContent = getTranslation('todo_list');
       
-      // 4. 동적으로 업데이트되는 UI 텍스트 재호출
-      updateTimerUI();         // 타이머 상태, 시작/일시정지/리셋
-      updateCyclesBtn();       // 사이클 버튼
-      updateWindowToggleUI();  // 창문 표시
-      updateCharacterToggleUI(); // 캐릭터 표시
-      updateRepeatUI();        // 반복 모드
+      updateTimerUI();
+      updateCyclesBtn();
+      updateWindowToggleUI();
+      updateCharacterToggleUI();
+      updateRepeatUI();
       
-      // 5. 배치 편집 상태 업데이트 (버튼이 숨겨져 있지만 로직은 유지)
       layoutEditBtn.textContent = getTranslation(window.editOn ? 'layout_edit_on' : 'layout_edit_off');
-      
-      // 6. 햄버거 버튼 '닫기' 텍스트 업데이트
       document.getElementById('closeDrawer').textContent = getTranslation('close');
-      
-      // 7. 실시간 보기 정보 업데이트
       document.getElementById('presenceInfo').textContent = getTranslation('presence_info');
   }
 
   /* ===== 트랙 데이터 (Track Data) ===== */
+  // 같은 폴더 내 mp3 폴더의 파일명을 매핑합니다.
+  // 음악 이름은 화면에 "음악 1", "음악 2" 등 깔끔하게 노출되며, 실제 mp3/1.mp3 등을 재생합니다.
   const TRACKS = [
-    { title: "Bass Meant Jazz",     mood: "Jazz",    url: "https://freepd.com/music/Bass%20Meant%20Jazz.mp3" },
-    { title: "Stompin at Midnight", mood: "Jazz",    url: "https://freepd.com/music/Stompin%20at%20Midnight.mp3" },
-    { title: "Abstract Anxiety",    mood: "Loud",    url: "https://freepd.com/music/Abstract%20Anxiety.mp3" },
-    { title: "Adding the Sun",      mood: "Lo-Fi",   url: "https://freepd.com/music/Adding%20the%20Sun.mp3" },
-    { title: "Bleu",                mood: "Lo-Fi",   url: "https://freepd.com/music/Bleu.mp3" },
-    { title: "Study and Relax",     mood: "Lo-Fi",   url: "https://freepd.com/music/Study%20and%20Relax.mp3" },
-    { title: "Deep Focus",          mood: "Lo-Fi",   url: "https://freepd.com/music/Deep%20Focus. основным" },
-    
-    /* --- 추가된 곡 (Freepd.com / Incompetech - 상업적 무료) --- */
-    { title: "Adventure",           mood: "Lo-Fi",   url: "https://freepd.com/music/Adventure.mp3" }, 
-    { title: "Compy Jazz",    mood: "Jazz",    url: "https://freepd.com/music/Compy%20Jazz.mp3" }, 
-    { title: "Overture", mood: "Piano",   url: "https://freepd.com/music/Overture.mp3" },
-    { title: "Winter",        mood: "Piano", url: "https://freepd.com/music/Winter.mp3" }, 
-    
-    /* White/Pink/Brown Noise (Public Domain) */
-    { title: "White Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/WhiteNoise_64kb.mp3" },
-    { title: "Pink Noise",   mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/PinkNoise_64kb.mp3" },
-    { title: "Brown Noise",  mood: "Noise", url: "https://archive.org/download/TenMinutesOfWhiteNoisePinkNoiseAndBrownianNoise/BrownianNoise_64kb.mp3" }
+    { title: "음악 1", mood: "Lo-Fi",   url: "mp3/1.mp3" },
+    { title: "음악 2", mood: "Lo-Fi",   url: "mp3/2.mp3" },
+    { title: "음악 3", mood: "Lo-Fi",   url: "mp3/3.mp3" },
+    { title: "음악 4", mood: "Jazz",    url: "mp3/4.mp3" },
+    { title: "음악 5", mood: "Jazz",    url: "mp3/5.mp3" },
+    { title: "음악 6", mood: "Piano",   url: "mp3/6.mp3" },
+    { title: "음악 7", mood: "Piano",   url: "mp3/7.mp3" },
+    { title: "음악 8", mood: "Ambient", url: "mp3/8.mp3" },
+    { title: "음악 9", mood: "Noise",   url: "mp3/9.mp3" },
+    { title: "음악 10", mood: "Noise",  url: "mp3/10.mp3" }
   ];
 
-  /* 창문/캐릭터 0.5s 교차 */
-  let charWorkA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true"; // 이미지 1 (집중중)
-  let charWorkB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true"; // 이미지 2 (집중중)
+  /* 창문/캐릭터 이미지 */
+  let charWorkA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209213.png?raw=true";
+  let charWorkB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209214.png?raw=true";
   let winWorkA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
   let winWorkB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
-  /* 1. 휴식 중일 때 사용할 새로운 이미지 3, 4 */
-  let charBreakA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209222.png?raw=true"; // 이미지 3 (휴식중: 임시 Placeholder)
-  let charBreakB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209224.png?raw=true"; // 이미지 4 (휴식중: 임시 Placeholder)
+  let charBreakA = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209222.png?raw=true";
+  let charBreakB = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209224.png?raw=true";
   let winBreakA  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209215.png?raw=true";
   let winBreakB  = "https://github.com/nihicheli/studywithme/blob/main/image/Group%209216.png?raw=true";
 
   let showA = true, blinkTimer = null;
   let fortuneBubbleTimeout = null;
-  
-  /* [삭제] 이미지 깜빡임 최적화를 위한 BLINK_CACHE 제거 */
 
-  // 2. 따뜻한 메시지 목록
+  // 따뜻한 메시지 목록
   const FORTUNE_MESSAGES = [
     "오늘의 노력은 내일의 빛이 될 거예요!",
     "잠시 쉬어가도 괜찮아요, 당신은 이미 충분히 잘하고 있어요.",
@@ -857,96 +818,74 @@
   const lsShare = localStorage.getItem("shareStudy");
   const state = {
     mode: localStorage.getItem("mode") || "pomodoro",
-    shareStudy: (lsShare === null) ? true : (lsShare === "1"),   // 기본 ON
+    shareStudy: (lsShare === null) ? true : (lsShare === "1"),
     isWork: true, running: false,
     workSec: 25*60, restSec: 5*60, remainSec: 25*60,
     interval: null, shuffle: false, playing: false,
     mood: "전체", trackIdx: 0, repeatMode: "off",
     totalCycles: 4, completedCycles: 0,
-    /* [유지] 타이머 지연 문제 해결을 위한 타임스탬프 */
-    startTimeStamp: 0, // 타이머가 시작된 실제 시점 (ms)
-    lastUpdateTimestamp: 0, // studyTimeTotal 업데이트를 위한 마지막 시점 (ms)
-    /* 2. 새벽 4시 기점으로 하루 공부시간 누적을 위해 studyTimeTotal 및 lastStudyTime 추가 */
+    startTimeStamp: 0,
+    lastUpdateTimestamp: 0,
     studyTimeTotal: parseInt(localStorage.getItem("studyTimeTotal") || "0", 10),
     lastStudyTime: parseInt(localStorage.getItem("lastStudyTime") || "0", 10),
     todos: JSON.parse(localStorage.getItem("todos-v1")||"[]"),
-    /* 4. 다크모드를 디폴트로 */
     theme: localStorage.getItem("theme") || "dark",
     windowVisible: (localStorage.getItem("ui-window-visible") ?? "1") === "1",
     characterVisible: (localStorage.getItem("ui-character-visible") ?? "1") === "1",
     props: JSON.parse(localStorage.getItem("props-v1")||"[]"),
     rotateOn: (localStorage.getItem("rotateOn") ?? "") === "" ? true : (localStorage.getItem("rotateOn") === "1"),
-    // 언어 설정: 한국어를 기본값으로 변경
     lang: localStorage.getItem("lang") || 'ko' 
   };
   window.state = state;
 
-  /* 2. 새벽 4시를 기점으로 공부 시간 초기화 확인 */
+  /* 새벽 4시 기점 공부 시간 초기화 */
   (function checkAndResetDailyStudyTime(){
       const now = new Date();
       const last = new Date(state.lastStudyTime);
-
       const isNewDay = (now.getFullYear() > last.getFullYear() || now.getMonth() > last.getMonth() || now.getDate() > last.getDate());
 
-      // 오늘 새벽 4시 (4:00:00)
       const resetTime = new Date(now);
       resetTime.setHours(4, 0, 0, 0);
 
-      // (1) 마지막 기록 시점 (last)이 오늘 새벽 4시 이전이고, 현재 시점(now)이 오늘 새벽 4시 이후일 경우
       const shouldReset = (last.getTime() < resetTime.getTime() && now.getTime() >= resetTime.getTime());
 
-      // (2) 또는 날짜 자체가 바뀌었는데, 아직 오늘 4시를 지나지 않았을 경우 (예: 3일 3시에 기록하고 4일 1시에 접속)
-      // 이 경우, 전날의 4시와 오늘 4시 사이에 접속했다면 리셋을 건너뛸 수 있으므로, (1) 조건으로 충분합니다.
-      // 리셋은 "4시가 되었을 때 처음 접속/액션 시"에만 일어나도록 설계합니다.
-
       if(shouldReset || (isNewDay && now.getHours() >= 4)){
-          // 4시가 지났으므로 리셋
           state.studyTimeTotal = 0;
           localStorage.setItem("studyTimeTotal", "0");
-          // lastStudyTime을 현재 시간으로 업데이트 (다시 리셋되지 않도록 방지)
           state.lastStudyTime = now.getTime();
           localStorage.setItem("lastStudyTime", state.lastStudyTime.toString());
       }
-      // lastStudyTime이 0이거나 (첫 실행), 4시 리셋 조건이 아니면 현재 시간으로 업데이트만 합니다.
       if (state.lastStudyTime === 0 || shouldReset || isNewDay) {
           state.lastStudyTime = now.getTime();
           localStorage.setItem("lastStudyTime", state.lastStudyTime.toString());
       }
   })();
   
-  /* [유지] 현재 정확한 남은 시간 계산 (탭 전환 문제 해결 핵심) */
   function calculateAccurateRemaining() {
     if (!state.running || state.startTimeStamp === 0) return state.remainSec;
-    
     const now = Date.now();
-    // 타이머 시작 시점 대비 실제 경과 초
     const elapsedRealSeconds = Math.floor((now - state.startTimeStamp) / 1000);
     
     if (state.mode === 'pomodoro') {
         const originalTotalTime = (state.isWork ? state.workSec : state.restSec);
         return originalTotalTime - elapsedRealSeconds;
-    } else { // Timer mode (Count-up)
+    } else {
         return elapsedRealSeconds;
     }
   }
 
-
   /* 새로고침시 타이머 유지 */
   window.addEventListener('beforeunload', ()=>{
     try{
-      // [수정] beforeunload 시 정확한 remainSec를 계산하여 저장
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
         workSec: state.workSec, restSec: state.restSec, 
-        remainSec: calculateAccurateRemaining(), // 정확히 계산된 남은 시간 저장
+        remainSec: calculateAccurateRemaining(),
         totalCycles: state.totalCycles, completedCycles: state.completedCycles
       };
       sessionStorage.setItem('timer-keep', JSON.stringify(snap));
       
-      // [수정] 마지막에 studyTimeTotal 업데이트
       if (state.running && (state.mode === 'timer' || state.isWork)) {
-        // running 중이었다면, stopTimer에서 누적되었어야 함. 
-        // 여기서 다시 한 번 정확한 누적 시간을 계산하여 저장
         const now = Date.now();
         const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
         if(deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
@@ -967,7 +906,6 @@
       state.isWork = !!s.isWork;
       state.workSec = +s.workSec || state.workSec;
       state.restSec = +s.restSec || state.restSec;
-      // [유지] 저장된 remainSec를 사용 (정확한 시간임)
       state.remainSec = +s.remainSec || state.remainSec; 
       state.totalCycles = +s.totalCycles || state.totalCycles;
       state.completedCycles = +s.completedCycles || 0;
@@ -1034,18 +972,17 @@
   const propFileName = document.getElementById("propFileName");
   const propList     = document.getElementById("propList");
   const propPresets  = document.querySelectorAll(".propPreset");
-  const propsSection = document.getElementById("propsSection"); // 소품 섹션
-  const layoutSettings = document.getElementById("layoutSettings"); // 화면 설정 섹션
+  const propsSection = document.getElementById("propsSection");
+  const layoutSettings = document.getElementById("layoutSettings");
 
   const presencePanel = document.getElementById("presencePanel");
   const meNickEl      = document.getElementById("meNick");
   const presenceList  = document.getElementById("presenceList");
   const presenceToggle= document.getElementById("presenceToggle");
   const nicknameInput = document.getElementById("nickname");
-  const languageSelect= document.getElementById("languageSelect"); // 새 언어 선택 요소
-  const applyNick     = document.getElementById("applyNick"); // 닉네임 적용 버튼
+  const languageSelect= document.getElementById("languageSelect");
+  const applyNick     = document.getElementById("applyNick");
 
-  /* 드로어 여닫기 보장 함수 (오버레이 잔존 방지) */
   function openDrawerNow(){
     drawer.classList.add("open");
     overlay.classList.add("show");
@@ -1064,59 +1001,44 @@
   }
 
   function getStudyTimeToday(){
-    // 누적 공부 시간 (초)을 포맷하여 반환
     return fmt(state.studyTimeTotal);
   }
 
-  // 2. 포춘 쿠키 메시지 표시 함수
   function showFortuneMessage(){
     clearTimeout(fortuneBubbleTimeout);
     
-    // 1. 메시지 선택
     const message = FORTUNE_MESSAGES[Math.floor(Math.random() * FORTUNE_MESSAGES.length)];
     
-    // 2. 메시지 설정 및 표시 (fade-in)
     fortuneBubble.textContent = message;
     fortuneBubble.classList.remove('show');
-    // DOM 업데이트를 보장한 후 클래스 추가
     setTimeout(() => {
         fortuneBubble.classList.add('show');
     }, 50);
 
-    // 3. 3초 후 사라짐 (fade-out)
     fortuneBubbleTimeout = setTimeout(() => {
         fortuneBubble.classList.remove('show');
     }, 3000);
   }
 
-
-  /* [복원] 이미지 깜빡임 로직 분리 및 업데이트 - src 변경 방식 사용 */
   function updateCharacterAndWindowImages() {
-    // running 상태 또는 isWork 상태에 따라 사용할 이미지 쌍을 결정
     let charA, charB, winA, winB;
 
     if (state.running && state.isWork) {
-        // 타이머가 돌아가고 집중중일 때: Work 이미지 1, 2 사용
         charA = charWorkA; charB = charWorkB;
         winA  = winWorkA;  winB  = winWorkB;
     } else {
-        // 타이머가 돌아가지 않거나, 휴식 중일 때
         charA = charBreakA; charB = charBreakB;
         winA  = winBreakA;  winB  = winBreakB;
     }
 
-    // [복원] src 속성을 직접 변경하는 방식 사용
     showA = !showA;
     charImg.src = showA ? charA : charB;
     winImg.src  = showA ? winA  : winB;
   }
 
-
   function init(){
-    /* 4. 다크모드를 디폴트로 - 이미 state.theme='dark'로 기본 설정되어있음 */
     applyTheme(state.theme);
     
-    // 언어 선택 기능 초기화
     languageSelect.value = state.lang;
     languageSelect.addEventListener('change', (e) => {
         state.lang = e.target.value;
@@ -1167,7 +1089,6 @@
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
     customBgFile?.addEventListener("change", ()=>{
-      // [오류 수정] customBgBgFile.files[0] -> customBgFile.files[0]
       const file = customBgFile.files && customBgFile.files[0]; 
       if(!file) return;
       bgFileName.textContent = file.name;
@@ -1180,11 +1101,9 @@
       reader.readAsDataURL(file);
     });
 
-    /* [재수정] 이미지 깜빡임 로직: 500ms setInterval 복원 (타이머 로직과 독립) */
-    updateCharacterAndWindowImages(); // 초기 이미지 설정 (src 설정)
-    if (blinkTimer) clearInterval(blinkTimer); // 혹시 모를 중복 방지
+    updateCharacterAndWindowImages();
+    if (blinkTimer) clearInterval(blinkTimer);
     blinkTimer = setInterval(updateCharacterAndWindowImages, 500);
-
 
     renderTodos();
     todoAdd.addEventListener("click", addTodo);
@@ -1232,13 +1151,11 @@
       updateCharacterToggleUI();
     });
 
-    // 2. 캐릭터 터치 시 말풍선 표시 이벤트 추가
     characterBox.addEventListener('click', showFortuneMessage);
     characterBox.addEventListener('touchstart', showFortuneMessage);
 
     setupLayoutDrag();
 
-    /* 회전(간소화: 스케일 호출 제거) */
     function setRotate(on){
       state.rotateOn = !!on;
       localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
@@ -1258,37 +1175,33 @@
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
-    // 저장된 값이 없으면: 스마트폰 = 기본 ON, 그 외 = 기본 OFF
+    
     const savedRotate = localStorage.getItem('rotateOn');
     if (savedRotate === null) {
-      setRotate(isSmartphone());        // 스마트폰이면 true, 아니면 false
+      setRotate(isSmartphone());
     } else {
-      setRotate(savedRotate === '1');   // 사용자가 이전에 선택한 값 유지
+      setRotate(savedRotate === '1');
     }
 
-    /* 소품 프리셋 */
+    /* 소품 설정 (숨겨짐) */
     document.querySelectorAll('.propPreset').forEach(btn=>
       btn.addEventListener('click', ()=>{
         addProp(btn.dataset.url, true, {autoEdit:true});
-        closeDrawerNow();           /* 오버레이 잔존 방지 */
+        closeDrawerNow();
       })
     );
 
-    /* (개선) 소품 파일 선택: 모바일에서도 '선택 즉시 추가' */
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
       propFileName.textContent = f ? f.name : getTranslation('not_selected');
       if(f){
         const url = URL.createObjectURL(f);
         addProp(url, true, {autoEdit:true});
-        // iOS에서 포커스/버튼 문제 방지: 드로어와 오버레이를 확실히 닫기
         closeDrawerNow();
-        // 파일 입력 리셋 (같은 파일 재첨부 가능)
         setTimeout(()=>{ propFile.value=""; propFileName.textContent=getTranslation('not_selected'); }, 0);
       }
     });
 
-    /* (유지) 별도의 '파일 추가' 버튼도 제공 */
     propFileAdd.addEventListener('click', ()=>{
       const f = propFile.files && propFile.files[0];
       if(!f) return;
@@ -1318,11 +1231,8 @@
     });
     refreshShareStudyUI();
     
-    // 닉네임 적용 버튼 이벤트
     applyNick.addEventListener('click', goOnline);
 
-
-    // 언어 설정 후 마지막에 UI 텍스트 일괄 업데이트
     updateTextByLanguage();
     updateTimerUI();
     if(__resumeAfterReload){ startTimer(); }
@@ -1335,7 +1245,6 @@
     stateEl.textContent = isPom ? (state.isWork?getTranslation('focusing'):getTranslation('resting')) : getTranslation('timer_mode');
   }
 
-  /* [유지] Todo List 렌더링 최적화: DocumentFragment 사용 */
   function renderTodos(){
     boardList.innerHTML = "";
     if(state.todos.length === 0) return;
@@ -1359,7 +1268,7 @@
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
   function addTodo(){ const v=todoInput.value.trim(); if(!v) return; state.todos.push({text:v,done:false}); todoInput.value=""; persistTodos(); renderTodos(); }
 
-  function MOODS(){ return ["전체","Lo-Fi","Jazz","Loud","Piano","Ambient","Noise"]; } /* Ambient 추가 */
+  function MOODS(){ return ["전체","Lo-Fi","Jazz","Piano","Ambient","Noise"]; }
   function filteredTrackIdxs(){
     if(state.mood==="전체") return TRACKS.map((_,i)=>i);
     return TRACKS.map((t,i)=> t.mood===state.mood ? i : -1).filter(i=>i>=0);
@@ -1377,7 +1286,6 @@
     highlightMood();
     renderTracks(true);
   }
-  /* [유지] 음악 트랙 렌더링 최적화: DocumentFragment 사용 */
   function renderTracks(initial=false){
     tracksWrap.innerHTML = "";
     const idxs = filteredTrackIdxs();
@@ -1448,7 +1356,6 @@
     return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`;
   }
   function updateTimerUI(){
-    // [유지] UI 업데이트 시 calculateAccurateRemaining을 사용하여 정확한 남은 시간 반영
     state.remainSec = calculateAccurateRemaining(); 
     timeEl.textContent=fmt(state.remainSec);
     
@@ -1465,14 +1372,12 @@
   function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
     o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
   
-  /* [유지] 실시간 타임스탬프 기반의 Timer Tick 함수 (SetTimeout 재귀) */
   function timerTick() {
     if (!state.running) {
       return;
     }
 
     const now = Date.now();
-    // 타이머 시작 시점 대비 실제 경과 초
     const elapsedRealSeconds = Math.floor((now - state.startTimeStamp) / 1000);
     let shouldAccumulate = false;
     let nextRemainSec = 0;
@@ -1482,33 +1387,29 @@
       nextRemainSec = originalTotalTime - elapsedRealSeconds;
       
       if (nextRemainSec <= 0) {
-        // 사이클 전환 처리
         beep();
         const wasWork = state.isWork;
         state.isWork = !state.isWork;
 
-        // 초과된 시간을 보정하여 새로운 phase의 startTimeStamp 설정
         state.startTimeStamp = now + nextRemainSec * 1000; 
         
-        state.remainSec = state.isWork ? state.workSec : state.restSec; // 다음 phase의 초기값
+        state.remainSec = state.isWork ? state.workSec : state.restSec;
         
         if (state.isWork && !wasWork){
           state.completedCycles = Math.min(state.totalCycles, state.completedCycles + 1);
           updateCyclesBtn();
           if (state.completedCycles >= state.totalCycles) { stopTimer(); return; }
         }
-        // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
-        shouldAccumulate = true; // 새로운 페이즈 시작 시도
+        shouldAccumulate = true;
       } else {
         state.remainSec = nextRemainSec;
         if(state.isWork) shouldAccumulate = true;
       }
-    } else { // Timer mode (Count-up)
+    } else {
       state.remainSec = elapsedRealSeconds;
       shouldAccumulate = true;
     }
 
-    // 누적 공부 시간 업데이트 (실제 경과 시간 기반)
     if(shouldAccumulate && state.lastUpdateTimestamp > 0) {
         const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
         if (deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
@@ -1516,12 +1417,8 @@
     state.lastUpdateTimestamp = now;
 
     updateTimerUI();
-    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
-    
-    // [유지] 1초마다 페이지 제목 업데이트 (지연 감소)
     document.title = `${fmt(state.remainSec)} • Studywithme`;
 
-    // 다음 틱을 정확히 1초 후에 실행되도록 스케줄링
     const timeSinceLastSecond = (now - state.startTimeStamp) % 1000;
     const nextTick = 1000 - timeSinceLastSecond;
     
@@ -1529,29 +1426,24 @@
     state.interval = setTimeout(timerTick, nextTick);
   }
 
-  /* [유지] 타이머 시작 (setInterval 대신 setTimeout 재귀 시작) */
   function startTimer(){
     if(state.running) return;
     
-    // 남은 시간(remainSec)을 기준으로 startTimeStamp 역계산
     const totalTimeInSeconds = (state.mode === 'pomodoro' && state.isWork) 
-                                ? state.workSec : state.remainSec; // count-up은 remainSec이 경과 시간
+                                ? state.workSec : state.remainSec;
     
     state.startTimeStamp = Date.now() - (totalTimeInSeconds - state.remainSec) * 1000;
-    state.lastUpdateTimestamp = Date.now(); // Accumulation 시작 시점
+    state.lastUpdateTimestamp = Date.now();
 
     state.running=true;
     updateTimerUI();
-    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
 
-    // 첫 번째 틱을 바로 시작
     if(state.interval) clearTimeout(state.interval);
     state.interval = setTimeout(timerTick, 0); 
     
     window.__presence_broadcastNow?.();
   }
   
-  /* [유지] 타이머 중지 (정확한 최종 시간 반영) */
   function stopTimer(){
     if(!state.running) return;
     state.running=false;
@@ -1561,7 +1453,6 @@
         state.interval=null; 
     }
     
-    // 멈추는 시점의 정확한 remainSec 및 studyTimeTotal 반영
     const now = Date.now();
     const elapsedRealSeconds = Math.floor((now - state.startTimeStamp) / 1000);
     const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
@@ -1570,7 +1461,7 @@
       const originalTotalTime = (state.isWork ? state.workSec : state.restSec);
       state.remainSec = originalTotalTime - elapsedRealSeconds;
       if(state.isWork && deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
-    } else { // Timer mode (Count-up)
+    } else {
       state.remainSec = elapsedRealSeconds;
       if(deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
     }
@@ -1579,14 +1470,10 @@
     state.lastUpdateTimestamp = 0; 
 
     updateTimerUI();
-    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
     window.__presence_broadcastNow?.();
-    
-    // [유지] 정지 시 제목을 기본값으로 복구
     document.title = `Studywithme`;
   }
   
-  /* [유지] 타이머 리셋 */
   function resetTimer(){
     stopTimer();
     state.isWork=true;
@@ -1594,9 +1481,6 @@
     state.startTimeStamp = 0;
     state.lastUpdateTimestamp = 0;
     updateTimerUI();
-    // updateCharacterAndWindowImages(); // [삭제] 그림 애니메이션은 별도의 500ms 타이머가 담당
-    
-    // [유지] 리셋 시 제목을 기본값으로 복구
     document.title = `Studywithme`;
   }
   
@@ -1626,7 +1510,6 @@
     const Z_TOP_CAP = 8999;
 
     const registry = new Map();
-    // window.editOn 전역 변수화 (layoutEditBtn 텍스트 업데이트를 위해)
     window.editOn = false; 
     let zTop = 100;
 
@@ -1821,7 +1704,6 @@
     }
 
     layoutResetBtn.addEventListener('click', ()=>{
-      // [유지] 리셋 전 정확한 remainSec을 계산하여 저장
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
         workSec: state.workSec, restSec: state.restSec, 
@@ -1906,39 +1788,34 @@
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://jvpasqknlkeyshrevqpg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2cGFzcWtubGtleXNocmV2cXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwNDQyOTMsImV4cCI6MjA3NDYyMDI5M30.7zKRGoBFjoWksoRXjUj8n4KzLXdiF86lZwneNdZNF5k";
+const SUPABASE_URL = "https://qdmeeqtumsstgfjhtuvt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbWVlcXR1bXNzdGdmamh0dXZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODE2MTMsImV4cCI6MjA5NDg1NzYxM30.Ei705_4svL6bhIa8kPfce6MKk3-XouH_pJ6K68QvKFU";
 
 const presencePanel = document.getElementById("presencePanel");
 const meNickEl      = document.getElementById("meNick");
 const presenceList  = document.getElementById("presenceList");
 const presenceToggle= document.getElementById("presenceToggle");
 const nicknameInput = document.getElementById("nickname");
-const applyNick     = document.getElementById("applyNick"); // 추가된 닉네임 적용 버튼
+const applyNick     = document.getElementById("applyNick");
 
-// --- smartphone detector (여기에 추가) ---
 function isSmartphone(){
   const ua = navigator.userAgent || navigator.vendor || window.opera || "";
   const looksMobileUA = /iPhone|iPod|Android.+Mobile|Mobi/i.test(ua);
-  const smallViewport = Math.min(window.innerWidth, window.innerHeight) <= 820; // 태블릿 제외용 여유값
+  const smallViewport = Math.min(window.innerWidth, window.innerHeight) <= 820;
   return looksMobileUA && smallViewport;
 }
 
-  
 let supabase = null;
 let channel  = null;
 let heartbeat= null;
 
-/* [수정] 닉네임이 있으면 자동 연결 */
 window.addEventListener('load', ()=>{ 
     const savedNick = localStorage.getItem("nickname");
-    // 닉네임 로드 및 UI 업데이트
     if (savedNick) {
         nicknameInput.value = savedNick;
-        meNickEl.textContent = savedNick; // 닉네임 UI에 표시
+        meNickEl.textContent = savedNick;
     }
     
-    // 닉네임이 있고, 설정 준비가 되었으면 goOnline() 시도
     if (cfgReady() && savedNick && savedNick.trim() !== "") { 
         goOnline(); 
     }
@@ -1951,16 +1828,11 @@ function getSnapshot(){
   const st = window.state || {};
   let study = null;
   
-  // 1. 공부 시간 공개가 ON일 때만 studyTimeTotal 전송 (롤백된 로직)
   if(st.shareStudy){
-    // [유지] 실시간 업데이트 시 studyTimeTotal을 정확히 반영
     const now = Date.now();
     let currentStudyTotal = st.studyTimeTotal;
     
-    // 타이머가 작동 중이고 집중중/카운트업 모드라면, 현재까지의 델타를 더해줌
     if (st.running && (st.mode === 'timer' || st.isWork)) {
-        // studyTimeTotal은 마지막 업데이트 시점(lastUpdateTimestamp)을 기준으로 누적됨.
-        // 여기서는 lastUpdateTimestamp 이후 경과된 시간만 추가
         const deltaSeconds = Math.floor((now - st.lastUpdateTimestamp) / 1000);
         currentStudyTotal += deltaSeconds;
     }
@@ -1968,37 +1840,28 @@ function getSnapshot(){
     study = currentStudyTotal || 0;
   }
   
-  let status = "idle"; // 기본 상태를 'idle'로 설정
-  
+  let status = "idle";
   if (st.running) {
-      // 타이머가 작동 중일 때만 상태를 work/break/timer로 설정
       status = (st.mode === 'pomodoro') ? (st.isWork ? "work" : "break") : "timer";
   }
   
   return { status, study };
 }
 function fmtMin(sec){
-    const s = sec|0; // 초 정수화
+    const s = sec|0;
     const h = Math.floor(s/3600);
     const m = Math.floor((s%3600)/60);
     
-    // 1분 미만은 0분으로 표시
     if (s < 60) return `0${getTranslation('min_short')}`; 
-    
-    // 1시간 이상일 경우 "X시간 Y분" 포맷
     if(h > 0) return `${h}${getTranslation('hour_short')} ${m}${getTranslation('min_short')}`;
-    
-    // 1시간 미만일 경우 "Y분" 포맷
     return `${m}${getTranslation('min_short')}`;
 }
 
 function getTranslation(key) {
     const lang = window.state.lang;
-    // 윈도우 객체에 TRANSLATIONS가 있을 경우 사용 (실제 앱 로직)
     if (window.TRANSLATIONS) {
         return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key;
     }
-    // 디버그 용 기본값
     const debugTranslations = {
         ko: { status_work: "집중중", status_break: "휴식중", status_idle: "대기중", timer_mode: "타이머", hour_short: "시간", min_short: "분", no_one_online: "아직 아무도 없어요" },
         en: { status_work: "Focusing", status_break: "Resting", status_idle: "Idle", timer_mode: "Timer Mode", hour_short: "h", min_short: "m", no_one_online: "No one online yet" }
@@ -2012,13 +1875,11 @@ function renderOnline(presenceState){
   for(const [nick, metas] of Object.entries(presenceState)){
     const meta = metas[metas.length-1] || {};
     const status = meta?.status || "idle";
-    // study가 null이면 공개 OFF, number면 공개 ON
     const study  = typeof meta?.study  === "number" ? meta.study  : null; 
 
     let statusKey = '';
     let dotClass = 'dot';
     
-    // 1. 상태 및 점 색상 결정
     if (status === 'work') {
         statusKey = 'status_work';
         dotClass += ' work';
@@ -2028,20 +1889,15 @@ function renderOnline(presenceState){
     } else if (status === 'timer') {
         statusKey = 'timer_mode';
         dotClass += ' work';
-    } else { // status === 'idle' (타이머 정지/미시작 상태)
+    } else {
         statusKey = 'status_idle';
     }
 
     let rightTxt = getTranslation(statusKey);
     
-    // 2. 공부시간 공개 여부에 따라 텍스트 결정
     if (study !== null) {
-      // 공부시간 공개 ON: 상태 + 누적 공부 시간
       const studyTimeText = fmtMin(study);
-      // [수정] "집중중 · 누적 57분" 형태로 표시
       rightTxt = `${getTranslation(statusKey)} · 누적 ${studyTimeText}`; 
-    } else {
-        // 공부시간 공개 OFF: 상태 텍스트만 유지 (rightTxt = getTranslation(statusKey))
     }
     
     items.push(
@@ -2053,8 +1909,6 @@ function renderOnline(presenceState){
   }
   
   const noOneOnlineText = getTranslation('no_one_online')
-  
-  // 닉네임이 'anonymous'인 사용자는 필터링 (로컬 유저가 닉네임 설정을 하지 않았을 경우)
   const filteredItems = items.filter(item => !item.includes('<span class="nick">anonymous</span>'));
 
   presenceList.innerHTML = filteredItems.slice(0,5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
@@ -2076,19 +1930,15 @@ async function goOnline(){
   if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const myNick = (nicknameInput.value || "").trim();
-  
-  // 닉네임이 유효하지 않으면 연결하지 않고 종료
   if (myNick === "" || myNick === "anonymous") {
-      goOffline(); // 연결되어 있을 경우 끊음
+      goOffline();
       return; 
   }
   
-  // 닉네임 변경/설정 로직
   localStorage.setItem("nickname", myNick); 
   meNickEl.textContent = myNick;
   presencePanel.style.display = "block";
 
-  // 채널이 이미 존재하거나 닉네임이 변경되었다면 재연결
   if (channel) {
       await channel.unsubscribe();
       if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
@@ -2100,7 +1950,6 @@ async function goOnline(){
   channel.subscribe(async (status)=>{
     if(status === "SUBSCRIBED"){
       try{ await channel.track(getSnapshot()); }catch{}
-      // [유지] heartbeat는 그대로 15초 간격 유지 (실시간 반영 위함)
       heartbeat = setInterval(async ()=>{ 
           try{ await channel.track(getSnapshot()); }catch{} 
       }, 15000);
@@ -2118,20 +1967,16 @@ async function goOffline(){
   presenceList.innerHTML = "";
 }
 
-// 닉네임 적용 버튼 이벤트 리스너
 applyNick.addEventListener('click', goOnline);
 
-// [수정] 닉네임 입력 시 localStorage 업데이트 및 UI 반영만. 연결은 적용 버튼으로 분리.
 nicknameInput.addEventListener('input', ()=>{
     const currentNick = nicknameInput.value.trim();
     localStorage.setItem("nickname", currentNick);
-    meNickEl.textContent = currentNick; // 즉시 UI 반영
+    meNickEl.textContent = currentNick;
     if (currentNick === "" && channel) {
-        // 닉네임이 비어 있고 현재 연결되어 있다면, 오프라인으로 전환
         goOffline(); 
     }
 });
-
 
 presenceToggle?.addEventListener("click", async ()=>{
   if(!channel){ await goOnline(); } else { await goOffline(); }

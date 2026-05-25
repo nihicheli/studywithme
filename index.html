@@ -529,7 +529,7 @@
       <h4 data-lang-key="credits">Credits</h4>
       <a id="creditLink" href="https://dashing-leek-81d.notion.site/Study-with-me-27c4376fbca680629fe3e6e31281b9e2?pvs=74" target="_blank" rel="noopener">Made by do</a>
     </section>
-  </</aside>
+  </aside>
 
   <!-- 상단: 햄버거 / 타이머 / Todo -->
   <div id="topbar">
@@ -748,6 +748,7 @@
       min_short: "분"
     }
   };
+  window.TRANSLATIONS = TRANSLATIONS;
 
   function getTranslation(key) {
       const lang = state.lang;
@@ -1001,6 +1002,7 @@
   const nicknameInput = document.getElementById("nickname");
   const languageSelect= document.getElementById("languageSelect");
   const applyNick     = document.getElementById("applyNick");
+  const shareStudyBtn = document.getElementById("shareStudyBtn");
 
   function openDrawerNow(){
     drawer.classList.add("open");
@@ -1241,17 +1243,18 @@
     renderProps();
 
     function refreshShareStudyUI(){
+      if (!shareStudyBtn) return;
       shareStudyBtn.textContent = getTranslation(state.shareStudy ? 'share_study_on' : 'share_study_off');
     }
-    shareStudyBtn.addEventListener("click", ()=>{
+    shareStudyBtn?.addEventListener("click", async ()=>{
       state.shareStudy = !state.shareStudy;
       localStorage.setItem('shareStudy', state.shareStudy ? "1" : "0");
       refreshShareStudyUI();
+      await window.__presence_updateProfileShareStudy?.(state.shareStudy);
       window.__presence_broadcastNow?.();
     });
     refreshShareStudyUI();
-    
-    applyNick.addEventListener('click', goOnline);
+
 
     updateTextByLanguage();
     updateTimerUI();
@@ -2057,6 +2060,21 @@ async function fetchAndRenderCombinedPresence() {
   presenceList.innerHTML = filteredItems.slice(0, 5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
 }
 
+async function updateProfileShareStudy(shareStudy) {
+  const profileId = localStorage.getItem("profile_id");
+  if (!supabase || !profileId) return;
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ share_study: !!shareStudy })
+      .eq('id', profileId);
+    if (error) console.warn("profiles.share_study 업데이트 실패:", error);
+  } catch (e) {
+    console.warn("profiles.share_study 업데이트 중 예외:", e);
+  }
+}
+window.__presence_updateProfileShareStudy = updateProfileShareStudy;
+
 // 타이머 작동이나 상태 변경 시 DB 및 실시간 채널에 동시 통보하는 함수로 개선
 window.__presence_broadcastNow = async function(){
   if(!channel) return;
@@ -2097,19 +2115,28 @@ async function goOnline(){
   try {
     let { data: profile, error: pErr } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, nickname, is_public, share_study')
       .eq('nickname', myNick)
       .maybeSingle();
+
+    if (pErr) console.warn("profiles 조회 실패:", pErr);
 
     let profileId;
     if (profile) {
       profileId = profile.id;
+      if (typeof profile.share_study === 'boolean') {
+        window.state.shareStudy = profile.share_study;
+        localStorage.setItem('shareStudy', profile.share_study ? "1" : "0");
+      } else {
+        await updateProfileShareStudy(window.state?.shareStudy ?? true);
+      }
     } else {
       const { data: newProfile, error: insErr } = await supabase
         .from('profiles')
         .insert({ nickname: myNick, is_public: true, share_study: window.state?.shareStudy ?? true })
         .select('id')
         .single();
+      if (insErr) console.warn("profiles 생성 실패:", insErr);
       if (!insErr && newProfile) {
         profileId = newProfile.id;
       }
@@ -2189,7 +2216,7 @@ async function goOffline(){
   presenceList.innerHTML = "";
 }
 
-applyNick.addEventListener('click', goOnline);
+applyNick?.addEventListener('click', goOnline);
 
 nicknameInput.addEventListener('input', ()=>{
     const currentNick = nicknameInput.value.trim();

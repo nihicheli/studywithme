@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Studywithme</title>
 
 <!-- 파비콘 설정 -->
@@ -336,9 +336,9 @@
       --maxh-window: 40vh;
       --maxh-char: 70vh; 
 
-      --maxw-board: 60vw;
+      --maxw-board: 100%; /* 모바일에서 100%를 활용하도록 개선 */
       --maxw-window: 30vw;
-      --maxw-timer: 86vw;
+      --maxw-timer: 100%; /* 모바일에서 100%를 활용하도록 개선 */
       --maxw-char: 120vw;
     }
 
@@ -354,6 +354,29 @@
       overflow:auto;
       top: unset;
     }
+
+    /* 모바일용 상단바 그리드 레이아웃 오버라이드 (겹침/탈출 현상 해결) */
+    #topbar {
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto auto;
+      gap: 8px;
+    }
+    #hamburger {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    #timer {
+      grid-column: 2;
+      grid-row: 1;
+      width: 100%;
+      justify-self: stretch;
+    }
+    #board {
+      grid-column: 1 / span 2;
+      grid-row: 2;
+      width: 100%;
+      max-width: 100%;
+    }
   }
 </style>
 </head>
@@ -366,7 +389,7 @@
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
-  </</aside>
+  </aside> <!-- </</aside> 오타를 올바른 </aside> 태그로 전면 수정 -->
 
   <!-- 소품 레이어 (숨김) -->
   <div id="propsLayer"></div>
@@ -506,7 +529,7 @@
       <h4 data-lang-key="credits">Credits</h4>
       <a id="creditLink" href="https://dashing-leek-81d.notion.site/Study-with-me-27c4376fbca680629fe3e6e31281b9e2?pvs=74" target="_blank" rel="noopener">Made by do</a>
     </section>
-  </aside>
+  </</aside>
 
   <!-- 상단: 햄버거 / 타이머 / Todo -->
   <div id="topbar">

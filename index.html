@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Studywithme</title>
-  
+
+<!-- 파비콘 설정 -->
 <link rel="icon" href="https://github.com/nihicheli/studywithme/blob/main/image/thumnail-eye-dark.png?raw=true" type="image/png" />
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script:wght@400;700&display=swap" rel="stylesheet">
 
@@ -762,8 +763,7 @@
   }
 
   /* ===== 트랙 데이터 (Track Data) ===== */
-  // 같은 폴더 내 mp3 폴더의 파일명을 매핑합니다.
-  // 음악 이름은 화면에 "음악 1", "음악 2" 등 깔끔하게 노출되며, 실제 mp3/1.mp3 등을 재생합니다.
+  // mp3 폴더 안의 1~7번 파일 구조와 매핑되도록 확실하게 7곡으로 조절했습니다.
   const TRACKS = [
     { title: "음악 1", mood: "Lo-Fi",   url: "mp3/1.mp3" },
     { title: "음악 2", mood: "Lo-Fi",   url: "mp3/2.mp3" },
@@ -771,7 +771,7 @@
     { title: "음악 4", mood: "Jazz",    url: "mp3/4.mp3" },
     { title: "음악 5", mood: "Jazz",    url: "mp3/5.mp3" },
     { title: "음악 6", mood: "Piano",   url: "mp3/6.mp3" },
-    { title: "음악 7", mood: "Piano",   url: "mp3/7.mp3" },
+    { title: "음악 7", mood: "Piano",   url: "mp3/7.mp3" }
   ];
 
   /* 창문/캐릭터 이미지 */
@@ -1109,7 +1109,8 @@
     initMoodsAndTracks();
 
     player.addEventListener("ended", onEnded);
-    player.addEventListener("error", ()=>{
+    player.addEventListener("error", (e)=>{
+      console.warn("오디오 재생 오류 발생, 다음 트랙 이동 시도:", e);
       const list = filteredTrackIdxs();
       if(list.length){
         const curPos = list.indexOf(state.trackIdx);
@@ -1303,7 +1304,15 @@
     highlightTrack();
     if(initial){ selectTrack(idxs[0] ?? 0, false); }
   }
-  function selectTrack(idx, autoplay=false){ state.trackIdx=idx; player.src=TRACKS[idx].url; highlightTrack(); if(autoplay) tryPlay(); }
+  
+  // selectTrack 함수에 player.load() 명시적 호출 추가 (상대 경로 갱신 강제화)
+  function selectTrack(idx, autoplay=false){ 
+    state.trackIdx=idx; 
+    player.src=TRACKS[idx].url; 
+    player.load(); 
+    highlightTrack(); 
+    if(autoplay) tryPlay(); 
+  }
   function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent=getTranslation('pause_music'); }).catch(()=>{}); }
   function highlightMood(){ [...moodsWrap.children].forEach(b=>{ b.style.boxShadow = (b.dataset.mood===state.mood) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
   function highlightTrack(){ [...tracksWrap.children].forEach(b=>{ b.style.boxShadow = (+b.dataset.idx===state.trackIdx) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
@@ -1786,6 +1795,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://qdmeeqtumsstgfjhtuvt.supabase.co";
+// 제공해주신 ANON KEY 사용
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkbWVlcXR1bXNzdGdmamh0dXZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODE2MTMsImV4cCI6MjA5NDg1NzYxM30.Ei705_4svL6bhIa8kPfce6MKk3-XouH_pJ6K68QvKFU";
 
 const presencePanel = document.getElementById("presencePanel");
@@ -1821,6 +1831,7 @@ window.addEventListener('load', ()=>{
 function cfgReady(){
   return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY;
 }
+
 function getSnapshot(){
   const st = window.state || {};
   let study = null;
@@ -1844,6 +1855,7 @@ function getSnapshot(){
   
   return { status, study };
 }
+
 function fmtMin(sec){
     const s = sec|0;
     const h = Math.floor(s/3600);
@@ -1870,6 +1882,8 @@ function renderOnline(presenceState){
   const items = [];
   
   for(const [nick, metas] of Object.entries(presenceState)){
+    // 실시간 동기화 데이터 안정성 확보를 위한 방어 코드 추가
+    if (!metas || metas.length === 0) continue;
     const meta = metas[metas.length-1] || {};
     const status = meta?.status || "idle";
     const study  = typeof meta?.study  === "number" ? meta.study  : null; 
@@ -1913,14 +1927,16 @@ function renderOnline(presenceState){
 
 window.__presence_broadcastNow = async function(){
   if(!channel) return;
-  try{ await channel.track(getSnapshot()); }catch{}
+  try{ await channel.track(getSnapshot()); }catch(e){
+    console.error("공부 상태 브로드캐스트 실패:", e);
+  }
 };
 window.__presence_goOnline = goOnline;
 window.__presence_goOffline = goOffline;
 
 async function goOnline(){
   if(!cfgReady()){ 
-      console.error("Supabase configuration not ready.");
+      console.error("Supabase 설정이 준비되지 않았습니다. URL 및 ANON_KEY를 확인하세요.");
       presencePanel.style.display = "none";
       return; 
   }
@@ -1941,20 +1957,33 @@ async function goOnline(){
       if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
   }
 
+  // Supabase 실시간 수신률과 안정성을 높이기 위한 구성 파라미터 세팅
   channel = supabase.channel("studyroom", { config: { presence: { key: myNick } } });
-  channel.on("presence", { event: "sync" }, ()=>{ renderOnline(channel.presenceState()); });
+  
+  channel.on("presence", { event: "sync" }, ()=>{ 
+    renderOnline(channel.presenceState()); 
+  });
 
-  channel.subscribe(async (status)=>{
-    if(status === "SUBSCRIBED"){
-      try{ await channel.track(getSnapshot()); }catch{}
+  // 채널 연결 시의 실시간 상태 변화 및 에러 진단을 위한 디버깅 캡처
+  channel.subscribe(async (status, err)=>{
+    if (status === "SUBSCRIBED") {
+      console.log("Supabase Realtime 연결 성공!");
+      try{ await channel.track(getSnapshot()); }catch(e){ console.error("Track 에러:", e); }
+      
+      if(heartbeat) clearInterval(heartbeat);
       heartbeat = setInterval(async ()=>{ 
           try{ await channel.track(getSnapshot()); }catch{} 
       }, 15000);
+    } else if (status === "CHANNEL_ERROR") {
+      console.error("Supabase Realtime 채널 오류 발생! 프로젝트의 Realtime 기능이 켜져 있는지 확인하세요.", err);
+    } else if (status === "TIMED_OUT") {
+      console.warn("Supabase Realtime 연결 제한 시간 초과. 재연결을 시도합니다.");
     }
   });
 
   presenceToggle.textContent = getTranslation('public_on');
 }
+
 async function goOffline(){
   if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
   if(channel){ try{ await channel.unsubscribe(); }catch{} }

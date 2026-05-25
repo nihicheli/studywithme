@@ -5,21 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Studywithme</title>
 
-<!-- 파비콘 설정 -->
 <link rel="icon" href="https://github.com/nihicheli/studywithme/blob/main/image/thumnail-eye-dark.png?raw=true" type="image/png" />
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Nanum+Pen+Script:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
   /* 다크모드 디폴트 설정 */
   :root{
     --bg-url: url("https://github.com/nihicheli/studywithme/blob/main/image/background%205.png?raw=true");
     --ink: #FBFFF4;
-    --ink-sub: rgba(255,255,255,.7); /* 다크모드에 맞춰 잉크 서브색 변경 */
+    --ink-sub: rgba(255,255,255,.7); 
     --line: transparent;
     --top-gap: 12px;
     --content-top: 20vh;
-
     /* 데스크톱 기본값 */
     --maxh-board: 80vh;
     --maxh-timer: 35vh;
@@ -42,12 +39,10 @@
     height:100%; margin:0; color:var(--ink);
     font-family:"Patrick Hand","Nanum Pen Script",system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif;
     background:#000;
-    /* 모바일 폰트 크기 조정 */
     font-size:clamp(10px, 4vw, 14.4px);
     letter-spacing:.02em;
   }
 
-  /* 배경 + 10% 검정 오버레이 */
   #app{
     position:relative; height:100dvh; overflow:hidden;
     background-image:
@@ -69,20 +64,18 @@
     font-family: inherit;
     font-size: 1rem;
   }
-  /* 안쪽 포커스 링 */
   button:focus, .pill:focus, button:focus-visible, .pill:focus-visible{
-    outline: none; box-shadow: inset 0 0 0 1px #7C9AFF;
+    outline: none;
+    box-shadow: inset 0 0 0 1px #7C9AFF;
   }
   *{ -webkit-tap-highlight-color: transparent; }
   input, textarea, select{ font-family: inherit; font-size: 1rem; color:#fff }
   :root[data-theme="light"] input, :root[data-theme="light"] textarea, :root[data-theme="light"] select{ color:#222 }
 
-
   .row{display:flex; gap:.75rem; align-items:center; flex-wrap:wrap}
   .hwrap{ display:flex; gap:.5rem; align-items:center; overflow-x:auto; }
   .title{font-weight:900; font-size: 1.125rem}
 
-  /* 상단 레이아웃 — 최상단 유지 */
   #topbar{
     position:absolute; left:12px; right:12px; top: var(--top-gap);
     display:grid; grid-template-columns: 1fr auto 1fr; align-items:start; gap:12px;
@@ -90,15 +83,14 @@
   }
   #hamburger{ justify-self:start; width:3.4rem; height:3.4rem; display:grid; place-items:center; font-size:1.2rem; position:relative; z-index:9001; }
 
-  /* 타이머(가운데) */
   #timer{
     justify-self:center; width: min(var(--maxw-timer), 90vw); max-height: var(--maxh-timer);
-    display:flex; flex-direction:column; align-items:center; gap:.6rem; text-align:center; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; gap:.6rem;
+    text-align:center; overflow:hidden;
   }
   #state{ font-size: 1.25rem; font-weight:900; }
   #time{ font-weight:900; font-size: clamp(2.2rem, 6vw, 4rem); line-height:1; }
 
-  /* Todo list(오른쪽) */
   #board{
     justify-self:end; width: min(var(--maxw-board), 92vw); max-height: var(--maxh-board);
     display:grid; grid-template-rows: auto 1fr auto; overflow:hidden;
@@ -113,24 +105,22 @@
   #inputRow{ display:flex; gap:.5rem; align-items:center; padding-top:.6rem; }
   #board input[type="text"]{ width:100%; background:transparent; border: 2px solid var(--line); border-radius: 12px; color:#fff; padding:.5rem .6rem; }
 
-  /* 좌: 창문, 가운데: 캐릭터 */
   #window{ position:absolute; left:2vw; top: var(--content-top); z-index:5; width: min(var(--maxw-window), 90vw); }
   #win-img{ display:block; width:100%; height:auto; max-height: var(--maxh-window); border-radius:16px; border:2px solid var(--line); }
 
   #character{ 
     position:absolute; left:50%; 
-    /* 데스크톱: 중앙 정렬 */
-    transform:translateX(-50%); 
+    transform:translateX(-50%);
     top: calc(var(--content-top) + 20vh); z-index:6; 
     width: min(var(--maxw-char), 96vw); 
     cursor: pointer;
   }
   #char-img{ 
-    display:block; width:100%; height:auto; max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); 
+    display:block; width:100%; height:auto;
+    max-height: var(--maxh-char); border-radius:18px; border:2px solid var(--line); 
     background:transparent center/contain no-repeat; 
   }
 
-  /* 말풍선 스타일 */
   #fortune-bubble {
     position: absolute;
     top: calc(var(--content-top) + 20vh - 40px); 
@@ -156,57 +146,34 @@
     color: #FBFFF4;
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
   }
-  #fortune-bubble.show {
-    opacity: 1;
-    visibility: visible;
-  }
+  #fortune-bubble.show { opacity: 1; visibility: visible; }
   #fortune-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+    content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent;
     border-top: 10px solid rgba(255, 255, 255, 0.95);
   }
-  :root[data-theme="dark"] #fortune-bubble::after {
-    border-top: 10px solid rgba(30, 30, 30, 0.95);
-  }
+  :root[data-theme="dark"] #fortune-bubble::after { border-top: 10px solid rgba(30, 30, 30, 0.95); }
 
-
-  /* 하단: 음악패널 */
   #bottombar{
     position:fixed; left:12px; right:12px; bottom: 8px;
-    display:flex; gap:12px; justify-content:center; align-items:flex-end; z-index:12;
+    display:flex; gap:12px; justify-content:center; align-items:flex-end;
+    z-index:12;
   }
   #bottombar .card{ flex:1 1 0; min-width:260px; }
   #bottombar h4{ margin:0 0 .5rem 0; font-size: 1.125rem; font-weight:900 }
 
-  /* === 소품 레이어 (사용 안함) === */
-  #propsLayer{
-    position:absolute; inset:0; z-index:7;
-    pointer-events:none;
-    display: none;
-  }
-  .prop{
-    position:absolute; left:40px; top:40px; width:120px; z-index:80;
-    pointer-events:auto;
-  }
+  #propsLayer{ position:absolute; inset:0; z-index:7; pointer-events:none; display: none; }
+  .prop{ position:absolute; left:40px; top:40px; width:120px; z-index:80; pointer-events:auto; }
   .prop img{ width:100%; height:auto; display:block; }
   .draggable { cursor: move; }
   .dragging  { opacity:.92; }
   .resizer{
     position:absolute; right:-8px; bottom:-8px; width:16px; height:16px;
-    border-radius:4px; background:rgba(255,255,255,.75);
-    border:1px solid rgba(0,0,0,.3);
+    border-radius:4px; background:rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.3);
     display:none; z-index:3;
   }
   .edit-on .resizable .resizer{ display:block; }
 
-  /* 드로어/오버레이 */
   #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index: 10000; }
   #overlay.show{ opacity:1; pointer-events:auto; }
 
@@ -238,7 +205,6 @@
   .list-scroll::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.22); border-radius:999px; }
   :root[data-theme="light"] .list-scroll::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.22); }
 
-
   a#creditLink{ color:#9db7ff; text-decoration:none; border-bottom:1px dashed #9db7ff; }
   a#creditLink:hover{ opacity:.85; }
 
@@ -253,157 +219,65 @@
   .pill-input:focus{ box-shadow: inset 0 0 0 3px #7C9AFF; background: rgba(124,154,255,.15); }
   .drawer-sec .row .pill-input{ flex:1; min-width:0; }
 
-  /* 파일 선택 */
-  .input-file-hidden{
-    position:absolute; width:0.1px; height:0.1px;
-    opacity:0; overflow:hidden; z-index:-1;
-  }
+  .input-file-hidden{ position:absolute; width:0.1px; height:0.1px; opacity:0; overflow:hidden; z-index:-1; }
   .file-row{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
   .file-pill{ display:inline-flex; align-items:center; gap:.5rem; }
   .file-pill .icon{ font-size:1.1rem; line-height:1; }
-  #bgFileName, #propFileName{
-    max-width: 10rem;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    opacity:.8;
-  }
-  .bg-thumb{
-    width:42px; height:28px; border-radius:8px;
-    border:1px solid var(--line); background:#000 center/cover no-repeat;
-  }
+  #bgFileName, #propFileName{ max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity:.8; }
+  .bg-thumb{ width:42px; height:28px; border-radius:8px; border:1px solid var(--line); background:#000 center/cover no-repeat; }
 
-  /* 강제 가로 보기(세로에서) */
-  html.portrait-force, body.portrait-force{
-    height:100%;
-    overflow-x:auto;
-    overflow-y:auto;
-  }
-  .portrait-force #app{
-    width: 100vh;
-    height: 100vw;
-    transform: rotate(90deg) translateY(-100%);
-    transform-origin: top left;
-  }
+  html.portrait-force, body.portrait-force{ height:100%; overflow-x:auto; overflow-y:auto; }
+  .portrait-force #app{ width: 100vh; height: 100vw; transform: rotate(90deg) translateY(-100%); transform-origin: top left; }
 
-  /* 오른쪽 아래: 실시간 패널 */
-  #presencePanel{
-    position: fixed;
-    right: 0;
-    bottom: calc(8px + 112px);
-    width: 25vw;
-    max-width: 25vw;
-    z-index: 8000;
-  }
+  #presencePanel{ position: fixed; right: 0; bottom: calc(8px + 112px); width: 25vw; max-width: 25vw; z-index: 8000; }
   #presencePanel .dot{ display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:.4rem; background:#9cccff; }
   #presencePanel .dot.work{ background:#7CFF7C; }
   #presencePanel .dot.break{ background:#FFC66D; }
   #presenceList .person{ display:flex; justify-content:space-between; gap:.5rem; padding:.25rem 0; }
   #presenceList .nick{ font-weight:700; }
 
-  /* 하단 중앙 투명 배너 */
-  #adBanner{
-    position:fixed; left:50%; bottom:0; transform:translateX(-50%);
-    width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none;
-  }
+  #adBanner{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); width:min(90vw, 970px); height:90px; z-index:1; pointer-events:none; }
   #adBanner img{ width:100%; height:100%; opacity:0.2; display:block; } 
-  
-  .ad-inquiry {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
-    pointer-events: none;
-    font-weight: 500;
-  }
-  :root[data-theme="light"] .ad-inquiry {
-    color: rgba(0, 0, 0, 0.6);
-  }
+  .ad-inquiry { position: absolute; top: 5px; right: 5px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); pointer-events: none; font-weight: 500; }
+  :root[data-theme="light"] .ad-inquiry { color: rgba(0, 0, 0, 0.6); }
 
-  /* ========== 모바일 전용 오버라이드 ========== */
   @media (max-width: 720px){
-    #character{ 
-        transform: translateX(-50%); 
-        width: min(120vw, 96vw);
-    } 
-    #fortune-bubble {
-        top: calc(var(--content-top) + 20vh - 80px);
-    }
-
+    #character{ transform: translateX(-50%); width: min(120vw, 96vw); } 
+    #fortune-bubble { top: calc(var(--content-top) + 20vh - 80px); }
     :root{
-      --content-top: 12vh;
-      --maxh-board: 80vh;
-      --maxh-timer: 40vh;
-      --maxh-window: 40vh;
-      --maxh-char: 70vh; 
-
-      --maxw-board: 100%; /* 모바일에서 100%를 활용하도록 개선 */
-      --maxw-window: 30vw;
-      --maxw-timer: 100%; /* 모바일에서 100%를 활용하도록 개선 */
-      --maxw-char: 120vw;
+      --content-top: 12vh; --maxh-board: 80vh; --maxh-timer: 40vh; --maxh-window: 40vh; --maxh-char: 70vh;
+      --maxw-board: 100%; --maxw-window: 30vw; --maxw-timer: 100%; --maxw-char: 120vw;
     }
-
     #bottombar{ flex-direction:column; }
     #bottombar .card{ width:100%; }
-
-    #presencePanel{
-      right: 12px;
-      bottom: 120px;
-      width: min(var(--maxw-board), 92vw);
-      max-width: min(var(--maxw-board), 92vw);
-      max-height: 40vh; 
-      overflow:auto;
-      top: unset;
+    #presencePanel {
+      right: 12px; bottom: 120px; width: min(var(--maxw-board), 92vw); max-width: min(var(--maxw-board), 92vw); max-height: 40vh; overflow:auto; top: unset;
     }
-
-    /* 모바일용 상단바 그리드 레이아웃 오버라이드 (겹침/탈출 현상 해결) */
-    #topbar {
-      grid-template-columns: auto 1fr;
-      grid-template-rows: auto auto;
-      gap: 8px;
-    }
-    #hamburger {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    #timer {
-      grid-column: 2;
-      grid-row: 1;
-      width: 100%;
-      justify-self: stretch;
-    }
-    #board {
-      grid-column: 1 / span 2;
-      grid-row: 2;
-      width: 100%;
-      max-width: 100%;
-    }
+    #topbar { grid-template-columns: auto 1fr; grid-template-rows: auto auto; gap: 8px; }
+    #hamburger { grid-column: 1; grid-row: 1; }
+    #timer { grid-column: 2; grid-row: 1; width: 100%; justify-self: stretch; }
+    #board { grid-column: 1 / span 2; grid-row: 2; width: 100%; max-width: 100%; }
   }
 </style>
 </head>
 <body>
 <div id="app" class="">
-  <!-- 오른쪽 아래: 실시간 패널 -->
   <aside id="presencePanel" class="card panel" style="display:none">
     <div class="row" style="justify-content:space-between">
       <div class="title" data-lang-key="presence_title">실시간 보기</div>
       <div id="meNick" style="opacity:.8"></div>
     </div>
     <div id="presenceList"></div>
-  </aside> <!-- </</aside> 오타를 올바른 </aside> 태그로 전면 수정 -->
+  </aside>
 
-  <!-- 소품 레이어 (숨김) -->
   <div id="propsLayer"></div>
-
-  <!-- 포춘 쿠키 말풍선 -->
   <div id="fortune-bubble" aria-live="polite"></div>
-
-  <!-- 오버레이 + 드로어 -->
   <div id="overlay"></div>
+
   <aside id="drawer" aria-label="설정">
     <header class="drawer-head">
       <h3 id="drawerTitle">설정</h3>
       <div class="row">
-        <!-- 언어 선택 드롭다운 -->
         <select id="languageSelect" class="pill" style="padding:0.6rem 0.7rem; border-radius:12px; flex-shrink:0;">
           <option value="ko">한국어</option>
           <option value="en">English</option>
@@ -413,7 +287,6 @@
       </div>
     </header>
 
-    <!-- 1) 뽀모도로 / 타이머 -->
     <section class="drawer-sec">
       <h4 data-lang-key="timer_pomodoro_title">뽀모도로 / 타이머</h4>
       <div class="row" id="modeRow">
@@ -436,7 +309,6 @@
       </div>
     </section>
 
-    <!-- 2) 실시간 보기 -->
     <section class="drawer-sec">
       <h4 data-lang-key="presence_title">실시간 보기</h4>
       <div class="row">
@@ -450,18 +322,15 @@
       <div id="presenceInfo" style="opacity:.8; margin-top:.4rem">※ 목록엔 최대 5명 표시.</div>
     </section>
 
-    <!-- 3) 음악 -->
     <section class="drawer-sec">
       <h4 data-lang-key="music_style">음악 스타일</h4>
       <div id="moods" class="chips list-scroll"></div>
     </section>
-
     <section class="drawer-sec">
       <h4 data-lang-key="track_select">곡 선택</h4>
       <div id="tracks" class="chips list-scroll"></div>
     </section>
 
-    <!-- 화면 표시 / 레이아웃 / 배경 / 소품 / 크레딧 -->
     <section class="drawer-sec">
       <h4 data-lang-key="ui_visibility">창문/캐릭터 표시</h4>
       <div class="row">
@@ -482,8 +351,6 @@
     <section class="drawer-sec">
       <h4 data-lang-key="bg_select">배경 선택</h4>
       <div id="bgChips" class="chips"></div>
-
-      <!-- 파일로 배경 선택 -->
       <div class="file-row" style="margin-top:.5rem">
         <input id="customBgFile" type="file" accept="image/*" class="input-file-hidden">
         <label for="customBgFile" class="pill file-pill" title="배경 이미지 선택">
@@ -492,14 +359,12 @@
         <span id="bgFileName" data-lang-key="not_selected">선택 안 됨</span>
         <span id="bgPreview" class="bg-thumb" aria-hidden="true"></span>
       </div>
-
       <div class="row" style="margin-top:.5rem">
         <input id="customBgUrl" placeholder="배경 이미지 URL 붙여넣기" class="fill pill-input">
         <button id="applyBg" class="pill" data-lang-key="apply">적용</button>
       </div>
     </section>
 
-    <!-- 소품 관련 섹션 (숨김) -->
     <section class="drawer-sec" id="propsSection" style="display:none;">
       <h4 data-lang-key="props">소품</h4>
       <div class="file-row" style="margin-top:.5rem">
@@ -514,7 +379,6 @@
         <input id="propUrl" class="fill pill-input" placeholder="소품 이미지 URL">
         <button id="propAdd" class="pill" data-lang-key="add">추가</button>
       </div>
-
       <div class="chips" style="margin-top:.5rem">
         <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f331.svg">🌱</button>
         <button class="pill propPreset" data-url="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2615.svg">☕</button>
@@ -531,10 +395,8 @@
     </section>
   </aside>
 
-  <!-- 상단: 햄버거 / 타이머 / Todo -->
   <div id="topbar">
     <button id="hamburger" class="card panel" aria-label="메뉴 열기">⋯</button>
-
     <section id="timer" class="card panel resizable" aria-label="타이머">
       <div id="state" data-lang-key="focusing">집중중</div>
       <div id="time">25:00</div>
@@ -555,11 +417,9 @@
     </section>
   </div>
 
-  <!-- 메인: 창문 + 캐릭터 -->
   <div id="window" class="resizable"><img id="win-img" alt="창문" /></div>
   <div id="character" class="resizable" role="button" tabindex="0"><img id="char-img" alt="캐릭터" /></div>
 
-  <!-- 하단: 음악 -->
   <div id="bottombar">
     <section id="music-controls" class="card panel" aria-label="음악 재생">
       <h4 data-lang-key="music_player">음악 재생</h4>
@@ -572,10 +432,8 @@
     </section>
   </div>
 
-  <!-- 하단 중앙 투명 배너 -->
   <div id="adBanner" aria-hidden="true">
-    <img alt="ad-placeholder"
-      src="https://github.com/nihicheli/studywithme/blob/main/image/Group%209225.png?raw=true"/>
+    <img alt="ad-placeholder" src="https://github.com/nihicheli/studywithme/blob/main/image/Group%209225.png?raw=true"/>
     <span class="ad-inquiry"></span>
   </div>
 </div>
@@ -584,168 +442,40 @@
   /* ===== 언어 번역 데이터 (Translation Data) ===== */
   const TRANSLATIONS = {
     en: {
-      settings: "Settings",
-      close: "Close",
-      theme_toggle: "🌙",
-      today_study: "Today's Study: ",
-      todo_list: "Todo List",
-      add_todo_placeholder: "Add a task and Enter",
-      delete: "Delete", 
-      
-      // Timer/Pomodoro
-      timer_pomodoro_title: "Timer / Pomodoro",
-      pomodoro: "Pomodoro",
-      timer_up: "Timer (Count Up)",
-      focus_min: "Focus (min)",
-      rest_min: "Rest (min)",
-      cycles_count: "Cycles (N)",
-      apply: "Apply",
-      
-      // Timer State
-      focusing: "Focusing",
-      resting: "Resting",
-      timer_mode: "Timer Mode",
-      start: "Start",
-      pause: "Pause",
-      reset: "Reset",
-      
-      // Presence
-      presence_title: "Live Presence",
-      nickname_placeholder: "Nickname (e.g. do)",
-      public_on: "Public: ON",
-      public_off: "Public: OFF",
-      share_study_on: "Share Time: ON",
-      share_study_off: "Share Time: OFF",
-      presence_info: "※ Max 5 people shown in list.",
-      
-      // Music
-      music_player: "Music Player",
-      music_style: "Music Style",
-      track_select: "Track Select",
-      play: "Play",
-      pause_music: "Pause",
-      shuffle_on: "Shuffle: ON",
-      shuffle_off: "Shuffle: OFF",
-      repeat_off: "Repeat: OFF",
-      repeat_one: "Repeat: One",
-      repeat_all: "Repeat: All",
-      
-      // UI/Layout
-      ui_visibility: "Visibility",
-      window_show: "Window: Show",
-      window_hide: "Window: Hide",
-      character_show: "Character: Show",
-      character_hide: "Character: Hide",
-      screen_settings: "Screen Settings",
-      layout_edit_off: "Layout Edit: OFF",
-      layout_edit_on: "Layout Edit: ON",
-      reset_layout: "Reset Layout",
-      rotate_on: "Rotate: ON",
-      rotate_off: "Rotate: OFF",
-
-      // Background/Props
-      bg_select: "Background Select",
-      bg_file_select: "Select BG File",
-      not_selected: "Not Selected",
-      props: "Props",
-      prop_file_select: "Select Prop File",
-      add_file: "Add File",
-      add: "Add",
-      prop_info: "※ Props are editable immediately after adding (placed center min size)",
-      
-      // Credits
-      credits: "Credits",
-      
-      // Presence Status
-      status_work: "Focusing",
-      status_break: "Resting",
-      status_idle: "Idle",
-      timer_mode: "Timer Mode",
-      no_one_online: "No one online yet",
-      hour_short: "h",
-      min_short: "m"
+      settings: "Settings", close: "Close", theme_toggle: "🌙", today_study: "Today's Study: ",
+      todo_list: "Todo List", add_todo_placeholder: "Add a task and Enter", delete: "Delete", 
+      timer_pomodoro_title: "Timer / Pomodoro", pomodoro: "Pomodoro", timer_up: "Timer (Count Up)",
+      focus_min: "Focus (min)", rest_min: "Rest (min)", cycles_count: "Cycles (N)", apply: "Apply",
+      focusing: "Focusing", resting: "Resting", timer_mode: "Timer Mode", start: "Start", pause: "Pause", reset: "Reset",
+      presence_title: "Live Presence", nickname_placeholder: "Nickname (e.g. do)",
+      public_on: "Public: ON", public_off: "Public: OFF", share_study_on: "Share Time: ON", share_study_off: "Share Time: OFF",
+      presence_info: "※ Max 5 people shown in list.", music_player: "Music Player", music_style: "Music Style", track_select: "Track Select",
+      play: "Play", pause_music: "Pause", shuffle_on: "Shuffle: ON", shuffle_off: "Shuffle: OFF",
+      repeat_off: "Repeat: OFF", repeat_one: "Repeat: One", repeat_all: "Repeat: All",
+      ui_visibility: "Visibility", window_show: "Window: Show", window_hide: "Window: Hide", character_show: "Character: Show", character_hide: "Character: Hide",
+      screen_settings: "Screen Settings", layout_edit_off: "Layout Edit: OFF", layout_edit_on: "Layout Edit: ON", reset_layout: "Reset Layout", rotate_on: "Rotate: ON", rotate_off: "Rotate: OFF",
+      bg_select: "Background Select", bg_file_select: "Select BG File", not_selected: "Not Selected",
+      props: "Props", prop_file_select: "Select Prop File", add_file: "Add File", add: "Add",
+      prop_info: "※ Props are editable immediately after adding (placed center min size)", credits: "Credits",
+      status_work: "Focusing", status_break: "Resting", status_idle: "Idle", timer_mode: "Timer Mode", no_one_online: "No one online yet", hour_short: "h", min_short: "m"
     },
     ko: {
-      settings: "설정",
-      close: "닫기",
-      theme_toggle: "🌙",
-      today_study: "오늘 누적 공부: ",
-      todo_list: "Todo list",
-      add_todo_placeholder: "할 일을 적고 Enter",
-      delete: "삭제", 
-      
-      // Timer/Pomodoro
-      timer_pomodoro_title: "뽀모도로 / 타이머",
-      pomodoro: "뽀모도로",
-      timer_up: "타이머(카운트업)",
-      focus_min: "집중(분)",
-      rest_min: "휴식(분)",
-      cycles_count: "사이클 수(N회)",
-      apply: "적용",
-      
-      // Timer State
-      focusing: "집중중",
-      resting: "휴식중",
-      timer_mode: "타이머",
-      start: "시작",
-      pause: "일시정지",
-      reset: "리셋",
-      
-      // Presence
-      presence_title: "실시간 보기",
-      nickname_placeholder: "닉네임(예: do)",
-      public_on: "공개: 켜짐",
-      public_off: "공개: 꺼짐",
-      share_study_on: "내 공부시간 공개: 켜짐",
-      share_study_off: "내 공부시간 공개: 꺼짐",
-      presence_info: "※ 목록엔 최대 5명 표시.",
-      
-      // Music
-      music_player: "음악 재생",
-      music_style: "음악 스타일",
-      track_select: "곡 선택",
-      play: "재생",
-      pause_music: "일시정지",
-      shuffle_on: "랜덤: 켜짐",
-      shuffle_off: "랜덤: 꺼짐",
-      repeat_off: "반복: 꺼짐",
-      repeat_one: "반복: 한곡",
-      repeat_all: "반복: 전체",
-      
-      // UI/Layout
-      ui_visibility: "창문/캐릭터 표시",
-      window_show: "창문: 보임",
-      window_hide: "창문: 숨김",
-      character_show: "캐릭터: 보임",
-      character_hide: "캐릭터: 숨김",
-      screen_settings: "화면 설정",
-      layout_edit_off: "배치 편집: 꺼짐",
-      layout_edit_on: "배치 편집: 켜짐",
-      reset_layout: "원상복구",
-      rotate_on: "회전: 켜짐",
-      rotate_off: "회전: 꺼짐",
-
-      // Background/Props
-      bg_select: "배경 선택",
-      bg_file_select: "배경 파일 선택",
-      not_selected: "선택 안 됨",
-      props: "소품",
-      prop_file_select: "소품 파일 선택",
-      add_file: "파일 추가",
-      add: "추가",
-      prop_info: "※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)",
-      
-      // Credits
-      credits: "Credits",
-      
-      // Presence Status
-      status_work: "집중중",
-      status_break: "휴식중",
-      status_idle: "대기중",
-      timer_mode: "타이머",
-      no_one_online: "아직 아무도 없어요",
-      hour_short: "시간",
-      min_short: "분"
+      settings: "설정", close: "닫기", theme_toggle: "🌙", today_study: "오늘 누적 공부: ",
+      todo_list: "Todo list", add_todo_placeholder: "할 일을 적고 Enter", delete: "삭제", 
+      timer_pomodoro_title: "뽀모도로 / 타이머", pomodoro: "뽀모도로", timer_up: "타이머(카운트업)",
+      focus_min: "집중(분)", rest_min: "휴식(분)", cycles_count: "사이클 수(N회)", apply: "적용",
+      focusing: "집중중", resting: "휴식중", timer_mode: "타이머", start: "시작", pause: "일시정지", reset: "리셋",
+      presence_title: "실시간 보기", nickname_placeholder: "닉네임(예: do)",
+      public_on: "공개: 켜짐", public_off: "공개: 꺼짐", share_study_on: "내 공부시간 공개: 켜짐", share_study_off: "내 공부시간 공개: 꺼짐",
+      presence_info: "※ 목록엔 최대 5명 표시.", music_player: "음악 재생", music_style: "음악 스타일", track_select: "곡 선택",
+      play: "재생", pause_music: "일시정지", shuffle_on: "랜덤: 켜짐", shuffle_off: "랜덤: 꺼짐",
+      repeat_off: "반복: 꺼짐", repeat_one: "반복: 한곡", repeat_all: "반복: 전체",
+      ui_visibility: "창문/캐릭터 표시", window_show: "창문: 보임", window_hide: "창문: 숨김", character_show: "캐릭터: 보임", character_hide: "캐릭터: 숨김",
+      screen_settings: "화면 설정", layout_edit_off: "배치 편집: 꺼짐", layout_edit_on: "배치 편집: 켜짐", reset_layout: "원상복구", rotate_on: "회전: 켜짐", rotate_off: "회전: 꺼짐",
+      bg_select: "배경 선택", bg_file_select: "배경 파일 선택", not_selected: "선택 안 됨",
+      props: "소품", prop_file_select: "소품 파일 선택", add_file: "파일 추가", add: "추가",
+      prop_info: "※ 소품은 추가 즉시 편집 가능(중앙 최소크기 배치)", credits: "Credits",
+      status_work: "집중중", status_break: "휴식중", status_idle: "대기중", timer_mode: "타이머", no_one_online: "아직 아무도 없어요", hour_short: "시간", min_short: "분"
     }
   };
   window.TRANSLATIONS = TRANSLATIONS;
@@ -757,7 +487,6 @@
   
   function updateTextByLanguage() {
       document.documentElement.lang = state.lang;
-      
       document.querySelectorAll('[data-lang-key]').forEach(el => {
           const key = el.getAttribute('data-lang-key');
           const translation = getTranslation(key);
@@ -771,7 +500,6 @@
               }
           }
       });
-      
       document.getElementById('drawerTitle').textContent = getTranslation('settings');
       document.getElementById('todoTitle').textContent = getTranslation('todo_list');
       
@@ -788,13 +516,13 @@
 
   /* ===== 트랙 데이터 (Track Data) ===== */
   const TRACKS = [
-    { title: "Rain 1", mood: "Rain",   url: "mp3/1.mp3" },
-    { title: "Rain 2", mood: "Rain",   url: "mp3/2.mp3" },
-    { title: "Rain 3", mood: "Rain",   url: "mp3/3.mp3" },
-    { title: "Rain 4", mood: "Rain",   url: "mp3/4.mp3" },
-    { title: "Rain 5", mood: "Rain",   url: "mp3/5.mp3" },
-    { title: "Rain 6", mood: "Rain",   url: "mp3/6.mp3" },
-    { title: "Rain 7", mood: "Rain",   url: "mp3/7.mp3" }
+    { title: "Rain 1", mood: "Rain", url: "mp3/1.mp3" },
+    { title: "Rain 2", mood: "Rain", url: "mp3/2.mp3" },
+    { title: "Rain 3", mood: "Rain", url: "mp3/3.mp3" },
+    { title: "Rain 4", mood: "Rain", url: "mp3/4.mp3" },
+    { title: "Rain 5", mood: "Rain", url: "mp3/5.mp3" },
+    { title: "Rain 6", mood: "Rain", url: "mp3/6.mp3" },
+    { title: "Rain 7", mood: "Rain", url: "mp3/7.mp3" }
   ];
 
   /* 창문/캐릭터 이미지 */
@@ -810,28 +538,17 @@
   let showA = true, blinkTimer = null;
   let fortuneBubbleTimeout = null;
 
-  // 따뜻한 메시지 목록
   const FORTUNE_MESSAGES = [
-    "오늘의 노력은 내일의 빛이 될 거예요!",
-    "잠시 쉬어가도 괜찮아요, 당신은 이미 충분히 잘하고 있어요.",
-    "포기하지 않는 마음이 가장 소중한 자산입니다.",
-    "지금 이 순간에도 당신은 성장하고 있어요.",
-    "작은 성취라도 괜찮아요. 스스로를 칭찬해 주세요!",
-    "따뜻한 차 한 잔과 함께 에너지를 채워보세요.",
-    "당신의 꿈은 반짝이고 있어요. 조금만 더 힘내요!",
-    "가끔은 먼 곳을 바라보는 것도 필요해요.",
-    "최고의 공부는 즐기는 공부입니다. 오늘도 화이팅!",
-    "천천히 꾸준히 하는 것이 중요해요. 오늘도 화이팅!",
-    "숨을 크게 쉬고, 다시 집중해 봐요!",
-    "당신은 이 모든 것을 해낼 능력이 있어요.",
-    "당신의 오늘은 누군가에게 큰 힘이 되고 있어요.",
-    "작은 웃음 하나가 하루를 더 빛나게 해줄 거예요.",
-    "마음이 지칠 땐 하늘을 올려다보세요. 위로가 될 거예요.",
-    "당신이 걸어온 길은 분명 의미 있는 발자취예요.",
-    "누구보다 소중한 건 바로 당신 자신이에요.",
-    "조금 늦더라도 괜찮아요. 중요한 건 멈추지 않는 거예요.",
-    "어제보다 나은 오늘을 만들고 있는 당신을 응원합니다.",
-    "당신의 따뜻한 마음은 언제나 빛나고 있어요."
+    "오늘의 노력은 내일의 빛이 될 거예요!", "잠시 쉬어가도 괜찮아요, 당신은 이미 충분히 잘하고 있어요.",
+    "포기하지 않는 마음이 가장 소중한 자산입니다.", "지금 이 순간에도 당신은 성장하고 있어요.",
+    "작은 성취라도 괜찮아요. 스스로를 칭찬해 주세요!", "따뜻한 차 한 잔과 함께 에너지를 채워보세요.",
+    "당신의 꿈은 반짝이고 있어요. 조금만 더 힘내요!", "가끔은 먼 곳을 바라보는 것도 필요해요.",
+    "최고의 공부는 즐기는 공부입니다. 오늘도 화이팅!", "천천히 꾸준히 하는 것이 중요해요. 오늘도 화이팅!",
+    "숨을 크게 쉬고, 다시 집중해 봐요!", "당신은 이 모든 것을 해낼 능력이 있어요.",
+    "당신의 오늘은 누군가에게 큰 힘이 되고 있어요.", "작은 웃음 하나가 하루를 더 빛나게 해줄 거예요.",
+    "마음이 지칠 땐 하늘을 올려다보세요. 위로가 될 거예요.", "당신이 걸어온 길은 분명 의미 있는 발자취예요.",
+    "누구보다 소중한 건 바로 당신 자신이에요.", "조금 늦더라도 괜찮아요. 중요한 건 멈추지 않는 거예요.",
+    "어제보다 나은 오늘을 만들고 있는 당신을 응원합니다.", "당신의 따뜻한 마음은 언제나 빛나고 있어요."
   ];
 
   /* ===== 전역 상태 ===== */
@@ -866,7 +583,6 @@
 
       const resetTime = new Date(now);
       resetTime.setHours(4, 0, 0, 0);
-
       const shouldReset = (last.getTime() < resetTime.getTime() && now.getTime() >= resetTime.getTime());
 
       if(shouldReset || (isNewDay && now.getHours() >= 4)){
@@ -880,7 +596,7 @@
           localStorage.setItem("lastStudyTime", state.lastStudyTime.toString());
       }
   })();
-  
+
   function calculateAccurateRemaining() {
     if (!state.running || state.startTimeStamp === 0) return state.remainSec;
     const now = Date.now();
@@ -888,29 +604,33 @@
     
     if (state.mode === 'pomodoro') {
         const originalTotalTime = (state.isWork ? state.workSec : state.restSec);
-        return originalTotalTime - elapsedRealSeconds;
+        return Math.max(0, originalTotalTime - elapsedRealSeconds);
     } else {
-        return elapsedRealSeconds;
+        return state.remainSec + elapsedRealSeconds; 
     }
   }
 
   /* 새로고침시 타이머 유지 */
   window.addEventListener('beforeunload', ()=>{
     try{
+      if (state.running) {
+        const now = Date.now();
+        const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
+        if (deltaSeconds > 0) {
+          if (state.mode === 'timer') {
+            state.remainSec += deltaSeconds;
+            state.studyTimeTotal += deltaSeconds;
+          } else if (state.isWork) {
+            state.studyTimeTotal += deltaSeconds;
+          }
+        }
+      }
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
-        workSec: state.workSec, restSec: state.restSec, 
-        remainSec: calculateAccurateRemaining(),
+        workSec: state.workSec, restSec: state.restSec, remainSec: state.remainSec,
         totalCycles: state.totalCycles, completedCycles: state.completedCycles
       };
       sessionStorage.setItem('timer-keep', JSON.stringify(snap));
-      
-      if (state.running && (state.mode === 'timer' || state.isWork)) {
-        const now = Date.now();
-        const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
-        if(deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
-      }
-      
       localStorage.setItem("studyTimeTotal", state.studyTimeTotal.toString());
       localStorage.setItem("lastStudyTime", Date.now().toString());
     }catch(e){}
@@ -951,7 +671,6 @@
   const player    = document.getElementById("player");
   const fortuneBubble = document.getElementById("fortune-bubble");
   const characterBox = document.getElementById("character");
-
   const overlay   = document.getElementById("overlay");
   const drawer    = document.getElementById("drawer");
   const hamburgerBtn = document.getElementById("hamburger");
@@ -959,31 +678,25 @@
   const themeToggle  = document.getElementById("themeToggle");
   const moodsWrap    = document.getElementById("moods");
   const tracksWrap   = document.getElementById("tracks");
-
   const workMin      = document.getElementById("workMin");
   const restMin      = document.getElementById("restMin");
   const totalCyclesInput = document.getElementById("totalCycles");
   const applyPom     = document.getElementById("applyPom");
-
   const modeRadios   = document.querySelectorAll('input[name="mode"]');
   const pomodoroFields = document.getElementById("pomodoroFields");
   const cyclesWrap   = document.getElementById("cyclesWrap");
-
   const bgChips      = document.getElementById("bgChips");
   const customBgUrl  = document.getElementById("customBgUrl");
   const applyBg      = document.getElementById("applyBg");
   const customBgFile = document.getElementById("customBgFile");
   const bgFileName   = document.getElementById("bgFileName");
   const bgPreview    = document.getElementById("bgPreview");
-
   const toggleWindowBtn    = document.getElementById("toggleWindow");
   const toggleCharacterBtn = document.getElementById("toggleCharacter");
   const windowBox          = document.getElementById("window");
-  
   const layoutEditBtn  = document.getElementById("layoutEdit");
   const layoutResetBtn = document.getElementById("layoutReset");
   const rotateToggle   = document.getElementById("rotateToggle");
-
   const propsLayer   = document.getElementById("propsLayer");
   const propUrl      = document.getElementById("propUrl");
   const propAdd      = document.getElementById("propAdd");
@@ -994,7 +707,6 @@
   const propPresets  = document.querySelectorAll(".propPreset");
   const propsSection = document.getElementById("propsSection");
   const layoutSettings = document.getElementById("layoutSettings");
-
   const presencePanel = document.getElementById("presencePanel");
   const meNickEl      = document.getElementById("meNick");
   const presenceList  = document.getElementById("presenceList");
@@ -1005,53 +717,34 @@
   const shareStudyBtn = document.getElementById("shareStudyBtn");
 
   function openDrawerNow(){
-    drawer.classList.add("open");
-    overlay.classList.add("show");
-    overlay.style.pointerEvents = "auto";
+    drawer.classList.add("open"); overlay.classList.add("show"); overlay.style.pointerEvents = "auto";
   }
   function closeDrawerNow(){
-    drawer.classList.remove("open");
-    overlay.classList.remove("show");
-    overlay.style.pointerEvents = "none";
+    drawer.classList.remove("open"); overlay.classList.remove("show"); overlay.style.pointerEvents = "none";
   }
-
   function applyTheme(t){
     document.documentElement.setAttribute("data-theme", t);
     themeToggle.textContent = (t==="dark" ? "🌙" : "☀️");
     localStorage.setItem("theme", t);
   }
-
-  function getStudyTimeToday(){
-    return fmt(state.studyTimeTotal);
-  }
+  function getStudyTimeToday(){ return fmt(state.studyTimeTotal); }
 
   function showFortuneMessage(){
     clearTimeout(fortuneBubbleTimeout);
-    
     const message = FORTUNE_MESSAGES[Math.floor(Math.random() * FORTUNE_MESSAGES.length)];
-    
     fortuneBubble.textContent = message;
     fortuneBubble.classList.remove('show');
-    setTimeout(() => {
-        fortuneBubble.classList.add('show');
-    }, 50);
-
-    fortuneBubbleTimeout = setTimeout(() => {
-        fortuneBubble.classList.remove('show');
-    }, 3000);
+    setTimeout(() => { fortuneBubble.classList.add('show'); }, 50);
+    fortuneBubbleTimeout = setTimeout(() => { fortuneBubble.classList.remove('show'); }, 3000);
   }
 
   function updateCharacterAndWindowImages() {
     let charA, charB, winA, winB;
-
     if (state.running && state.isWork) {
-        charA = charWorkA; charB = charWorkB;
-        winA  = winWorkA;  winB  = winWorkB;
+        charA = charWorkA; charB = charWorkB; winA  = winWorkA;  winB  = winWorkB;
     } else {
-        charA = charBreakA; charB = charBreakB;
-        winA  = winBreakA;  winB  = winBreakB;
+        charA = charBreakA; charB = charBreakB; winA  = winBreakA;  winB  = winBreakB;
     }
-
     showA = !showA;
     charImg.src = showA ? charA : charB;
     winImg.src  = showA ? winA  : winB;
@@ -1059,14 +752,12 @@
 
   function init(){
     applyTheme(state.theme);
-    
     languageSelect.value = state.lang;
     languageSelect.addEventListener('change', (e) => {
         state.lang = e.target.value;
         localStorage.setItem('lang', state.lang);
         updateTextByLanguage();
     });
-
     hamburgerBtn.addEventListener("click", openDrawerNow);
     closeDrawer  .addEventListener("click", closeDrawerNow);
     overlay      .addEventListener("click", closeDrawerNow);
@@ -1110,18 +801,14 @@
     function setBackground(url){ document.documentElement.style.setProperty("--bg-url", `url("${url}")`); }
 
     customBgFile?.addEventListener("change", ()=>{
-      const file = customBgFile.files && customBgFile.files[0]; 
-      if(!file) return;
+      const file = customBgFile.files && customBgFile.files[0]; if(!file) return;
       bgFileName.textContent = file.name;
       const reader = new FileReader();
       reader.onload = (e)=>{
-        const dataUrl = e.target.result;
-        bgPreview.style.backgroundImage = `url("${dataUrl}")`;
-        setBackground(dataUrl);
+        const dataUrl = e.target.result; bgPreview.style.backgroundImage = `url("${dataUrl}")`; setBackground(dataUrl);
       };
       reader.readAsDataURL(file);
     });
-
     updateCharacterAndWindowImages();
     if (blinkTimer) clearInterval(blinkTimer);
     blinkTimer = setInterval(updateCharacterAndWindowImages, 500);
@@ -1129,17 +816,14 @@
     renderTodos();
     todoAdd.addEventListener("click", addTodo);
     todoInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
-
     initMoodsAndTracks();
-
     player.addEventListener("ended", onEnded);
     player.addEventListener("error", (e)=>{
       console.warn("오디오 재생 오류 발생, 다음 트랙 이동 시도:", e);
       const list = filteredTrackIdxs();
       if(list.length){
         const curPos = list.indexOf(state.trackIdx);
-        const n = list[(curPos+1) % list.length];
-        selectTrack(n,true);
+        const n = list[(curPos+1) % list.length]; selectTrack(n,true);
       }
     });
     repeatBtn.addEventListener("click", toggleRepeat);
@@ -1158,8 +842,7 @@
     });
     cyclesBtn.addEventListener("click", ()=>{ state.completedCycles=0; updateCyclesBtn(); });
 
-    updateWindowToggleUI();
-    updateCharacterToggleUI();
+    updateWindowToggleUI(); updateCharacterToggleUI();
     toggleWindowBtn.addEventListener("click", ()=>{
       state.windowVisible = !state.windowVisible;
       windowBox.style.display = state.windowVisible ? "" : "none";
@@ -1172,15 +855,13 @@
       localStorage.setItem("ui-character-visible", state.characterVisible ? "1" : "0");
       updateCharacterToggleUI();
     });
-
     characterBox.addEventListener('click', showFortuneMessage);
     characterBox.addEventListener('touchstart', showFortuneMessage);
 
     setupLayoutDrag();
 
     function setRotate(on){
-      state.rotateOn = !!on;
-      localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
+      state.rotateOn = !!on; localStorage.setItem('rotateOn', state.rotateOn ? "1" : "0");
       rotateToggle.textContent = getTranslation(state.rotateOn ? 'rotate_on' : 'rotate_off');
       applyRotateState();
     }
@@ -1197,49 +878,29 @@
     rotateToggle.addEventListener('click', ()=> setRotate(!state.rotateOn));
     window.addEventListener('resize', applyRotateState);
     window.addEventListener('orientationchange', ()=> setTimeout(applyRotateState, 50));
-    
     const savedRotate = localStorage.getItem('rotateOn');
-    if (savedRotate === null) {
-      setRotate(isSmartphone());
-    } else {
-      setRotate(savedRotate === '1');
-    }
+    if (savedRotate === null) { setRotate(isSmartphone()); } else { setRotate(savedRotate === '1'); }
 
-    /* 소품 설정 (숨겨짐) */
     document.querySelectorAll('.propPreset').forEach(btn=>
-      btn.addEventListener('click', ()=>{
-        addProp(btn.dataset.url, true, {autoEdit:true});
-        closeDrawerNow();
-      })
+      btn.addEventListener('click', ()=>{ addProp(btn.dataset.url, true, {autoEdit:true}); closeDrawerNow(); })
     );
-
     propFile.addEventListener('change', ()=>{
       const f = propFile.files && propFile.files[0];
       propFileName.textContent = f ? f.name : getTranslation('not_selected');
       if(f){
-        const url = URL.createObjectURL(f);
-        addProp(url, true, {autoEdit:true});
-        closeDrawerNow();
+        const url = URL.createObjectURL(f); addProp(url, true, {autoEdit:true}); closeDrawerNow();
         setTimeout(()=>{ propFile.value=""; propFileName.textContent=getTranslation('not_selected'); }, 0);
       }
     });
-
     propFileAdd.addEventListener('click', ()=>{
-      const f = propFile.files && propFile.files[0];
-      if(!f) return;
-      const url = URL.createObjectURL(f);
-      addProp(url, true, {autoEdit:true});
-      propFile.value = ""; propFileName.textContent = getTranslation('not_selected');
-      closeDrawerNow();
+      const f = propFile.files && propFile.files[0]; if(!f) return;
+      const url = URL.createObjectURL(f); addProp(url, true, {autoEdit:true});
+      propFile.value = ""; propFileName.textContent = getTranslation('not_selected'); closeDrawerNow();
     });
-
     propAdd.addEventListener('click', ()=>{
       const u=(propUrl.value||"").trim(); if(!u) return;
-      addProp(u, true, {autoEdit:true});
-      propUrl.value="";
-      closeDrawerNow();
+      addProp(u, true, {autoEdit:true}); propUrl.value=""; closeDrawerNow();
     });
-
     renderProps();
 
     function refreshShareStudyUI(){
@@ -1247,14 +908,12 @@
       shareStudyBtn.textContent = getTranslation(state.shareStudy ? 'share_study_on' : 'share_study_off');
     }
     shareStudyBtn?.addEventListener("click", async ()=>{
-      state.shareStudy = !state.shareStudy;
-      localStorage.setItem('shareStudy', state.shareStudy ? "1" : "0");
+      state.shareStudy = !state.shareStudy; localStorage.setItem('shareStudy', state.shareStudy ? "1" : "0");
       refreshShareStudyUI();
       await window.__presence_updateProfileShareStudy?.(state.shareStudy);
       window.__presence_broadcastNow?.();
     });
     refreshShareStudyUI();
-
 
     updateTextByLanguage();
     updateTimerUI();
@@ -1269,11 +928,8 @@
   }
 
   function renderTodos(){
-    boardList.innerHTML = "";
-    if(state.todos.length === 0) return;
-    
+    boardList.innerHTML = ""; if(state.todos.length === 0) return;
     const fragment = document.createDocumentFragment();
-
     state.todos.forEach((t,idx)=>{
       const row=document.createElement("div"); row.className="todo";
       const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!t.done;
@@ -1282,10 +938,8 @@
       tx.style.textDecoration=t.done?"line-through":"none"; tx.style.opacity=t.done?".6":"1";
       const del=document.createElement("button"); del.className="del"; del.textContent=getTranslation('delete'); 
       del.addEventListener("click",()=>{ state.todos.splice(idx,1); persistTodos(); renderTodos(); });
-      row.append(cb,tx,del); 
-      fragment.appendChild(row);
+      row.append(cb,tx,del); fragment.appendChild(row);
     });
-    
     boardList.appendChild(fragment);
   }
   function persistTodos(){ localStorage.setItem("todos-v1", JSON.stringify(state.todos)); }
@@ -1297,84 +951,60 @@
     return TRACKS.map((t,i)=> t.mood===state.mood ? i : -1).filter(i=>i>=0);
   }
   function initMoodsAndTracks(){
-    moodsWrap.innerHTML = "";
-    const moodFragment = document.createDocumentFragment();
+    moodsWrap.innerHTML = ""; const moodFragment = document.createDocumentFragment();
     MOODS().forEach(m=>{
-      const b=document.createElement("button");
-      b.className="pill"; b.textContent=m; b.dataset.mood=m;
+      const b=document.createElement("button"); b.className="pill"; b.textContent=m; b.dataset.mood=m;
       b.addEventListener("click", ()=>{ state.mood=m; highlightMood(); renderTracks(); });
       moodFragment.appendChild(b);
     });
-    moodsWrap.appendChild(moodFragment);
-    highlightMood();
-    renderTracks(true);
+    moodsWrap.appendChild(moodFragment); highlightMood(); renderTracks(true);
   }
   function renderTracks(initial=false){
-    tracksWrap.innerHTML = "";
-    const idxs = filteredTrackIdxs();
-    
-    const fragment = document.createDocumentFragment();
+    tracksWrap.innerHTML = ""; const idxs = filteredTrackIdxs(); const fragment = document.createDocumentFragment();
     idxs.forEach(idx=>{
-      const t = TRACKS[idx];
-      const b=document.createElement("button");
-      b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
-      b.addEventListener("click", ()=> selectTrack(idx, state.playing));
-      fragment.appendChild(b);
+      const t = TRACKS[idx]; const b=document.createElement("button"); b.className="pill"; b.textContent=t.title; b.dataset.idx=idx;
+      b.addEventListener("click", ()=> selectTrack(idx, state.playing)); fragment.appendChild(b);
     });
     tracksWrap.appendChild(fragment);
-
-    if(!idxs.includes(state.trackIdx) && idxs.length){
-      selectTrack(idxs[0], false);
-    }
+    if(!idxs.includes(state.trackIdx) && idxs.length){ selectTrack(idxs[0], false); }
     highlightTrack();
     if(initial){ selectTrack(idxs[0] ?? 0, false); }
   }
   
   function selectTrack(idx, autoplay=false){ 
-    state.trackIdx=idx; 
-    player.src=TRACKS[idx].url; 
-    player.load(); 
-    highlightTrack(); 
-    if(autoplay) tryPlay(); 
+    state.trackIdx=idx; player.src=TRACKS[idx].url; player.load(); highlightTrack(); if(autoplay) tryPlay(); 
   }
   function tryPlay(){ player.play().then(()=>{ state.playing=true; playPause.textContent=getTranslation('pause_music'); }).catch(()=>{}); }
   function highlightMood(){ [...moodsWrap.children].forEach(b=>{ b.style.boxShadow = (b.dataset.mood===state.mood) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
   function highlightTrack(){ [...tracksWrap.children].forEach(b=>{ b.style.boxShadow = (+b.dataset.idx===state.trackIdx) ? "inset 0 0 0 1px #7C9AFF" : "none"; }); }
+  
   document.getElementById("playPause").addEventListener("click", ()=>{
     if(!player.src) selectTrack(state.trackIdx,false);
     if(!state.playing){ tryPlay(); } else { player.pause(); state.playing=false; playPause.textContent=getTranslation('play'); }
   });
   document.getElementById("shuffle").addEventListener("click", ()=>{ state.shuffle=!state.shuffle; shuffleBtn.textContent=getTranslation(state.shuffle?'shuffle_on':'shuffle_off'); });
+  
   function toggleRepeat(){ 
-      const order=["off","one","all"]; 
-      const i=order.indexOf(state.repeatMode); 
-      state.repeatMode=order[(i+1)%order.length]; 
-      updateRepeatUI(); 
+      const order=["off","one","all"]; const i=order.indexOf(state.repeatMode); state.repeatMode=order[(i+1)%order.length]; updateRepeatUI();
   }
   function getRepeatKey(mode) {
       if (mode === 'one') return 'repeat_one';
       if (mode === 'all') return 'repeat_all';
       return 'repeat_off';
   }
-  function updateRepeatUI(){ 
-      repeatBtn.textContent=getTranslation(getRepeatKey(state.repeatMode)); 
-      player.loop=(state.repeatMode==="one"); 
-  }
+  function updateRepeatUI(){ repeatBtn.textContent=getTranslation(getRepeatKey(state.repeatMode)); player.loop=(state.repeatMode==="one"); }
   updateRepeatUI();
+
   function onEnded(){
     if(state.repeatMode==="one") return;
     const list = filteredTrackIdxs();
     if(state.shuffle){
       let n = state.trackIdx;
-      if(list.length>1){
-        while(n===state.trackIdx) n = list[Math.floor(Math.random()*list.length)];
-      }
+      if(list.length>1){ while(n===state.trackIdx) n = list[Math.floor(Math.random()*list.length)]; }
       selectTrack(n,true); return;
     }
     if(state.repeatMode==="all" && list.length){
-      const cur = list.indexOf(state.trackIdx);
-      const n = list[(cur+1)%list.length];
-      selectTrack(n,true); return;
+      const cur = list.indexOf(state.trackIdx); const n = list[(cur+1)%list.length]; selectTrack(n,true); return;
     }
     state.playing=false; playPause.textContent=getTranslation('play');
   }
@@ -1385,152 +1015,114 @@
     const mm=m.toString().padStart(2,'0'); const s2=ss.toString().padStart(2,'0');
     return h>0?`${h}:${mm}:${s2}`:`${mm}:${s2}`;
   }
+
   function updateTimerUI(){
-    state.remainSec = calculateAccurateRemaining(); 
     timeEl.textContent=fmt(state.remainSec);
-    
     let statusKey = 'timer_mode';
-    if(state.mode === 'pomodoro') {
-        statusKey = state.isWork ? 'focusing' : 'resting';
-    }
+    if(state.mode === 'pomodoro') { statusKey = state.isWork ? 'focusing' : 'resting'; }
     stateEl.textContent=getTranslation(statusKey);
-    
     startPause.textContent=getTranslation(state.running?'pause':'start');
-    
     window.__presence_broadcastNow?.();
   }
-  function beep(){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-    o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);}catch{} }
+
+  function beep(){ 
+    try{ 
+      const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); 
+      o.connect(g); g.connect(ctx.destination); o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.0001,ctx.currentTime); 
+      g.gain.exponentialRampToValueAtTime(.3,ctx.currentTime+.01); o.start(); g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.25); o.stop(ctx.currentTime+.3);
+    }catch{} 
+  }
   
   function timerTick() {
-    if (!state.running) {
-      return;
-    }
+    if (!state.running) return;
 
     const now = Date.now();
-    const elapsedRealSeconds = Math.floor((now - state.startTimeStamp) / 1000);
-    let shouldAccumulate = false;
-    let nextRemainSec = 0;
+    const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
 
-    if (state.mode === 'pomodoro') {
-      const originalTotalTime = (state.isWork ? state.workSec : state.restSec);
-      nextRemainSec = originalTotalTime - elapsedRealSeconds;
+    if (deltaSeconds >= 1) {
+      state.lastUpdateTimestamp = now;
       
-      if (nextRemainSec <= 0) {
-        beep();
-        const wasWork = state.isWork;
-        state.isWork = !state.isWork;
+      if (state.mode === 'pomodoro') {
+        state.remainSec -= deltaSeconds;
+        if (state.isWork) state.studyTimeTotal += deltaSeconds;
 
-        state.startTimeStamp = now + nextRemainSec * 1000; 
-        
-        state.remainSec = state.isWork ? state.workSec : state.restSec;
-        
-        if (state.isWork && !wasWork){
-          state.completedCycles = Math.min(state.totalCycles, state.completedCycles + 1);
-          updateCyclesBtn();
-          if (state.completedCycles >= state.totalCycles) { stopTimer(); return; }
+        if (state.remainSec <= 0) {
+          beep();
+          const wasWork = state.isWork;
+          state.isWork = !state.isWork;
+          state.remainSec = state.isWork ? state.workSec : state.restSec;
+          
+          if (state.isWork && !wasWork){
+            state.completedCycles = Math.min(state.totalCycles, state.completedCycles + 1);
+            updateCyclesBtn();
+            if (state.completedCycles >= state.totalCycles) { stopTimer(); return; }
+          }
         }
-        shouldAccumulate = true;
       } else {
-        state.remainSec = nextRemainSec;
-        if(state.isWork) shouldAccumulate = true;
+        /* 타이머 카운트업 모드 */
+        state.remainSec += deltaSeconds;
+        state.studyTimeTotal += deltaSeconds;
       }
-    } else {
-      state.remainSec = elapsedRealSeconds;
-      shouldAccumulate = true;
+      updateTimerUI();
+      document.title = `${fmt(state.remainSec)} • Studywithme`;
     }
 
-    if(shouldAccumulate && state.lastUpdateTimestamp > 0) {
-        const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
-        if (deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
-    }
-    state.lastUpdateTimestamp = now;
-
-    updateTimerUI();
-    document.title = `${fmt(state.remainSec)} • Studywithme`;
-
-    const timeSinceLastSecond = (now - state.startTimeStamp) % 1000;
-    const nextTick = 1000 - timeSinceLastSecond;
-    
     if(state.interval) clearTimeout(state.interval);
-    state.interval = setTimeout(timerTick, nextTick);
+    state.interval = setTimeout(timerTick, 200);
   }
 
   function startTimer(){
     if(state.running) return;
-    
-    const totalTimeInSeconds = (state.mode === 'pomodoro' && state.isWork) 
-                                ? state.workSec : state.remainSec;
-    
-    state.startTimeStamp = Date.now() - (totalTimeInSeconds - state.remainSec) * 1000;
+    state.startTimeStamp = Date.now();
     state.lastUpdateTimestamp = Date.now();
-
-    state.running=true;
+    state.running = true;
     updateTimerUI();
 
     if(state.interval) clearTimeout(state.interval);
     state.interval = setTimeout(timerTick, 0); 
-    
     window.__presence_broadcastNow?.();
   }
   
   function stopTimer(){
     if(!state.running) return;
-    state.running=false;
-    
-    if(state.interval){ 
-        clearTimeout(state.interval); 
-        state.interval=null; 
-    }
+    state.running = false;
+    if(state.interval){ clearTimeout(state.interval); state.interval=null; }
     
     const now = Date.now();
-    const elapsedRealSeconds = Math.floor((now - state.startTimeStamp) / 1000);
     const deltaSeconds = Math.floor((now - state.lastUpdateTimestamp) / 1000);
-    
-    if (state.mode === 'pomodoro') {
-      const originalTotalTime = (state.isWork ? state.workSec : state.restSec);
-      state.remainSec = originalTotalTime - elapsedRealSeconds;
-      if(state.isWork && deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
-    } else {
-      state.remainSec = elapsedRealSeconds;
-      if(deltaSeconds > 0) state.studyTimeTotal += deltaSeconds;
+    if (deltaSeconds > 0) {
+      if (state.mode === 'timer') {
+        state.remainSec += deltaSeconds;
+        state.studyTimeTotal += deltaSeconds;
+      } else if (state.isWork) {
+        state.studyTimeTotal += deltaSeconds;
+        state.remainSec = Math.max(0, state.remainSec - deltaSeconds);
+      }
     }
     
     state.startTimeStamp = 0; 
     state.lastUpdateTimestamp = 0; 
-
     updateTimerUI();
     window.__presence_broadcastNow?.();
     document.title = `Studywithme`;
   }
   
   function resetTimer(){
-    stopTimer();
-    state.isWork=true;
-    state.remainSec = (state.mode==='pomodoro') ? state.workSec : 0;
-    state.startTimeStamp = 0;
-    state.lastUpdateTimestamp = 0;
-    updateTimerUI();
-    document.title = `Studywithme`;
+    stopTimer(); state.isWork=true; state.remainSec = (state.mode==='pomodoro') ? state.workSec : 0;
+    state.startTimeStamp = 0; state.lastUpdateTimestamp = 0; updateTimerUI(); document.title = `Studywithme`;
   }
   
   document.getElementById("startPause").addEventListener("click", ()=> state.running?stopTimer():startTimer());
   document.getElementById("reset").addEventListener("click", resetTimer);
+  
   function updateCyclesBtn(){ 
-      const text = `${state.completedCycles}/${state.totalCycles}회`;
-      cyclesBtn.textContent = text;
-      cyclesBtn.title = text;
+      const text = `${state.completedCycles}/${state.totalCycles}회`; cyclesBtn.textContent = text; cyclesBtn.title = text;
   }
-
   function updateWindowToggleUI(){ 
-      const show = state.windowVisible;
-      toggleWindowBtn.textContent = getTranslation(show ? 'window_show' : 'window_hide');
-      windowBox.style.display = show ? "" : "none"; 
+      const show = state.windowVisible; toggleWindowBtn.textContent = getTranslation(show ? 'window_show' : 'window_hide'); windowBox.style.display = show ? "" : "none";
   }
   function updateCharacterToggleUI(){ 
-      const show = state.characterVisible;
-      toggleCharacterBtn.textContent = getTranslation(show ? 'character_show' : 'character_hide');
-      characterBox.style.display = show ? "" : "none"; 
+      const show = state.characterVisible; toggleCharacterBtn.textContent = getTranslation(show ? 'character_show' : 'character_hide'); characterBox.style.display = show ? "" : "none";
   }
 
   function setupLayoutDrag(){
@@ -1538,194 +1130,111 @@
     const DRAG_IDS = ['timer','board','window','character','music-controls'];
     const RESIZE_IDS = ['window','character'];
     const Z_TOP_CAP = 8999;
-
     const registry = new Map();
-    window.editOn = false; 
-    let zTop = 100;
-
+    window.editOn = false; let zTop = 100;
     const posKey = id => `pos-${id}`;
 
     function restorePositionsOnLoad(){
       DRAG_IDS.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
+        const el = document.getElementById(id); if(!el) return;
         const saved = localStorage.getItem(posKey(id));
-        if(saved){
-          const {left, top, width} = JSON.parse(saved);
-          absolutize(el);
-          place(el, left, top, width);
-        }
+        if(saved){ const {left, top, width} = JSON.parse(saved); absolutize(el); place(el, left, top, width); }
       });
     }
 
     function absolutize(el){
       if(registry.has(el.id)) return;
-      const rect = el.getBoundingClientRect();
-      const appRect = APP.getBoundingClientRect();
-
-      const ph = document.createElement('div');
-      ph.style.width  = rect.width + 'px';
-      ph.style.height = rect.height + 'px';
-      ph.style.visibility = 'hidden';
-      el.parentNode.insertBefore(ph, el);
-
-      el.style.position = 'absolute';
-      el.style.width    = rect.width + 'px';
-      el.style.left     = (rect.left - appRect.left + window.scrollX) + 'px';
-      el.style.top      = (rect.top  - appRect.top  + window.scrollY) + 'px';
-      el.style.zIndex   = (parseInt(el.style.zIndex||'10',10));
-      APP.appendChild(el);
-
+      const rect = el.getBoundingClientRect(); const appRect = APP.getBoundingClientRect();
+      const ph = document.createElement('div'); ph.style.width = rect.width + 'px'; ph.style.height = rect.height + 'px'; ph.style.visibility = 'hidden';
+      el.parentNode.insertBefore(ph, el); el.style.position = 'absolute'; el.style.width = rect.width + 'px';
+      el.style.left = (rect.left - appRect.left + window.scrollX) + 'px'; el.style.top = (rect.top - appRect.top + window.scrollY) + 'px';
+      el.style.zIndex = (parseInt(el.style.zIndex||'10',10)); APP.appendChild(el);
       if(el.classList.contains('resizable') && !el.querySelector('.resizer')){
-        const rz = document.createElement('div');
-        rz.className = 'resizer';
-        el.appendChild(rz);
+        const rz = document.createElement('div'); rz.className = 'resizer'; el.appendChild(rz);
       }
-
       registry.set(el.id, {el, placeholder: ph});
     }
 
-    function place(el, left, top, width){
-      if(width) el.style.width = width + 'px';
-      el.style.left = left + 'px';
-      el.style.top  = top  + 'px';
-    }
+    function place(el, left, top, width){ if(width) el.style.width = width + 'px'; el.style.left = left + 'px'; el.style.top = top + 'px'; }
 
     function setEditable(on){
-      window.editOn = on;
-      document.getElementById('app').classList.toggle('edit-on', on);
+      window.editOn = on; document.getElementById('app').classList.toggle('edit-on', on);
       layoutEditBtn.textContent = getTranslation(on ? 'layout_edit_on' : 'layout_edit_off');
-
       DRAG_IDS.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-
+        const el = document.getElementById(id); if(!el) return;
         if(on){
-          if(!registry.has(id)) absolutize(el);
-          el.classList.add('draggable');
-          enableDrag(el);
-          if(RESIZE_IDS.includes(id)) enableResize(el);
+          if(!registry.has(id)) absolutize(el); el.classList.add('draggable'); enableDrag(el); if(RESIZE_IDS.includes(id)) enableResize(el);
         }else{
-          el.classList.remove('draggable');
-          disableDrag(el);
-          if(RESIZE_IDS.includes(id)) disableResize(el);
+          el.classList.remove('draggable'); disableDrag(el); if(RESIZE_IDS.includes(id)) disableResize(el);
         }
       });
-
       document.querySelectorAll('.prop').forEach(el=>{
-        if(on){ enableDrag(el); enableResize(el); }
-        else  { disableDrag(el); disableResize(el); }
+        if(on){ enableDrag(el); enableResize(el); } else { disableDrag(el); disableResize(el); }
       });
     }
 
     window.__layoutSetEditable = setEditable;
     window.__layoutFocus = (pid)=>{
-      const el = document.querySelector(`.prop[data-pid="${pid}"]`);
-      if(!el) return;
-      el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
-      el.classList.add('selected');
-      setTimeout(()=> el.classList.remove('selected'), 1500);
-      el.scrollIntoView?.({behavior:'smooth', block:'center', inline:'center'});
+      const el = document.querySelector(`.prop[data-pid="${pid}"]`); if(!el) return;
+      el.style.zIndex = Math.min(++zTop, Z_TOP_CAP); el.classList.add('selected');
+      setTimeout(()=> el.classList.remove('selected'), 1500); el.scrollIntoView?.({behavior:'smooth', block:'center', inline:'center'});
     };
 
     function enableDrag(el){
       if(el._dragBound) return;
       const onDown = (e)=>{
-        if(!window.editOn) return;
-        if(e.target.classList && e.target.classList.contains('resizer')) return;
-
-        e.preventDefault();
-        el.classList.add('dragging');
-        el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
-
-        const startX = (e.touches? e.touches[0].clientX : e.clientX);
-        const startY = (e.touches? e.touches[0].clientY : e.clientY);
-        const startLeft = parseFloat(el.style.left)||0;
-        const startTop  = parseFloat(el.style.top)||0;
-
+        if(!window.editOn) return; if(e.target.classList && e.target.classList.contains('resizer')) return;
+        e.preventDefault(); el.classList.add('dragging'); el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
+        const startX = (e.touches? e.touches[0].clientX : e.clientX); const startY = (e.touches? e.touches[0].clientY : e.clientY);
+        const startLeft = parseFloat(el.style.left)||0; const startTop = parseFloat(el.style.top)||0;
         const move = (ev)=>{
-          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
-          const cy = (ev.touches? ev.touches[0].clientY : ev.clientY);
-          const dx = cx - startX;
-          const dy = cy - startY;
-          place(el, startLeft + dx, startTop + dy);
+          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX); const cy = (ev.touches? ev.touches[0].clientY : ev.clientY);
+          place(el, startLeft + (cx - startX), startTop + (cy - startY));
         };
         const up = ()=>{
-          document.removeEventListener('pointermove', move);
-          document.removeEventListener('pointerup', up);
-          document.removeEventListener('touchmove', move);
-          document.removeEventListener('touchend', up);
-          el.classList.remove('dragging');
-          persistPos(el);
+          document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up);
+          document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up);
+          el.classList.remove('dragging'); persistPos(el);
         };
-
-        document.addEventListener('pointermove', move);
-        document.addEventListener('pointerup', up);
-        document.addEventListener('touchmove', move, {passive:false});
-        document.addEventListener('touchend', up);
+        document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
+        document.addEventListener('touchmove', move, {passive:false}); document.addEventListener('touchend', up);
       };
-      el.addEventListener('pointerdown', onDown);
-      el.addEventListener('touchstart', onDown, {passive:false});
-      el._dragBound = onDown;
+      el.addEventListener('pointerdown', onDown); el.addEventListener('touchstart', onDown, {passive:false}); el._dragBound = onDown;
     }
+
     function disableDrag(el){
-      if(!el._dragBound) return;
-      el.removeEventListener('pointerdown', el._dragBound);
-      el.removeEventListener('touchstart', el._dragBound);
-      delete el._dragBound;
+      if(!el._dragBound) return; el.removeEventListener('pointerdown', el._dragBound); el.removeEventListener('touchstart', el._dragBound); delete el._dragBound;
     }
 
     function enableResize(el){
       if(el._resizeBound) return;
       const onDown = (e)=>{
-        if(!window.editOn) return;
-        if(!e.target.classList || !e.target.classList.contains('resizer')) return;
-        e.preventDefault();
-        el.classList.add('dragging');
-        el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
-
+        if(!window.editOn) return; if(!e.target.classList || !e.target.classList.contains('resizer')) return;
+        e.preventDefault(); el.classList.add('dragging'); el.style.zIndex = Math.min(++zTop, Z_TOP_CAP);
         const startX = (e.touches? e.touches[0].clientX : e.clientX);
         const startWidth = parseFloat(el.style.width) || el.getBoundingClientRect().width;
-
         const move = (ev)=>{
-          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX);
-          const dx = cx - startX;
-          const newW = Math.max(120, startWidth + dx);
-          el.style.width = newW + 'px';
+          const cx = (ev.touches? ev.touches[0].clientX : ev.clientX); el.style.width = Math.max(120, startWidth + (cx - startX)) + 'px';
         };
         const up = ()=>{
-          document.removeEventListener('pointermove', move);
-          document.removeEventListener('pointerup', up);
-          document.removeEventListener('touchmove', move);
-          document.removeEventListener('touchend', up);
-          el.classList.remove('dragging');
-          persistPos(el);
+          document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up);
+          document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up);
+          el.classList.remove('dragging'); persistPos(el);
         };
-
-        document.addEventListener('pointermove', move);
-        document.addEventListener('pointerup', up);
-        document.addEventListener('touchmove', move);
-        document.addEventListener('touchend', up);
+        document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
+        document.addEventListener('touchmove', move); document.addEventListener('touchend', up);
       };
-      el.addEventListener('pointerdown', onDown);
-      el.addEventListener('touchstart', onDown, {passive:false});
-      el._resizeBound = onDown;
+      el.addEventListener('pointerdown', onDown); el.addEventListener('touchstart', onDown, {passive:false}); el._resizeBound = onDown;
     }
+
     function disableResize(el){
-      if(!el._resizeBound) return;
-      el.removeEventListener('pointerdown', el._resizeBound);
-      el.removeEventListener('touchstart', el._resizeBound);
-      delete el._resizeBound;
+      if(!el._resizeBound) return; el.removeEventListener('pointerdown', el._resizeBound); el.removeEventListener('touchstart', el._resizeBound); delete el._resizeBound;
     }
 
     function persistPos(el){
-      const left = parseFloat(el.style.left)||0;
-      const top  = parseFloat(el.style.top)||0;
-      const width= parseFloat(el.style.width)||el.getBoundingClientRect().width;
-
+      const left = parseFloat(el.style.left)||0; const top = parseFloat(el.style.top)||0; const width= parseFloat(el.style.width)||el.getBoundingClientRect().width;
       if(el.classList.contains('prop')){
-        const id = el.dataset.pid;
-        const idx = state.props.findIndex(p=>p.id===id);
+        const id = el.dataset.pid; const idx = state.props.findIndex(p=>p.id===id);
         if(idx>=0){ state.props[idx].left=left; state.props[idx].top=top; state.props[idx].width=width; }
         localStorage.setItem('props-v1', JSON.stringify(state.props));
       }else{
@@ -1736,19 +1245,14 @@
     layoutResetBtn.addEventListener('click', ()=>{
       const snap = {
         mode: state.mode, isWork: state.isWork, running: state.running,
-        workSec: state.workSec, restSec: state.restSec, 
-        remainSec: calculateAccurateRemaining(),
+        workSec: state.workSec, restSec: state.restSec, remainSec: state.remainSec,
         totalCycles: state.totalCycles, completedCycles: state.completedCycles
       };
       sessionStorage.setItem('timer-keep', JSON.stringify(snap));
-
       DRAG_IDS.forEach(id=> localStorage.removeItem(`pos-${id}`));
-      localStorage.removeItem('props-v1');
-      localStorage.removeItem('ui-window-visible');
-      localStorage.removeItem('ui-character-visible');
+      localStorage.removeItem('props-v1'); localStorage.removeItem('ui-window-visible'); localStorage.removeItem('ui-character-visible');
       location.reload();
     });
-
     layoutEditBtn.addEventListener('click', ()=> setEditable(!window.editOn));
     restorePositionsOnLoad();
   }
@@ -1756,68 +1260,45 @@
   function renderProps(){
     propsLayer.innerHTML = '';
     state.props.forEach(p=>{
-      const el = document.createElement('div');
-      el.className = 'prop resizable';
-      el.dataset.pid = p.id;
-      el.style.left = (p.left ?? 40) + 'px';
-      el.style.top  = (p.top  ?? 40) + 'px';
-      el.style.width= (p.width?? 120) + 'px';
-      el.style.zIndex = 80;
-
-      const img = document.createElement('img');
-      img.src = p.url; img.alt = 'prop';
-      el.appendChild(img);
-
-      const rz = document.createElement('div'); rz.className='resizer'; el.appendChild(rz);
-      propsLayer.appendChild(el);
+      const el = document.createElement('div'); el.className = 'prop resizable'; el.dataset.pid = p.id;
+      el.style.left = (p.left ?? 40) + 'px'; el.style.top = (p.top ?? 40) + 'px'; el.style.width= (p.width?? 120) + 'px'; el.style.zIndex = 80;
+      const img = document.createElement('img'); img.src = p.url; img.alt = 'prop'; el.appendChild(img);
+      const rz = document.createElement('div'); rz.className='resizer'; el.appendChild(rz); propsLayer.appendChild(el);
     });
     renderPropList();
   }
+  
   function renderPropList(){
-    propList.innerHTML = '';
-    const fragment = document.createDocumentFragment();
+    propList.innerHTML = ''; const fragment = document.createDocumentFragment();
     state.props.forEach(p=>{
       const row = document.createElement('div'); row.className='todo';
       const tx  = document.createElement('div'); tx.className='txt';
       tx.innerHTML = `<img src="${p.url}" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:.5rem"> ${p.id}`;
       const del = document.createElement('button'); del.className='del'; del.textContent=getTranslation('delete');
       del.addEventListener('click', ()=>{
-        const idx = state.props.findIndex(x=>x.id===p.id);
-        if(idx>=0) state.props.splice(idx,1);
-        localStorage.setItem('props-v1', JSON.stringify(state.props));
-        renderProps();
+        const idx = state.props.findIndex(x=>x.id===p.id); if(idx>=0) state.props.splice(idx,1);
+        localStorage.setItem('props-v1', JSON.stringify(state.props)); renderProps();
       });
-      row.append(tx, del);
-      fragment.appendChild(row);
+      row.append(tx, del); fragment.appendChild(row);
     });
     propList.appendChild(fragment);
   }
+  
   function addProp(url, center=true, opts={}){
-    const id = 'prop-' + Date.now().toString(36);
-    const MINW = 120;
-    let left=40, top=40, width=MINW;
+    const id = 'prop-' + Date.now().toString(36); const MINW = 120; let left=40, top=40, width=MINW;
     if(center){
       const appRect = document.getElementById('app').getBoundingClientRect();
-      left = Math.max(0, Math.floor((appRect.width - width)/2));
-      top  = Math.max(0, Math.floor((appRect.height - width)/2));
+      left = Math.max(0, Math.floor((appRect.width - width)/2)); top = Math.max(0, Math.floor((appRect.height - width)/2));
     }
-    state.props.push({id, url, left, top, width});
-    localStorage.setItem('props-v1', JSON.stringify(state.props));
-    renderProps();
-
-    if(opts.autoEdit){
-      window.__layoutSetEditable?.(true);
-      setTimeout(()=> window.__layoutFocus?.(id), 0);
-    }
+    state.props.push({id, url, left, top, width}); localStorage.setItem('props-v1', JSON.stringify(state.props)); renderProps();
+    if(opts.autoEdit){ window.__layoutSetEditable?.(true); setTimeout(()=> window.__layoutFocus?.(id), 0); }
   }
 
   init();
 </script>
 
-<!-- ===== Supabase Presence & SQL Sync (실시간 및 데이터베이스 동기화) ===== -->
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 const SUPABASE_URL = "https://qdmeeqtumsstgfjhtuvt.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_82tiEHkGHsuIpiHedmdmOg_yF_YUr26";
 
@@ -1828,63 +1309,30 @@ const presenceToggle= document.getElementById("presenceToggle");
 const nicknameInput = document.getElementById("nickname");
 const applyNick     = document.getElementById("applyNick");
 
-function isSmartphone(){
-  const ua = navigator.userAgent || navigator.vendor || window.opera || "";
-  const looksMobileUA = /iPhone|iPod|Android.+Mobile|Mobi/i.test(ua);
-  const smallViewport = Math.min(window.innerWidth, window.innerHeight) <= 820;
-  return looksMobileUA && smallViewport;
-}
-
 let supabase = null;
 let channel  = null;
 let heartbeat= null;
 
 window.addEventListener('load', ()=>{ 
     const savedNick = localStorage.getItem("nickname");
-    if (savedNick) {
-        nicknameInput.value = savedNick;
-        meNickEl.textContent = savedNick;
-    }
-    
-    if (cfgReady() && savedNick && savedNick.trim() !== "") { 
-        goOnline(); 
-    }
+    if (savedNick) { nicknameInput.value = savedNick; meNickEl.textContent = savedNick; }
+    if (cfgReady() && savedNick && savedNick.trim() !== "") { goOnline(); }
 });
 
-function cfgReady(){
-  return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY;
-}
-
-function getKstIsoString() {
-  const kstOffset = 9 * 60 * 60 * 1000;
-  return new Date(Date.now() + kstOffset).toISOString();
-}
-
-function getKstDateString() {
-  return getKstIsoString().split('T')[0];
-}
+function cfgReady(){ return SUPABASE_URL.startsWith("https://") && !!SUPABASE_ANON_KEY; }
+function getKstIsoString() { const kstOffset = 9 * 60 * 60 * 1000; return new Date(Date.now() + kstOffset).toISOString(); }
+function getKstDateString() { return getKstIsoString().split('T')[0]; }
 
 function getSnapshot(){
   const st = window.state || {};
   let study = null;
-  
   if(st.shareStudy){
-    const now = Date.now();
-    let currentStudyTotal = st.studyTimeTotal;
-    
-    if (st.running && (st.mode === 'timer' || st.isWork)) {
-        const deltaSeconds = Math.floor((now - st.lastUpdateTimestamp) / 1000);
-        currentStudyTotal += deltaSeconds;
-    }
-    
-    study = currentStudyTotal || 0;
+    study = st.studyTimeTotal || 0;
   }
-  
   let status = "idle";
   if (st.running) {
       status = (st.mode === 'pomodoro') ? (st.isWork ? "work" : "break") : "timer";
   }
-  
   return { status, study };
 }
 
@@ -1892,17 +1340,14 @@ function fmtMin(sec){
     const s = sec|0;
     const h = Math.floor(s/3600);
     const m = Math.floor((s%3600)/60);
-    
-    if (s < 60) return `0${getTranslation('min_short')}`; 
+    if (s < 60) return `${s}${getTranslation('ko' ? '초' : 's')}`; 
     if(h > 0) return `${h}${getTranslation('hour_short')} ${m}${getTranslation('min_short')}`;
     return `${m}${getTranslation('min_short')}`;
 }
 
 function getTranslation(key) {
     const lang = window.state.lang;
-    if (window.TRANSLATIONS) {
-        return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key;
-    }
+    if (window.TRANSLATIONS) { return window.TRANSLATIONS[lang][key] || window.TRANSLATIONS['en'][key] || key; }
     const debugTranslations = {
         ko: { status_work: "집중중", status_break: "휴식중", status_idle: "대기중", timer_mode: "타이머", hour_short: "시간", min_short: "분", no_one_online: "아직 아무도 없어요" },
         en: { status_work: "Focusing", status_break: "Resting", status_idle: "Idle", timer_mode: "Timer Mode", hour_short: "h", min_short: "m", no_one_online: "No one online yet" }
@@ -1910,15 +1355,12 @@ function getTranslation(key) {
     return debugTranslations[lang]?.[key] || key;
 }
 
-// profiles & presence_status & study_records 테이블 동시 연동을 위한 함수
 async function writeDbPresence(profileId) {
   if (!supabase || !profileId) return;
   const snapshot = getSnapshot();
   const isFocusing = (snapshot.status === 'work' || snapshot.status === 'timer');
   const todaySeconds = snapshot.study || 0;
-  
   try {
-    // 1. 실시간 대시보드 상태 동기화 (presence_status)
     await supabase
       .from('presence_status')
       .upsert({
@@ -1927,21 +1369,15 @@ async function writeDbPresence(profileId) {
         today_seconds: todaySeconds,
         last_seen: new Date().toISOString()
       }, { onConflict: 'profile_id' });
-  } catch(e) {
-    console.error("DB Presence 기록 실패:", e);
-  }
+  } catch(e) { console.error("DB Presence 기록 실패:", e); }
 }
 
 async function syncDailyStudyRecordToDb() {
   const profileId = localStorage.getItem("profile_id");
   if (!supabase || !profileId) return;
-  
-  // 한국 표준시(KST) 기준 날짜 구하기 (YYYY-MM-DD)
   const todayKst = getKstDateString();
   const totalSeconds = window.state?.studyTimeTotal || 0;
-  
   try {
-    // 2. 일일 누적 공부 시간 백업 (study_records)
     await supabase
       .from('study_records')
       .upsert({
@@ -1950,19 +1386,13 @@ async function syncDailyStudyRecordToDb() {
         seconds: totalSeconds,
         updated_at: new Date().toISOString()
       }, { onConflict: 'profile_id, study_date' });
-  } catch(e) {
-    console.error("DB 일일 기록 백업 실패:", e);
-  }
+  } catch(e) { console.error("DB 일일 기록 백업 실패:", e); }
 }
 
-// DB의 presence_status 테이블과 Supabase Presence(실시간 채널) 목록을 안전하게 가공하여 병합 렌더링 (Rule 2: Join 에러 원천 차단)
 async function fetchAndRenderCombinedPresence() {
   if (!supabase) return;
-  
-  const presenceMap = new Map(); // nick -> { status, study }
+  const presenceMap = new Map(); 
   const myNick = (nicknameInput.value || "").trim();
-  
-  // 1. 데이터베이스에서 최근 3분 동안 업데이트된 활성 사용자 정보 가져오기
   try {
     const threeMinutesAgo = new Date(Date.now() - 180000).toISOString();
     const { data, error } = await supabase
@@ -1974,78 +1404,37 @@ async function fetchAndRenderCombinedPresence() {
         profiles ( nickname, is_public )
       `)
       .gt('last_seen', threeMinutesAgo);
-
     if (!error && data) {
       data.forEach(row => {
         const profile = row.profiles;
-        if (!profile || profile.is_public === false) return; // 비공개 사용자 제외
-        
-        const nick = profile.nickname;
-        if (!nick || nick === 'anonymous') return;
-        
+        if (!profile || profile.is_public === false) return; 
+        const nick = profile.nickname; if (!nick || nick === 'anonymous') return;
         const isMe = (nick === myNick);
-        
         let status = "idle";
-        if (isMe) {
-          status = getSnapshot().status;
-        } else {
-          status = row.is_focusing ? "work" : "idle";
-        }
-        
+        if (isMe) { status = getSnapshot().status; } else { status = row.is_focusing ? "work" : "idle"; }
         const study = isMe ? (window.state?.studyTimeTotal || 0) : row.today_seconds;
-
-        presenceMap.set(nick, {
-          status,
-          study: window.state?.shareStudy || !isMe ? study : null
-        });
+        presenceMap.set(nick, { status, study: window.state?.shareStudy || !isMe ? study : null });
       });
     }
-  } catch(e) {
-    console.error("SQL 실시간 목록 로드 실패:", e);
-  }
+  } catch(e) { console.error("SQL 실시간 목록 로드 실패:", e); }
 
-  // 2. 인메모리 Presence 채널의 유저 정보 병합 (DB 미반영분 보정)
   if (channel) {
     const realtimeState = channel.presenceState();
     for (const [nick, metas] of Object.entries(realtimeState)) {
       if (nick === 'anonymous' || !metas || metas.length === 0) continue;
       const meta = metas[metas.length - 1] || {};
-      
-      if (!presenceMap.has(nick)) {
-        presenceMap.set(nick, {
-          status: meta.status || "idle",
-          study: meta.study
-        });
-      }
+      if (!presenceMap.has(nick)) { presenceMap.set(nick, { status: meta.status || "idle", study: meta.study }); }
     }
   }
 
-  // 3. 렌더링
   const items = [];
   for (const [nick, info] of presenceMap.entries()) {
-    const status = info.status;
-    const study = info.study;
-
-    let statusKey = 'status_idle';
-    let dotClass = 'dot';
-    
-    if (status === 'work' || status === 'timer') {
-        statusKey = 'status_work';
-        dotClass += ' work';
-    } else if (status === 'break') {
-        statusKey = 'status_break';
-        dotClass += ' break';
-    } else {
-        statusKey = 'status_idle';
-    }
-
+    const status = info.status; const study = info.study;
+    let statusKey = 'status_idle'; let dotClass = 'dot';
+    if (status === 'work' || status === 'timer') { statusKey = 'status_work'; dotClass += ' work'; } 
+    else if (status === 'break') { statusKey = 'status_break'; dotClass += ' break'; }
     let rightTxt = getTranslation(statusKey);
-    
-    if (study !== null && typeof study === 'number') {
-      const studyTimeText = fmtMin(study);
-      rightTxt = `${getTranslation(statusKey)} · 누적 ${studyTimeText}`; 
-    }
-    
+    if (study !== null && typeof study === 'number') { rightTxt = `${getTranslation(statusKey)} · 누적 ${fmtMin(study)}`; }
     items.push(
       `<div class="person">
          <div><span class="${dotClass}"></span><span class="nick">${nick}</span></div>
@@ -2053,183 +1442,91 @@ async function fetchAndRenderCombinedPresence() {
        </div>`
     );
   }
-  
   const noOneOnlineText = getTranslation('no_one_online');
   const filteredItems = items.filter(item => !item.includes('<span class="nick">anonymous</span>'));
-
   presenceList.innerHTML = filteredItems.slice(0, 5).join("") || `<div style="opacity:.8">${noOneOnlineText}</div>`;
 }
 
 async function updateProfileShareStudy(shareStudy) {
-  const profileId = localStorage.getItem("profile_id");
-  if (!supabase || !profileId) return;
+  const profileId = localStorage.getItem("profile_id"); if (!supabase || !profileId) return;
   try {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ share_study: !!shareStudy })
-      .eq('id', profileId);
-    if (error) console.warn("profiles.share_study 업데이트 실패:", error);
-  } catch (e) {
-    console.warn("profiles.share_study 업데이트 중 예외:", e);
-  }
+    await supabase.from('profiles').update({ share_study: !!shareStudy }).eq('id', profileId);
+  } catch (e) { console.warn("profiles.share_study 업데이트 예외:", e); }
 }
 window.__presence_updateProfileShareStudy = updateProfileShareStudy;
 
-// 타이머 작동이나 상태 변경 시 DB 및 실시간 채널에 동시 통보하는 함수로 개선
 window.__presence_broadcastNow = async function(){
   if(!channel) return;
   try {
     await channel.track(getSnapshot()); 
     const profileId = localStorage.getItem("profile_id");
-    if (profileId) {
-      await writeDbPresence(profileId);
-      await syncDailyStudyRecordToDb();
-    }
-  } catch(e) {
-    console.error("공부 상태 동기화 실패:", e);
-  }
+    if (profileId) { await writeDbPresence(profileId); await syncDailyStudyRecordToDb(); }
+  } catch(e) { console.error("공부 상태 동기화 실패:", e); }
 };
 
 window.__presence_goOnline = goOnline;
 window.__presence_goOffline = goOffline;
 
 async function goOnline(){
-  if(!cfgReady()){ 
-      console.error("Supabase 설정이 준비되지 않았습니다. URL 및 ANON_KEY를 확인하세요.");
-      presencePanel.style.display = "none";
-      return; 
-  }
+  if(!cfgReady()){ presencePanel.style.display = "none"; return; }
   if(!supabase) supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   const myNick = (nicknameInput.value || "").trim();
-  if (myNick === "" || myNick === "anonymous") {
-      goOffline();
-      return; 
-  }
+  if (myNick === "" || myNick === "anonymous") { goOffline(); return; }
   
-  localStorage.setItem("nickname", myNick); 
-  meNickEl.textContent = myNick;
-  presencePanel.style.display = "block";
-
-  // --- DB 연동: profiles 조회 및 생성 ---
+  localStorage.setItem("nickname", myNick); meNickEl.textContent = myNick; presencePanel.style.display = "block";
   try {
-    let { data: profile, error: pErr } = await supabase
-      .from('profiles')
-      .select('id, nickname, is_public, share_study')
-      .eq('nickname', myNick)
-      .maybeSingle();
-
-    if (pErr) console.warn("profiles 조회 실패:", pErr);
-
+    let { data: profile, error: pErr } = await supabase.from('profiles').select('id, nickname, is_public, share_study').eq('nickname', myNick).maybeSingle();
     let profileId;
     if (profile) {
       profileId = profile.id;
       if (typeof profile.share_study === 'boolean') {
-        window.state.shareStudy = profile.share_study;
-        localStorage.setItem('shareStudy', profile.share_study ? "1" : "0");
-      } else {
-        await updateProfileShareStudy(window.state?.shareStudy ?? true);
-      }
+        window.state.shareStudy = profile.share_study; localStorage.setItem('shareStudy', profile.share_study ? "1" : "0");
+      } else { await updateProfileShareStudy(window.state?.shareStudy ?? true); }
     } else {
-      const { data: newProfile, error: insErr } = await supabase
-        .from('profiles')
-        .insert({ nickname: myNick, is_public: true, share_study: window.state?.shareStudy ?? true })
-        .select('id')
-        .single();
-      if (insErr) console.warn("profiles 생성 실패:", insErr);
-      if (!insErr && newProfile) {
-        profileId = newProfile.id;
-      }
+      const { data: newProfile, error: insErr } = await supabase.from('profiles').insert({ nickname: myNick, is_public: true, share_study: window.state?.shareStudy ?? true }).select('id').single();
+      if (!insErr && newProfile) profileId = newProfile.id;
     }
-    
-    if (profileId) {
-      localStorage.setItem("profile_id", profileId);
-      await writeDbPresence(profileId);
-      await syncDailyStudyRecordToDb();
-    }
-  } catch(e) {
-    console.error("DB 사용자 연동 실패:", e);
-  }
+    if (profileId) { localStorage.setItem("profile_id", profileId); await writeDbPresence(profileId); await syncDailyStudyRecordToDb(); }
+  } catch(e) { console.error("DB 사용자 연동 실패:", e); }
 
-  // 실시간 Presence 채널 구독 및 동기화
-  if (channel) {
-      await channel.unsubscribe();
-      if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
-  }
-
+  if (channel) { await channel.unsubscribe(); if(heartbeat){ clearInterval(heartbeat); heartbeat = null; } }
   channel = supabase.channel("studyroom", { config: { presence: { key: myNick } } });
-  
-  channel.on("presence", { event: "sync" }, ()=>{ 
-    fetchAndRenderCombinedPresence(); 
-  });
-
+  channel.on("presence", { event: "sync" }, ()=>{ fetchAndRenderCombinedPresence(); });
   channel.subscribe(async (status, err)=>{
     if (status === "SUBSCRIBED") {
-      console.log("Supabase Realtime 연결 성공!");
-      try{ await channel.track(getSnapshot()); }catch(e){ console.error("Track 에러:", e); }
-      
+      try{ await channel.track(getSnapshot()); }catch(e){}
       if(heartbeat) clearInterval(heartbeat);
-      // 15초 간격으로 실시간 채널 Track, DB Presence 상태 업데이트 및 리스트 갱신 수행
       heartbeat = setInterval(async ()=>{ 
           try {
             await channel.track(getSnapshot()); 
             const profileId = localStorage.getItem("profile_id");
-            if (profileId) {
-              await writeDbPresence(profileId);
-              await syncDailyStudyRecordToDb();
-            }
+            if (profileId) { await writeDbPresence(profileId); await syncDailyStudyRecordToDb(); }
             await fetchAndRenderCombinedPresence();
           } catch(e){} 
       }, 15000);
-    } else if (status === "CHANNEL_ERROR") {
-      console.error("Supabase Realtime 채널 오류 발생! Realtime 기능 활성화를 점검하세요.", err);
-    } else if (status === "TIMED_OUT") {
-      console.warn("Supabase Realtime 연결 제한 시간 초과. 재연결을 시도합니다.");
     }
   });
-
-  await fetchAndRenderCombinedPresence();
-  presenceToggle.textContent = getTranslation('public_on');
+  await fetchAndRenderCombinedPresence(); presenceToggle.textContent = getTranslation('public_on');
 }
 
 async function goOffline(){
   if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
-  
-  // 오프라인 전환 시 DB의 presence_status에서 실시간 갱신 시간을 과거로 밀어 목록에서 즉시 제거
   const profileId = localStorage.getItem("profile_id");
   if (profileId && supabase) {
     try {
-      await supabase
-        .from('presence_status')
-        .upsert({
-          profile_id: profileId,
-          is_focusing: false,
-          last_seen: new Date(Date.now() - 300000).toISOString() // 5분 전으로 처리하여 목록 즉각 제외
-        }, { onConflict: 'profile_id' });
+      await supabase.from('presence_status').upsert({ profile_id: profileId, is_focusing: false, last_seen: new Date(Date.now() - 300000).toISOString() }, { onConflict: 'profile_id' });
     } catch(e){}
   }
-
   if(channel){ try{ await channel.unsubscribe(); }catch{} }
-  channel = null;
-  presenceToggle.textContent = getTranslation('public_off');
-  presencePanel.style.display = "none";
-  presenceList.innerHTML = "";
+  channel = null; presenceToggle.textContent = getTranslation('public_off'); presencePanel.style.display = "none"; presenceList.innerHTML = "";
 }
 
 applyNick?.addEventListener('click', goOnline);
-
 nicknameInput.addEventListener('input', ()=>{
-    const currentNick = nicknameInput.value.trim();
-    localStorage.setItem("nickname", currentNick);
-    meNickEl.textContent = currentNick;
-    if (currentNick === "" && channel) {
-        goOffline(); 
-    }
+    const currentNick = nicknameInput.value.trim(); localStorage.setItem("nickname", currentNick); meNickEl.textContent = currentNick;
+    if (currentNick === "" && channel) { goOffline(); }
 });
-
-presenceToggle?.addEventListener("click", async ()=>{
-  if(!channel){ await goOnline(); } else { await goOffline(); }
-});
+presenceToggle?.addEventListener("click", async ()=>{ if(!channel){ await goOnline(); } else { await goOffline(); } });
 </script>
 </body>
 </html>
